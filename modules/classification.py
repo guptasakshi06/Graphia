@@ -1,4 +1,4 @@
-"""Small, conservative rules for the demonstration document titles.
+"""Small, conservative rules for supported document titles.
 
 Input is OCR text, never a filename. Matching uses a temporary normalized copy;
 callers must retain the original OCR text for display and later extraction.
@@ -8,11 +8,12 @@ No image, OCR engine, Streamlit, or third-party package is required here.
 import re
 
 
-# These phrases identify our fictional layouts, not official documents.
+OBC_CERTIFICATE_HEADING = "form of certificate to be produced by other backward classes"
+
 # Keep order fixed so evidence and test results are reproducible.
 TITLE_KEYWORDS = {
     "income_certificate": ("income certificate",),
-    "caste_certificate": ("caste certificate",),
+    "caste_certificate": ("caste certificate", OBC_CERTIFICATE_HEADING),
     "marksheet": ("marksheet", "mark sheet"),
     "identity_proof": ("identity proof",),
 }

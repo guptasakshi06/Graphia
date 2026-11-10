@@ -14,6 +14,31 @@ EMPTY_FIELDS = dict.fromkeys(FIELD_KEYS)
 
 
 class ExtractionTests(unittest.TestCase):
+    def test_obc_form_uses_holder_sentence_and_labeled_certificate_number(self):
+        heading = ("FORM OF CERTIFICATE TO BE PRODUCED BY\n"
+                   "OTHER BACKWARD CLASSES")
+        body = (
+            "\nआवेदन क्र० 000000000000001\nप्रमाणपत्र क०.. 000000000042\n"
+            "This is to certify that Asha\nExample son/daughter of Other Example."
+        )
+        text = heading + body
+        self.assertEqual(classify_document(text)["doc_type"], "caste_certificate")
+        self.assertEqual(extract_fields(text, "caste_certificate"), {
+            **EMPTY_FIELDS, "student_name": "Asha Example", "certificate_number": "000000000042",
+        })
+        self.assertEqual(classify_document("Other Backward Classes" + body)["doc_type"], "unknown")
+        self.assertEqual(extract_fields("Caste Certificate" + body, "caste_certificate"), EMPTY_FIELDS)
+        self.assertEqual(classify_document("Income Certificate\n" + text)["doc_type"], "unknown")
+
+        conflicts = text + (
+            "\nप्रमाण पत्र क्र०: 000000000043\n"
+            "This is to certify that Bela Example daughter of Other Example."
+        )
+        self.assertEqual(extract_fields(conflicts, "caste_certificate"), EMPTY_FIELDS)
+
+        application_only = text.replace("प्रमाणपत्र क०.. 000000000042\n", "")
+        self.assertIsNone(extract_fields(application_only, "caste_certificate")["certificate_number"])
+
     def test_all_reference_cases_through_classifier_and_extractor(self):
         fixtures = json.loads(
             (Path(__file__).parent / "fixtures" / "rule_cases.json").read_text(encoding="utf-8")

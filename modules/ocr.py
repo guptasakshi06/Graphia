@@ -36,6 +36,12 @@ def extract_text(image, lang="eng", psm=6, timeout=20):
     # Pytesseract interprets 3-channel arrays as RGB, unlike OpenCV's BGR.
     prepared = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if image.ndim == 3 else image.copy()
     try:
+        if "+" in lang:
+            # Tesseract can return English text even if the requested second model is missing.
+            missing = sorted(set(lang.split("+")) - set(pytesseract.get_languages()))
+            if missing:
+                result["error"] = "Missing Tesseract language data: " + ", ".join(missing)
+                return result
         text = pytesseract.image_to_string(prepared, lang=lang,
                                           config=f"--psm {int(psm)}", timeout=float(timeout))
     except pytesseract.TesseractNotFoundError:

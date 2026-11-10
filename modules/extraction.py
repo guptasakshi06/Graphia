@@ -1,12 +1,14 @@
-"""Conservative extraction for labeled, fictional demonstration layouts.
+"""Conservative extraction for supported document layouts.
 
-Values must follow a supported label and colon on the same line. No OCR
-correction, arbitrary-number fallback, image/OCR/UI dependency or identity
-verification is performed. Callers retain the original OCR text separately.
+Most values follow a supported label on the same line. The supported OBC form
+also identifies the holder in a certification sentence. Callers retain the
+original OCR text separately.
 """
 
 from datetime import date
 import re
+
+from modules.classification import OBC_CERTIFICATE_HEADING
 
 
 FIELD_KEYS = ("student_name", "certificate_number", "application_id", "issue_date")
@@ -24,6 +26,16 @@ LABEL_PATTERN = re.compile(
     r"[ \t]*(?P<label>Student[ \t]+Name|Certificate[ \t]+(?:Number|No\.?)|"
     r"Application[ \t]+ID|Issue[ \t]+Date)[ \t]*:[ \t]*(?P<value>.*?)[ \t]*",
     re.IGNORECASE | re.ASCII,
+)
+OBC_HOLDER_PATTERN = re.compile(
+    r"\bthis is to certify that[ \t]+"
+    r"(?P<name>[A-Za-z][A-Za-z .'-]{1,79}?)"
+    r"[ \t]+(?:son\s*/\s*daughter|son|daughter)[ \t]+of\b",
+    re.IGNORECASE | re.ASCII,
+)
+OBC_CERTIFICATE_NUMBER_PATTERN = re.compile(
+    r"[ \t]*प्रमाण[ \t]*पत्र(?:[ \t]+(?:क्र|क)[०॰]?\.{0,2})?"
+    r"[ \t]*:?[ \t]*(?P<value>[0-9]+)[ \t]*"
 )
 MISSING_MARKERS = {
     "", "unknown", "unreadable", "not found", "not found / unreadable",
@@ -100,6 +112,19 @@ def extract_fields(text, doc_type):
         if field == "certificate_number" and doc_type not in CERTIFICATE_PREFIXES:
             continue
         candidates[field].append(_validate_value(field, match.group("value"), doc_type))
+
+    if doc_type == "caste_certificate":
+        normalized = " ".join(text.split())
+        if OBC_CERTIFICATE_HEADING in normalized.casefold():
+            for match in OBC_HOLDER_PATTERN.finditer(normalized):
+                candidates["student_name"].append(
+                    _validate_value("student_name", match.group("name"), doc_type)
+                )
+            for line in text.splitlines():
+                if match := OBC_CERTIFICATE_NUMBER_PATTERN.fullmatch(line):
+                    candidates["certificate_number"].append(
+                        _validate_value("certificate_number", match.group("value"), doc_type)
+                    )
 
     for field, values in candidates.items():
         if values and None not in values and len(set(values)) == 1:

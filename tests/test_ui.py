@@ -261,6 +261,14 @@ class StreamlitInteractionTests(unittest.TestCase):
             self.assertEqual(len(at.exception), 0)
         self.assertEqual(at.session_state["analysis"]["report"]["documents"][0]["fields"]["student_name"],
                          "Bela Example")
+        language = next(widget for widget in at.selectbox if widget.label == "OCR language")
+        language.set_value("English + Hindi").run()
+        self.assertNotIn("analysis", at.session_state)
+        self.assertEqual(len(at.get("download_button")), 0)
+        self.analyze(at)
+        document = at.session_state["analysis"]["report"]["documents"][0]
+        for source in ("original", "processed"):
+            self.assertEqual(document["ocr_" + source]["engine_config"], app.BILINGUAL_ENGINE)
         # Different file bytes/count trigger the same production invalidation path.
         with patch("test_ui.fixture_uploads", return_value=[FictionalUpload(data=b"new bytes")]):
             at.run()
