@@ -1,0 +1,30 @@
+PASS single (1, 1, 1, 4, 25.0, 25.0, 'Incomplete')
+PASS complete (4, 4, 4, 4, 100.0, 100.0, 'Ready')
+PASS missing (3, 3, 3, 4, 75.0, 75.0, 'Incomplete')
+PASS unusable (4, 4, 3, 4, 100.0, 75.0, 'Needs Attention')
+PASS edge_batch (9, 4, 3, 4, 100.0, 75.0, 'Needs Attention')
+PASS checklist_subset (9, 3, 3, 3, 100.0, 100.0, 'Ready')
+PASS original_source (9, 3, 3, 3, 100.0, 100.0, 'Ready')
+PASS changed_settings (9, 3, 3, 3, 100.0, 100.0, 'Ready')
+PASS checklist settled DOM has no stale report or downloads
+PASS source settled DOM has no stale report or downloads
+PASS settings settled DOM has no stale report or downloads
+PASS: browser JSON counts, types, expected fields, six stages, source/settings, negative cases and Markdown payloads.
+{
+  "status": "PASS",
+  "frozen_files": 387,
+  "samples": 8,
+  "conditions": {
+    "clear": 4,
+    "low_contrast": 1,
+    "noisy": 1,
+    "slightly_blurred": 2
+  },
+  "comparison_groups": 7,
+  "measured_method_rows": 112,
+  "sg05_reproduction_files_identical": 282,
+  "browser_scenarios": 8,
+  "screenshots": 15,
+  "fresh_ocr_calls_in_this_audit": 0,
+  "fresh_browser_run_in_this_audit": false
+}

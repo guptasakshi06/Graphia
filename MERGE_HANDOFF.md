@@ -5,9 +5,9 @@
 ## Current position
 
 - Integration lead: **Sakshi Gupta**. Application/presentation reviewer: **Jigisha Baiswar**.
-- Updated: 2026-11-10 14:40 Asia/Kolkata; **M01 DONE**, both complete build tracks integrated, verified and synchronized locally.
-- Active checkpoint: none; **M01 completed and verified**.
-- Next checkpoint: **M02**, waiting for SG05 and JB05 DONE/READY. Both are now eligible in their synchronized personal checkouts.
+- Updated: 2026-11-10 15:59 Asia/Kolkata; **M02 IN_PROGRESS**, both live validation tracks verified ready at clean cutoffs.
+- Active checkpoint: **M02**, merge validation evidence and verify the freeze.
+- Next checkpoint after M02: **M03**, requires SG06 and JB06; neither submission sprint starts before M02 synchronization.
 - Integration checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
 - Integration branch: `codex/integration`; verified M01 code/evidence baseline `c1c155d5ab9368f13ede5781470ff4cc0673d38a` synchronized into both tracks; completion metadata commit follows.
 - Sakshi branch/checkout: `codex/sakshi-dip`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`.
@@ -24,7 +24,7 @@ Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` an
 |---|---|---|---|---|
 | M00 | Planning files | DONE | Tested baseline, fixed interfaces, two separate checkouts | `M00` single root commit; `docs/merge/M00.md` + JSON evidence |
 | M01 | M00, SG01–SG04, JB01–JB04 | DONE | Real integrated application with first complete upload test | `c1c155d`; `docs/merge/M01.md`; synchronized both tracks |
-| M02 | M01, SG05, JB05 | TODO | Frozen tested code and measured evidence for report/slides | — |
+| M02 | M01, SG05, JB05 | IN_PROGRESS | Frozen tested code and measured evidence for report/slides | Stable cutoffs recorded below; verification pending |
 | M03 | M02, SG06, JB06 | TODO | Verified submission package and final master status | — |
 
 ## General merge rules
@@ -272,3 +272,18 @@ Update this file and the master at every checkpoint or interruption. When person
 - Exact next Sakshi action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG05 only. Verify the work and update the handoff before stopping.`
 - Exact next Jigisha action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB05 only. Verify the work and update the handoff before stopping.`
 - Next merge requires both SG05 and JB05 from these synchronized checkouts; use `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md` for M02. Stop after final metadata synchronization.
+
+### M02 — 2026-11-10 15:59 Asia/Kolkata — session 1 — start
+- TODO → IN_PROGRESS. Read project instructions, master, original brief, contract v1, M00/M01 foundation evidence, both live personal handoffs and validation summaries.
+- Integration root / codex/integration starts clean at `183ff6bfa6e67e2156eafc282044eb151e07ad39`.
+- Sakshi: worktrees/sakshi / codex/sakshi-dip / `c98d89370960faeb2fb626ae270669769627fb4c`, clean, SG05 DONE/READY, SG06 TODO; correct Sakshi author/committer.
+- Jigisha: worktrees/jigisha / codex/jigisha-app / `80a38e4eb4cf0de179d581a1ab1e38f073fbc22f`, clean, JB05 DONE/READY, JB06 TODO; correct Jigisha author/committer.
+- Both validation commits descend from synchronized M01 `183ff6b`; changed-file inventories are owner evidence/runner/tests/handoffs only. Production app/modules/config/dataset/contract/dependencies unchanged in both; no unresolved peer requests or required student action in either track. No active edits observed.
+- Merge sequentially preserving both authors; audit source/data/evidence hashes, all seven comparisons, browser downloads/scenarios/state invalidation and full regression/environment. Freeze only after actual checks. Preserve raw outputs/screenshots, no new features/defaults, no SG06/JB06/M03/main update/push.
+
+### M02 — 2026-11-10 16:02 Asia/Kolkata — session 1 — verification checkpoint
+- M02 IN_PROGRESS for completion synchronization only. Sakshi c98d893 and Jigisha 80a38e4 merged sequentially with normal merge commits c335709 / bc35ef9, no conflicts. No owner behavior/API/default/dependency fixes required; production remains M01 183ff6b.
+- PASS: 107 tests in 8.409s; environment/imports/Tesseract eng+osd/pip; compile/diff; 387-file frozen inventory; matching references/source hashes; all seven comparisons/112 method rows; stored 282/282 independent repeat hashes; eight actual browser download scenarios, three exact Markdown pairs and three settled invalidation DOMs; all 15 screenshot hashes/decodes. No fresh browser/whole experiment rerun or human review claimed.
+- Final results/paths/limitations and snapshot caveats in docs/merge/M02.md. Original/default CER0 is a tie; related synthetic samples do not prove general accuracy. Historical SG05/JB05 candidate wording preserved in raw evidence and superseded by the merge freeze. No invalidated evidence or required student action.
+- Master delivery tracker and integrated personal annotations updated; local verified-freeze commit and sequential forward synchronization next. No SG06/JB06/M03/main update/push. Source worktrees must be rechecked clean/stable before each synchronization.
+- A documentation helper initially rejected an outdated SG05 ledger string before writing personal records; corrected against the actual row, with no source/evidence change or effect on passing checks.

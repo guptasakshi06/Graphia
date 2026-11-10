@@ -10,10 +10,10 @@
 - **Integration lead:** Sakshi Gupta; Jigisha reviews the application and presentation. A merge chat performs the concrete integration work, rather than asking either person to manually combine code snippets.
 - **Planning date:** 2026-11-10, Asia/Kolkata. Update local timestamps during actual work.
 - **Workspace/integration checkout:** `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- **Current phase:** **M01 DONE**; SG01–SG04 and JB01–JB04 merged, verified and synchronized locally.
-- **Next shared action:** **M02** waits for verified SG05 and JB05.
-- **Next Sakshi action:** **SG05**, eligible from the synchronized M01 baseline; use Sakshi’s live checkout handoff.
-- **Next Jigisha action:** **JB05**, eligible from the synchronized M01 baseline; use Jigisha’s live checkout handoff.
+- **Current phase:** **M02 IN_PROGRESS**; SG05/JB05 evidence merged and verified; freeze synchronization pending.
+- **Next shared action:** finish M02 synchronization; then M03 waits for verified SG06 and JB06.
+- **Next Sakshi action:** **SG06** after M02 synchronization; use Sakshi’s live checkout handoff and frozen evidence.
+- **Next Jigisha action:** **JB06** after M02 synchronization; use Jigisha’s live checkout handoff and frozen evidence.
 - **Original full requirements:** `PROJECT_BRIEF.md`, preserved without edits.
 - **Time budget:** Two focused days. Work estimates are targets, not calendar deadlines.
 
@@ -89,7 +89,7 @@ No shared experiment script or combined report file should be edited by both tra
 
 Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, plus a buffer of up to an hour each day. Individual sprint durations are not promises. The workload is parallel, so do not add both people's hours as elapsed project time. Keep optional features out if buffers are consumed.
 
-### Master status snapshot — M01 completion, 2026-11-10 14:40 Asia/Kolkata
+### Master status snapshot — M02 evidence verified, 2026-11-10 16:02 Asia/Kolkata
 
 | Track | Sprints/checkpoints | Status | Merged state |
 |---|---|---|---|
@@ -97,9 +97,9 @@ Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, pl
 | Sakshi build | SG01–SG04 | DONE | Merged at M01, source cutoff `93a07b1`, merge `8951039` |
 | Jigisha build | JB01–JB04 | DONE | Merged at M01, source cutoff `5bbd086`, merge `a8a0208` |
 | Code integration | M01 | DONE | `c1c155d` verified code/evidence synchronized into both tracks |
-| Sakshi validation | SG05 | TODO | Not merged |
-| Jigisha validation | JB05 | TODO | Not merged |
-| Evidence integration | M02 | TODO | Waiting for both validation tracks |
+| Sakshi validation | SG05 | DONE | Merged at M02 from c98d893 through c335709 |
+| Jigisha validation | JB05 | DONE | Merged at M02 from 80a38e4 through bc35ef9 |
+| Evidence integration | M02 | IN_PROGRESS | Verified freeze bc35ef9; synchronization pending |
 | Sakshi report | SG06 | TODO | Not merged |
 | Jigisha slides/viva | JB06 | TODO | Not merged |
 | Final integration | M03 | TODO | Waiting for both submission tracks |
@@ -181,11 +181,11 @@ Deep learning, TensorFlow/PyTorch, CNNs, transformers, LLM services, cloud deplo
 |---|---|---|---|
 | Environment/dependencies/source organization | M00, M03 | M00 DONE; final audit at M03 | `requirements.txt`, `scripts/check_environment.py`, `docs/merge/M00*.json` |
 | Dataset + references + provenance | SG01 | DONE, merged at M01 | `dataset/manifest.json`, `dataset/visual_review.json` |
-| DIP pipeline + all comparisons | SG02–SG05 | Build DONE/merged; final validation SG05 | `modules/preprocessing.py`, `outputs/experiments/SG02/`, `outputs/experiments/SG03/` |
-| OCR + measured results/raw outputs | SG04–SG05 | Build/preliminary CER DONE/merged; SG05 pending | `modules/ocr.py`, `outputs/experiments/SG04/` |
+| DIP pipeline + all comparisons | SG02–SG05 | DONE; merged/verified at M02 | `modules/preprocessing.py`, `outputs/experiments/SG05/` |
+| OCR + measured results/raw outputs | SG04–SG05 | DONE; final SG05 evidence verified at M02 | `modules/ocr.py`, `outputs/experiments/SG05/metrics.json`, `outputs/experiments/SG05/summary.csv` |
 | Classification/fields/readiness/report export | JB01–JB03 | DONE, merged at M01 | `modules/classification.py`, `modules/extraction.py`, `modules/readiness.py`, `config/requirements.json` |
-| Real integrated Streamlit application | JB04, M01, JB05 | M01 real flow PASS; final scenarios JB05 | `app.py`, `docs/merge/M01.md` |
-| Final experiment tables + screenshots | SG05, JB05, M02 | TODO | — |
+| Real integrated Streamlit application | JB04, M01, JB05 | DONE; actual browser scenarios verified at M02 | `app.py`, `docs/validation/jigisha.md`, `outputs/reports/JB05/` |
+| Final experiment tables + screenshots | SG05, JB05, M02 | Verified at M02; synchronization pending | `docs/merge/M02.md`, `docs/merge/M02-freeze.json`, `outputs/experiments/SG05/`, `outputs/screenshots/JB05/` |
 | README | M03 | Starter setup guide written; final guide at M03 | `README.md` |
 | Academic report, editable source + usable artifact | SG06 | TODO | — |
 | Actual PowerPoint `.pptx` | JB06 | TODO | — |
@@ -207,7 +207,7 @@ Current Git baseline: single root commit named `M00` (resolve with `git rev-list
 | Contract-first rules/UI development | Jigisha need not wait for Sakshi's OCR implementation |
 | Merge real code before final experiments and submission artifacts | Ensure all report/slide claims match the actual integrated application |
 
-Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; final integrated dataset/browser validation (SG05/JB05) is still pending; college/roll-number/faculty metadata and report format are unknown; two days is tight. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
+Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; SG05/JB05 validation is verified at M02 with a small synthetic set and no general-accuracy claim; college/roll-number/faculty metadata and report format are unknown; two days is tight. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
 
 ## 10. Handoff maintenance after every sprint
 
@@ -246,3 +246,9 @@ At each M gate the integration chat reads both live handoffs, merges owned work,
 - M01 synchronization pending. No SG05/JB05, final evidence freeze, human review, push or main update. Evidence: `docs/merge/M01.md`.
 
 - 2026-11-10 14:40 Asia/Kolkata: **M01 DONE**. Verified code/evidence baseline `c1c155d5ab9368f13ede5781470ff4cc0673d38a` fast-forwarded into both clean personal tracks. Their independent venv real-module imports, checklist validation and pip checks PASS; correct worktree-specific identities retained. Completion metadata follows locally and is synchronized before stopping. Next: SG05/JB05 independently; M02 awaits both. No push/main update or later checkpoint.
+
+### M02 evidence verification — 2026-11-10 16:02 Asia/Kolkata
+- Both live SG05/JB05 DONE/READY at clean cutoffs c98d893 / 80a38e4, based on M01 183ff6b. Sequential normal merges c335709 / bc35ef9 preserve both owner histories; no conflicts, production changes or unresolved peer requests.
+- PASS: 107 combined tests (8.409s), environment/Tesseract English, pip check, syntax/whitespace; 387-file hash freeze and all source/reference/image hashes; 282/282 stored independent repeat hashes; seven comparisons; eight actual browser downloads/scenarios, three Markdown pairs and settled invalidation DOMs; fifteen screenshot hashes/decodes. No fresh M02 browser/128-call experiment or human review claimed.
+- Original/default both CER0 on 2190 normalized characters, types8/8, present fields28/28; no measured improvement. Adverse alternatives retained, including CER>1. All figures/raw OCR/settings/tables/screenshots/provenance and limitations indexed in docs/merge/M02.md. No evidence invalidated; no required student action.
+- M02 IN_PROGRESS only for local verified-freeze commit and synchronization into both clean owner checkouts. SG06/JB06 remain TODO until synchronization; M03 remains TODO. No push/main update or later sprint.

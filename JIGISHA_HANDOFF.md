@@ -6,13 +6,13 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 15:09 Asia/Kolkata; **JB05 DONE / READY FOR M02, not merged**.
+- Updated: 2026-11-10 16:02 Asia/Kolkata; **JB05 DONE and merged at M02**, evidence verified; synchronization pending.
 - Active sprint: none; **JB05 completed and verified locally**, JB01–JB04 integrated at M01.
-- Next: **M02** in the root merge chat, after independently verifying SG05. **JB06 waits for M02** and frozen evidence.
+- Next: **JB06 after M02 synchronization**, using `docs/merge/M02.md` and the identical frozen results.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
-- Code/evidence merged: JB01–JB04 at M01; JB05 browser validation DONE locally, awaiting M02 evidence merge.
+- Code/evidence merged: build sprints at M01; **JB05 at M02**. Evidence baseline `bc35ef9`; no behavior/default/dependency changes. See `docs/merge/M02.md` and `M02-freeze.json`.
 - JB01 artifacts: `modules/classification.py`, `tests/fixtures/rule_cases.json`, `tests/test_classification.py`, `docs/sprint_notes/JB01.md`. 8 unittest methods PASS on 16 fictional reference cases; also PASS with site packages disabled. Fixture success is not real OCR evidence.
 - JB02 artifacts: `modules/extraction.py`, `tests/test_extraction.py`, fixture extensions (32 total cases), `docs/sprint_notes/JB02.md`. 23 methods PASS (15 extraction + 8 classification), also with site packages disabled. Eight peer reference transcripts matched expected fields in a read-only compatibility check; no real OCR run. No unmet JB02 acceptance checks.
 - Git authorization: local JB01/JB02 commits approved; latest project policy automatically authorizes a local commit after each verified sprint, including JB03, as **Jigisha Baiswar**, account `jigishadebugging`, using `146957478+jigishadebugging@users.noreply.github.com` for both author and committer. Use per-command identity overrides; shared/global Git identity stays unchanged. Existing Graphia repository confirmed. No push requested.
@@ -20,7 +20,7 @@
 - Main delivery instruction (2026-11-10): keep personal sprint commits local; **add completed work to `main` only after all sprints and required verification are done**. Intermediate M01/M02 integration gates remain on `codex/integration`; this instruction does not authorize an early main update or push. Merge chat must carry this preference into the shared record at its next gate.
 - JB03 artifacts: `config/requirements.json`, `modules/readiness.py`, `tests/test_readiness.py`, `outputs/reports/JB03_fixture_report.json`, `outputs/reports/JB03_fixture_report.md`, `docs/sprint_notes/JB03.md`. All 46 methods PASS (23 readiness + previous 23), also with site packages disabled. Fixture example: six uploads, four detected / three usable required types, 100% coverage / 75% readiness. These JB03 fixture artifacts are not real OCR/browser evidence; M01 now supplies separate real integration evidence.
 - JB04 artifacts: `app.py`, `tests/test_ui.py`, `docs/sprint_notes/JB04.md`, `outputs/screenshots/JB04_preintegration_missing_modules.png`. Final suite 58 methods PASS (46 prior + 12 UI/orchestration); actual browser preview/missing-module state checked. JB04 evidence is pre-integration only; test providers confined to tests. JB01–JB04 are now merged at M01 with separate real OCR/browser evidence.
-- JB05 artifacts: `docs/validation/jigisha.md`, `docs/sprint_notes/JB05.md`, `outputs/reports/JB05/**`, `outputs/screenshots/JB05/**`. Eight actual browser JSON scenarios, three actual Markdown pairs, fifteen inspected screenshots and three settled invalidation DOMs PASS; 101 existing tests PASS. No production fixes needed. READY FOR M02; not merged.
+- JB05 artifacts: `docs/validation/jigisha.md`, `docs/sprint_notes/JB05.md`, `outputs/reports/JB05/**`, `outputs/screenshots/JB05/**`. Eight actual browser JSON scenarios, three actual Markdown pairs, fifteen inspected screenshots and three settled invalidation DOMs PASS; 101 existing tests PASS. No production fixes needed. Merged and evidence verified at M02; synchronization pending.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Jigisha's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Keep your own handoff current; do not change the master, Sakshi's handoff, shared dependencies or her image/OCR modules during parallel work.
@@ -35,7 +35,7 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 | JB02 | 1 | 60 min | JB01 | DONE | M01 (DONE, synchronized) |
 | JB03 | 1 | 60 min | JB02 | DONE | M01 (DONE, synchronized) |
 | JB04 | 1 | 90 min | JB03 | DONE | M01 (DONE, synchronized) |
-| JB05 | 2 | 75 min | JB04, M01 | DONE | Not merged; target M02 |
+| JB05 | 2 | 75 min | JB04, M01 | DONE | M02 (verified; synchronization pending) |
 | JB06 | 2 | 90 min | JB05, M02 | TODO | Not merged; target M03 |
 
 ## JB01 — Rule fixtures and document classification
@@ -395,3 +395,9 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - Teaching notes explain functions, local/adaptive thresholds, same-source rules, distinct presence/readable/usable concepts and `100 × 3 / 4 = 75%`. Reports/screens are real execution of synthetic images, not real-world accuracy or CER/improvement measurements; those remain SG05/M02. No human/student review, eligibility/authenticity/matching-identity claim.
 - Required local sprint commit: `JB05: verify real browser scenarios and save traceable evidence`, author/committer Jigisha Baiswar <146957478+jigishadebugging@users.noreply.github.com>. This handoff included. Resolve actual immutable commit using `git log -1 --format=fuller -- docs/validation/jigisha.md`; verify parent/scope/attribution/clean status after commit and report hash in chat. Keep local only.
 - Exact next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute M02 only after verifying both live SG05 and JB05 are DONE and ready.` This chat makes no claim about current SG05 completion. JB06 requires M02 frozen evidence; final M03/main delivery remain later. Stop after the local JB05 commit.
+
+### M02 integration annotation — 2026-11-10 16:02 Asia/Kolkata
+- JB05 source cutoff 80a38e4 merged through normal M02 merges c335709 / bc35ef9. Earlier not-merged/candidate statements are historical. Both authors and raw evidence preserved; no conflicts or behavior/default/contract/dependency changes.
+- M02 verification PASS: 107 tests, environment/pip/compile/diff, 387 frozen hashes, all eight image/reference pairs, seven comparisons, 282-file repeat maps, eight actual browser report scenarios/three Markdown pairs/settled invalidation DOMs and 15 screenshot hashes. Exact commands/limits/artifacts: docs/merge/M02.md.
+- Original/default CER0 is a tie on a small synthetic set, not measured improvement/general accuracy. Browser missing-field identity is readable but unusable; blank/unknown/corrupt/duplicates remain distinct. Prior server interruption and identical invalidation viewport crops are documented honestly. No human review or new M02 browser experiment claimed.
+- Synchronization pending into both clean personal checkouts. Do not start JB06 until the M02 completion annotation below. No further sprint, push or main update performed.

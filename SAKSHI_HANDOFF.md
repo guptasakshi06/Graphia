@@ -6,14 +6,14 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 15:11 Asia/Kolkata; **SG05 DONE**, verified locally and READY FOR M02; not merged.
+- Updated: 2026-11-10 16:02 Asia/Kolkata; **SG05 DONE and merged at M02**, evidence verified; synchronization pending.
 - Active sprint: none; **SG05 completed and verified**.
-- Next: **M02 in a separate merge chat**, after both SG05/JB05 are verified. **SG06 remains gated by M02** and its frozen evidence.
+- Next: **SG06 after M02 synchronization**, using `docs/merge/M02.md` and the identical frozen results.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
 - Build readiness: **SG01–SG04 DONE and integrated at M01**; both source cutoffs verified by the merge chat.
-- Code/evidence merged: SG01–SG04 at M01; **SG05 final local measurements DONE, not merged/frozen**. Validation: `docs/validation/sakshi.md`; artifacts: `outputs/experiments/SG05/`.
+- Code/evidence merged: build sprints at M01; **SG05 at M02**. Evidence baseline `bc35ef9`; no behavior/default/dependency changes. See `docs/merge/M02.md` and `M02-freeze.json`.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Sakshi's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Contract APIs are fixed across tracks. Keep your own handoff current; do not change the master, Jigisha's handoff, or shared dependencies during parallel work.
@@ -26,7 +26,7 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 | SG02 | 1 | 75 min | SG01 | DONE | M01 (DONE, synchronized) |
 | SG03 | 1 | 75 min | SG02 | DONE | M01 (DONE, synchronized) |
 | SG04 | 1 | 75 min | SG03 | DONE | M01 (DONE, synchronized) |
-| SG05 | 2 | 75 min | SG04, M01 | DONE | Not merged; READY FOR M02 |
+| SG05 | 2 | 75 min | SG04, M01 | DONE | M02 (verified; synchronization pending) |
 | SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
 
 ## SG01 — Dataset and correct image input
@@ -394,3 +394,9 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - Acceptance still unmet / unresolved error / student-only action: **none for SG05**. M02 must verify live peer JB05 readiness, combine browser evidence and recheck source fingerprints before freeze. This chat does not assert JB05 completion.
 - Exact next action in a new merge chat: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute the next eligible merge checkpoint. Verify both live validation handoffs and actual branch tips first.` If JB05 is incomplete, wait for **JB05** at `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md`. Do not merge incomplete validation work.
 - Next personal action only after M02 passes and synchronizes: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG06. Verify the work and update the handoff before stopping.`
+
+### M02 integration annotation — 2026-11-10 16:02 Asia/Kolkata
+- SG05 source cutoff c98d893 merged through normal M02 merges c335709 / bc35ef9. Earlier not-merged/candidate statements are historical. Both authors and raw evidence preserved; no conflicts or behavior/default/contract/dependency changes.
+- M02 verification PASS: 107 tests, environment/pip/compile/diff, 387 frozen hashes, all eight image/reference pairs, seven comparisons, 282-file repeat maps, eight actual browser report scenarios/three Markdown pairs/settled invalidation DOMs and 15 screenshot hashes. Exact commands/limits/artifacts: docs/merge/M02.md.
+- Original/default CER0 is a tie on a small synthetic set, not measured improvement/general accuracy. Browser missing-field identity is readable but unusable; blank/unknown/corrupt/duplicates remain distinct. Prior server interruption and identical invalidation viewport crops are documented honestly. No human review or new M02 browser experiment claimed.
+- Synchronization pending into both clean personal checkouts. Do not start SG06 until the M02 completion annotation below. No further sprint, push or main update performed.
