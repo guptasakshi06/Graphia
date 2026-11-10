@@ -6,9 +6,9 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 16:04 Asia/Kolkata; **SG05 DONE and merged at M02**, evidence frozen and synchronized; **SG06 eligible**.
-- Active sprint: none; **SG05 completed and verified**.
-- Next: **SG06 only**, now eligible from synchronized M02 freeze `46e4bf9`; use `docs/merge/M02.md` and the identical frozen results.
+- Updated: 2026-11-10 16:36 Asia/Kolkata; **SG06 DONE and READY FOR M03**, not merged.
+- Active sprint: none; **SG01–SG06 complete**.
+- Next: **M03** in a separate merge chat after verified **JB06**. The report uses frozen M02 results; final diagram insertion and re-render belong to M03.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -27,7 +27,7 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 | SG03 | 1 | 75 min | SG02 | DONE | M01 (DONE, synchronized) |
 | SG04 | 1 | 75 min | SG03 | DONE | M01 (DONE, synchronized) |
 | SG05 | 2 | 75 min | SG04, M01 | DONE | M02 (DONE, synchronized) |
-| SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
+| SG06 | 2 | 90 min | SG05, M02 | DONE; READY FOR M03 | Not merged; target M03 |
 
 ## SG01 — Dataset and correct image input
 
@@ -407,3 +407,20 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - No public API/default/dependency revision, pending peer request or required M02 user action. No source behavior changed; no expensive experiment/browser rerun needed. Original/default tie does not demonstrate improvement. Any future blocking behavior fix must invalidate and rerun affected evidence through integration.
 - Completion metadata is forwarded before merge-chat stop; final containing hash is `git rev-parse HEAD`. No SG06, M03, publication, push or main update was performed here. All further commits remain local until both full tracks and M03 verification complete.
 - Exact next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG06 only. Verify the work and update the handoff before stopping.`
+
+### SG06 start — 2026-11-10 16:32 Asia/Kolkata
+- TODO → IN_PROGRESS in Sakshi’s checkout on `codex/sakshi-dip`, clean at synchronized M02 tip `bf3d34ef3684e54d951502188278988965ebd94e`; freeze commit `46e4bf9` is in history. Worktree author verified as Sakshi Gupta.
+- M02 verifier PASS: 387 frozen files, 112 saved method rows, 282 identical repeat artifacts, eight browser scenarios and 15 screenshots. No fresh OCR or browser run.
+- Report will separate CER, type/field results, and readiness; use fixed comparisons and describe the zero-CER tie and destructive alternatives. Write and inspect report and viva artifacts only.
+
+### SG06 drafting checkpoint — 2026-11-10 Asia/Kolkata
+- Report Markdown and 15 DIP/OCR viva answers drafted against the M02 audit and official technical documentation. Tables separate normalized edits, exact fields and checklist outcomes; figures and browser capture link to the original frozen bytes.
+- Neither JB06 diagram was present in this checkout. Added visible architecture and workflow notices for M03 assembly. Next: build DOCX/PDF and check every rendered page against the source and frozen results.
+
+### SG06 completion — 2026-11-10 16:36 Asia/Kolkata
+- **DONE / READY FOR M03**, not merged. Branch `codex/sakshi-dip`, Sakshi checkout, synchronized start `bf3d34ef3684e54d951502188278988965ebd94e`, frozen M02 `46e4bf9`.
+- Added `docs/project_report.md`, `docs/project_report.docx`, `docs/project_report.pdf`, `docs/viva_sakshi.md`, `docs/report_assets/build_report.py`, `docs/report_assets/verify_report.py` and `docs/sprint_notes/SG06.md`. The report distinguishes OCR, exact fields and readiness; original and processed tied at 0/2,190 edits on the fictional images. No new experiment/browser run, app edit, dependency change or shared/peer edit.
+- M02 re-audit PASS (387 frozen files, 112 rows, 282 repeated artifacts, eight browser scenarios, 15 screenshots). DOCX content PASS: 14 required sections, both names, 14 method rows, eight browser rows and six byte-identical frozen images; viva has 15 prompts. Bundled renderer produced nine pages; all visually inspected. Final rerender changed only page 8, which was reinspected; PDF opens and matches the inspected export. Exact commands and regeneration steps in `docs/sprint_notes/SG06.md`.
+- Final report assembly pending M03: replace the two labeled notices with JB06 `docs/diagrams/architecture.png` and `docs/diagrams/workflow.png`, regenerate and reinspect. Cover still needs roll numbers, college, department, faculty guide and prescribed cover format if required. No SG06 acceptance blocker, peer request or student action needed to finish this sprint.
+- Local Sakshi-authored completion commit: `SG06: Write and verify the academic report and DIP viva`; resolve its hash with `git log -1 --format='%H %an <%ae> %s'`. No integration merge, push, publication, submission or main update.
+- Exact next request once JB06 is verified: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute M03 only. Verify both live SG06 and JB06 tips before merging.` If JB06 is still pending, its handoff is `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md`. Stop after SG06 here.
