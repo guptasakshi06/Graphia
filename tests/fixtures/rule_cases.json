@@ -1,0 +1,372 @@
+{
+  "description": "JB01/JB02 development-only fictional/reference text fixtures. Manually authored strings, not measured OCR outputs, official documents, or real student data.",
+  "expected_fields_note": "JB02 verifies these manually authored expected fields with extract_fields; JB01 verified classification only. Unknown/ambiguous cases specify no extracted fields. None/null covers absent, malformed, conflicting and not-applicable values; this is not OCR evidence.",
+  "cases": [
+    {
+      "id": "income_reference",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nIncome Certificate\nStudent Name: Asha Example\nCertificate Number: INC-00017\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nAnnual Income: 48000\n",
+      "expected_classification": {"doc_type": "income_certificate", "evidence": ["income certificate"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": "INC-00017", "application_id": "APP-00041", "issue_date": "2026-01-15"}
+    },
+    {
+      "id": "caste_reference",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nCaste Certificate\nStudent Name: Asha Example\nCertificate Number: CST-00028\nApplication ID: APP-00041\nIssue Date: 2026-01-16\nCategory: Demonstration Category\n",
+      "expected_classification": {"doc_type": "caste_certificate", "evidence": ["caste certificate"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": "CST-00028", "application_id": "APP-00041", "issue_date": "2026-01-16"}
+    },
+    {
+      "id": "marksheet_reference",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nMarksheet\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-17\nMathematics: 78\nComputer Science: 84\n",
+      "expected_classification": {"doc_type": "marksheet", "evidence": ["marksheet"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": null, "application_id": "APP-00041", "issue_date": "2026-01-17"}
+    },
+    {
+      "id": "identity_reference",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nIdentity Proof\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-18\nDemo Institution: Example College\n",
+      "expected_classification": {"doc_type": "identity_proof", "evidence": ["identity proof"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": null, "application_id": "APP-00041", "issue_date": "2026-01-18"}
+    },
+    {
+      "id": "unrelated_text",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nLibrary Receipt\nBooks returned: 2\nReceipt Number: 00019\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "blank",
+      "text": "",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "whitespace_only",
+      "text": " \t\n\r  ",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "case_and_linebreaks",
+      "text": "FICTIONAL SAMPLE - NOT VALID\ninCoMe\t\n   CeRtIfIcAtE\nStudent Name: Asha Example\nCertificate Number: INC-00017\n",
+      "expected_classification": {"doc_type": "income_certificate", "evidence": ["income certificate"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": "INC-00017", "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "punctuated_title",
+      "text": "FICTIONAL SAMPLE - NOT VALID\n(IDENTITY PROOF):\nStudent Name: Asha Example\n",
+      "expected_classification": {"doc_type": "identity_proof", "evidence": ["identity proof"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "mark_sheet_variant",
+      "text": "FICTIONAL SAMPLE - NOT VALID\nMark Sheet\nStudent Name: Asha Example\n",
+      "expected_classification": {"doc_type": "marksheet", "evidence": ["mark sheet"], "ambiguous": false},
+      "expected_fields": {"student_name": "Asha Example", "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "competing_certificates",
+      "text": "FICTIONAL AMBIGUOUS TEST\nIncome Certificate\nCaste Certificate\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": ["income certificate", "caste certificate"], "ambiguous": true},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "all_four_compete",
+      "text": "FICTIONAL CHECKLIST TEST\nIdentity Proof, Marksheet, Caste Certificate, Income Certificate\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": ["income certificate", "caste certificate", "marksheet", "identity proof"], "ambiguous": true},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "repeated_title",
+      "text": "FICTIONAL REPEATED TITLE TEST\nMarksheet\nMARKSHEET\nMark Sheet\n",
+      "expected_classification": {"doc_type": "marksheet", "evidence": ["marksheet", "mark sheet"], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "generic_words_only",
+      "text": "FICTIONAL NEGATIVE TEST\nIncome, caste, certificate, identity, proof and marks are generic words here.\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "embedded_words",
+      "text": "FICTIONAL NEGATIVE TEST\npremarksheetpost\nIncome Certificates\nCaste Certificateholder\nIdentity Proofreading\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "damaged_title",
+      "text": "FICTIONAL OCR-LIKE ERROR TEST (manually authored)\nInc0me Certiflcate\nStudent Name: Asha Example\nCertificate Number: INC-00017\n",
+      "expected_classification": {"doc_type": "unknown", "evidence": [], "ambiguous": false},
+      "expected_fields": {"student_name": null, "certificate_number": null, "application_id": null, "issue_date": null}
+    },
+    {
+      "id": "jb02_label_case_spacing",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\n  sTuDeNt\tNaMe :  Asha   Example  \r\nCERTIFICATE NUMBER: inc-2026-0042\r\napplication id: APP-2026-0101\r\nissue date: 2026-01-15\r\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": "Asha Example",
+        "certificate_number": "inc-2026-0042",
+        "application_id": "APP-2026-0101",
+        "issue_date": "2026-01-15"
+      }
+    },
+    {
+      "id": "jb02_certificate_no_variant",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nCaste Certificate\nStudent Name: A. Example-Sen\nCertificate No.: CST-2026-0043\n",
+      "expected_classification": {
+        "doc_type": "caste_certificate",
+        "evidence": [
+          "caste certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": "A. Example-Sen",
+        "certificate_number": "CST-2026-0043",
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_numeric_ids",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nCertificate Number: 000017\nApplication ID: 000041\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": "000017",
+        "application_id": "000041",
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_unrelated_numbers",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nAsha Example\nAnnual Income: 48000\nReceipt Number: 00017\nApplication Count: 41\nExam Date: 2026-01-15\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_malformed_values",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nStudent Name: Asha Examp1e\nCertificate Number: INC-00O17\nApplication ID: APP--00041\nIssue Date: 2026-02-30\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_empty_values",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nStudent Name:\nAsha Example\nCertificate Number: \t\nINC-00017\nApplication ID:\nAPP-00041\nIssue Date:\n2026-01-15\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_unknown_with_labels",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nLibrary Receipt\nStudent Name: Asha Example\nCertificate Number: INC-00017\nApplication ID: APP-00041\nIssue Date: 2026-01-15\n",
+      "expected_classification": {
+        "doc_type": "unknown",
+        "evidence": [],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_conflicting_values",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nStudent Name: Asha Example\nStudent Name: Mira Example\nCertificate Number: INC-00017\nCertificate No.: INC-00018\nApplication ID: APP-00041\nApplication ID: damaged\nIssue Date: 2026-01-15\nIssue Date: 2026-02-30\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_identical_values",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nStudent Name: Asha Example\nStudent Name: Asha   Example\nCertificate Number: INC-00017\nCertificate No: INC-00017\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": "Asha Example",
+        "certificate_number": "INC-00017",
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_wrong_prefixes",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nCertificate Number: CST-00017\nApplication ID: INC-00041\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_not_applicable_certificate",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nMarksheet\nStudent Name: Mira Example\nCertificate Number: INC-00017\n",
+      "expected_classification": {
+        "doc_type": "marksheet",
+        "evidence": [
+          "marksheet"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": "Mira Example",
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_calendar_leap_date",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIdentity Proof\nStudent Name: Dev O'Example\nIssue Date: 2024-02-29\n",
+      "expected_classification": {
+        "doc_type": "identity_proof",
+        "evidence": [
+          "identity proof"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": "Dev O'Example",
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": "2024-02-29"
+      }
+    },
+    {
+      "id": "jb02_ambiguous_date",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nMarksheet\nIssue Date: 01/02/2026\n",
+      "expected_classification": {
+        "doc_type": "marksheet",
+        "evidence": [
+          "marksheet"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_inline_fields_unsupported",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nStudent Name: Asha Example Application ID: APP-00041\nCertificate Number: INC-00017 Issue Date: 2026-01-15\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_unsupported_labels",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nIncome Certificate\nFather Name: Arun Example\nName: Asha Example\nOld Certificate Number: INC-00017\nStudent ID: 00041\nDate of Birth: 2004-01-15\n",
+      "expected_classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    },
+    {
+      "id": "jb02_placeholder_values",
+      "text": "FICTIONAL JB02 REFERENCE - NOT VALID\nMarksheet\nStudent Name: Not Found\nApplication ID: N/A\nIssue Date: Unreadable\n",
+      "expected_classification": {
+        "doc_type": "marksheet",
+        "evidence": [
+          "marksheet"
+        ],
+        "ambiguous": false
+      },
+      "expected_fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      }
+    }
+  ]
+}

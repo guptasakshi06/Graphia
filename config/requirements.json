@@ -1,0 +1,10 @@
+{
+  "profile_name": "Demonstration scholarship checklist",
+  "required_documents": {
+    "income_certificate": ["student_name", "certificate_number"],
+    "caste_certificate": ["student_name", "certificate_number"],
+    "marksheet": ["student_name"],
+    "identity_proof": ["student_name"]
+  },
+  "readability": {"min_alnum_chars": 20}
+}
