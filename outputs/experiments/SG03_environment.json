@@ -1,0 +1,43 @@
+{
+  "python": "3.12.3",
+  "executable": "/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/.venv/bin/python",
+  "prefix": "/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/.venv",
+  "virtual_environment": true,
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+  "packages": {
+    "numpy": {
+      "version": "2.5.4",
+      "import": "PASS"
+    },
+    "opencv-python-headless": {
+      "version": "5.0.0.93",
+      "import": "PASS"
+    },
+    "matplotlib": {
+      "version": "3.11.2",
+      "import": "PASS"
+    },
+    "pytesseract": {
+      "version": "0.3.13",
+      "import": "PASS"
+    },
+    "streamlit": {
+      "version": "1.67.0",
+      "import": "PASS"
+    },
+    "Pillow": {
+      "version": "13.0.0",
+      "import": "PASS"
+    }
+  },
+  "tesseract": {
+    "path": "/usr/bin/tesseract",
+    "version": "tesseract 5.3.4",
+    "languages": [
+      "eng",
+      "osd"
+    ]
+  },
+  "problems": [],
+  "status": "PASS"
+}

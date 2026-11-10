@@ -6,9 +6,9 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 13:21 Asia/Kolkata; **SG02 DONE locally**, verified; not merged.
-- Active sprint: none; **SG02 completed**.
-- Next: **SG03 — eligible; SG02 DONE**. Execute in a new chat using this handoff.
+- Updated: 2026-11-10 13:35 Asia/Kolkata; **SG03 DONE locally**, verified; not merged.
+- Active sprint: none; **SG03 completed**.
+- Next: **SG04 — eligible; SG03 DONE**. Execute in a new chat using this handoff.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -23,7 +23,7 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 |---|---|---:|---|---|---|
 | SG01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
 | SG02 | 1 | 75 min | SG01 | DONE | Not merged; target M01 |
-| SG03 | 1 | 75 min | SG02 | TODO | Not merged; target M01 |
+| SG03 | 1 | 75 min | SG02 | DONE | Not merged; target M01 |
 | SG04 | 1 | 75 min | SG03 | TODO | Not merged; target M01 |
 | SG05 | 2 | 75 min | SG04, M01 | TODO | Not merged; target M02 |
 | SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
@@ -266,3 +266,42 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - Pre-commit `git diff --check`: PASS; all pending paths belong to Sakshi's SG02 work. Existing verification remains 15 tests PASS and 74/74 experiment files reproduced identically; no code changes since those checks.
 - This is a local commit only; no push or merge. SG02 remains DONE; next SG03 in this checkout. M01 readiness remains NOT READY pending SG04 and peer prerequisites.
 - Staged verification: ordinary `git diff --cached --check` flags CSV writer CRLF line endings as trailing whitespace. `git -c core.whitespace=cr-at-eol diff --cached --check`: PASS, recognizing those CSV line endings; experiment files and their verified hashes are preserved. Reviewed staged paths: all 82 files are Sakshi-owned SG02 code, evidence and notes.
+
+### SG03 start — 2026-11-10 13:28 Asia/Kolkata — session 1
+- TODO → IN_PROGRESS. Read project AGENTS/master/brief/contract, this live handoff and M00 evidence. Root Git policy supplied by user takes precedence over stale publication guidance in this checkout.
+- Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`; branch `codex/sakshi-dip`; clean at start. Actual SG02 prerequisite commit `f4e0a363e0bfc610d3ba73b754bfaef924c8c703`; SG01 `6629e0f`; M00 root `464c884`. No merge performed.
+- Explained threshold cutoff example, Otsu grouping, local adaptive thresholds, white foreground and deliberate morphology inversion before coding.
+- Plan: validated threshold/morphology helpers, exact contract-v1 pipeline, independent comparison artifacts, numerical and contract checks, visual inspection, notes and local commit with Sakshi's worktree-specific identity. No OCR or later sprint work.
+- No blocker or peer/dependency request. Existing `extensions.worktreeConfig=true`; owner identity will be set only for this worktree before committing.
+
+### SG03 checkpoint — 2026-11-10 13:32 Asia/Kolkata — session 1
+- Implemented `threshold_image`, `apply_morphology` and exact `run_pipeline(image_bgr, options=None)` contract-v1 API. All nine public defaults preserved; bypass stages and OCR input are independent copies; Otsu cutoff and fixed settings are JSON-safe parameters. No shared/peer changes.
+- Environment PASS in own venv. Existing 15 regression checks PASS after implementation. First new focused run: 9 functional checks PASS, artifact audit ERROR because metrics were still being generated; runner then completed. Sequenced full rerun after generation: **25 tests PASS**, including artifact audit. No unresolved test failure.
+- Generated 72 measured alternatives, 48 default stage PNGs and 32 comparison figures for 8 samples (154 SG03 files with CSV/JSON). Thresholds start from common grayscale; four morphology alternatives start independently from its Otsu result. Default pipeline saved separately.
+- Assistant visually inspected clear-income full thresholds, low-contrast-income full thresholds and detail, noisy-caste thresholds/detail morphology, clear-income morphology detail and blurred-marksheet threshold/morphology details. Global 127 erases faint sample; Otsu 218 restores visible text; adaptive adds noisy background; erosion damages thin strokes; dilation thickens strokes. Opening/closing change geometry subtly. Polarity verified by numerical tests. No human review or OCR claim.
+- Remaining: reproducibility and SG02 compatibility reruns, notes/final handoff, syntax/diff checks and owner-authored local commit. No blocker or peer request.
+
+### SG03 completion — 2026-11-10 13:35 Asia/Kolkata — session 1
+- Status: TODO → IN_PROGRESS → **DONE**. All SG03 acceptance checks met. SG04–SG06 remain TODO; no later sprint or merge performed.
+- Checkout/branch: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` / `codex/sakshi-dip`. Start HEAD/prerequisite SG02 `f4e0a363e0bfc610d3ba73b754bfaef924c8c703`; SG01 `6629e0f240023aadb8027032f1e60b6071e34d27`; root M00 `464c884af09bb1d2db686559eaee16cdb9912d59`. Clean at start; all sprint changes belong to Sakshi.
+- Implemented global/Otsu/adaptive thresholding, four morphology methods and complete contract-v1 `run_pipeline(image_bgr, options=None)`. Existing loader/grayscale/filter/contrast behavior preserved. API returns exactly `stages`, `ocr_input`, `parameters`; original BGR and five 2D gray/binary stages remain present. All arrays are independent, including bypasses and OCR input. Caller image and options remain unchanged.
+- All nine public defaults unchanged: median/3, CLAHE, Otsu, global 127, adaptive block 31/C 11, morphology none/kernel 2. Fixed CLAHE settings 2.0/8x8 and selected Otsu cutoff returned as JSON-safe parameters alongside morphology/polarity/shape details. Unknown option keys, invalid method names, wrong image arrays, invalid integers/booleans and nonfinite numeric values fail clearly, even for bypassed settings. No contract change requested.
+- Morphology uses inverted white text foreground, rectangular kernel, one iteration, anchor `(k//2,k//2)`, neutral constant borders, then restores dark-text/light-background convention. Even size 2 is allowed by contract and is asymmetric; known tests verify its anchor, border behavior, polarity and grayscale min/max. No automatic polarity guessing or hidden thresholding. Default morphology stays bypassed.
+- Teaching/key functions/settings/actual measurements recorded in `docs/sprint_notes/SG03.md`. Covered cutoff example, Otsu within-group variance, Gaussian local threshold, structuring element, numeric 5x5 → 3x3/7x7 erosion/dilation, opening/closing order, thin-stroke damage, inversion and even-kernel shifts.
+- Experiments: independent thresholds on common grayscale; independent erosion/dilation/opening/closing on its Otsu result; separate contract-default pipeline. All eight fictional samples unchanged at 1400x1000. Saved **72 measured rows, 72 alternative PNGs, 48 stage PNGs, 32 figures, 2 tables = 154 SG03 files**. Metadata includes hashes, versions, exact settings, dimensions/dtypes, binary flags and actual dark-pixel counts. Dark count uses intensity <128 on the whole page (including borders), not OCR accuracy. No exhaustive dataset parameter search.
+- Visual inspection: eight figures listed exactly in SG03 notes (clear-income full thresholds/morphology detail; faint-income full/detail thresholds; noisy-caste threshold/morphology details; blurred-marksheet threshold/morphology details). Global 127 erased the faint page (0 dark pixels), Otsu selected 218 and retained text (63888 dark pixels). Noisy-caste Otsu selected 150 (64016 dark pixels) while adaptive produced heavy speckle (245721). Erosion weakens/breaks thin strokes; dilation thickens letters; 2x2 opening/closing have smaller geometric changes. Only listed figures visually inspected by assistant; all figures decode in tests; no human review or OCR improvement claimed.
+- Changed files: `modules/preprocessing.py`, `scripts/run_experiments.py`, `tests/test_preprocessing.py`, `docs/sprint_notes/SG03.md`, `SAKSHI_HANDOFF.md`; `outputs/experiments/SG03/**`, `outputs/experiments/SG03_environment.json`, `outputs/experiments/SG03_tests.txt`, `outputs/experiments/SG03_reproducibility.json`. Dataset, SG01/SG02 evidence, shared files and peer paths untouched.
+- Executed commands / actual results (from this checkout):
+  - `git status --short --branch`, `git worktree list --porcelain`, `git log -4 --format='%H %an <%ae> %s'`: correct owner worktree/branch and SG02 commit, clean starting state.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json outputs/experiments/SG03_environment.json`: PASS; independent venv, Python 3.12.3, all six imports, Tesseract 5.3.4 with eng/osd. Environment evidence only.
+  - Existing suite after code implementation: **15 PASS**. Initial new focused run: **9 functional checks PASS, artifact audit ERROR** because generation was still running. Generation then finished; sequential rerun resolved the missing-file error. Final full suite: **25 PASS**, including all regression/SG03 numerical, validation, polarity, contract and saved-artifact checks.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/run_experiments.py --sprint SG03`: PASS, 72 rows / 8 pipelines. Every saved alternative and stage recomputed/compared by audit; all source/output hashes and measured counts checked; all 32 figure files verified.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/run_experiments.py --sprint SG03 --output-dir /tmp/dip042-sg03-reproduce`: PASS. Python SHA256/file-set comparison: **154/154 files byte-identical**.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/run_experiments.py --sprint SG02 --output-dir /tmp/dip042-sg03-sg02-regression`: PASS. Comparison: **74/74 existing SG02 files byte-identical**. Both commands, directories and full hash maps saved in `outputs/experiments/SG03_reproducibility.json`.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python -m unittest discover -s tests -p test_preprocessing.py -v > outputs/experiments/SG03_tests.txt 2>&1`: final **25 tests PASS** (exit 0). Tiny-image combinations exercise 180 API configurations, not a dataset parameter search.
+  - `.venv/bin/python -m compileall -q modules/preprocessing.py scripts/run_experiments.py tests/test_preprocessing.py`: PASS. `git diff --check`: PASS.
+- Git identity: `extensions.worktreeConfig=true` already existed. Initial sandbox write to worktree Git config returned read-only filesystem; authorized retry succeeded. `git config --worktree user.name 'Sakshi Gupta'` and `git config --worktree user.email 'guptasak06@gmail.com'` set identity in `.git/worktrees/sakshi/config.worktree` only; shared/global identity unchanged. `git var GIT_AUTHOR_IDENT` confirmed Sakshi Gupta <guptasak06@gmail.com>.
+- Local commit policy: this completion record is included with the verified sprint in the local commit **`SG03: Add validated thresholding, morphology and the contract pipeline`**. Resolve its hash using `git log -1 --format='%H %an <%ae> %s'`; check final working state with `git status --short --branch`. No push, publication, branch switch, main update or integration merge. Earlier start/checkpoint states are historical.
+- Acceptance still unmet / unresolved errors / student-only actions: **none for SG03**. No peer/dependency request. Readiness/authenticity/eligibility claims unchanged; no real OCR/CER or end-to-end success claimed.
+- Exact next action in a new chat: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG04. Verify the work and update the handoff before stopping.`
+- Merge readiness: **SG03 complete locally; NOT READY for M01** until SG04 and peer build prerequisites pass. Merged at: **not yet**. Stop after SG03.

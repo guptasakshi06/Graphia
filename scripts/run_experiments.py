@@ -1,8 +1,8 @@
-"""Reproduce SG02 comparisons. Run with this checkout's .venv/bin/python.
+"""Reproduce SG02 or SG03 comparisons. Run with this checkout's .venv/bin/python.
 
-Each alternative starts from the same loaded image/grayscale image. No OCR,
-thresholding or morphology is executed. Only fictional manifest samples are
-saved; this is not an upload storage path.
+SG02 alternatives start from the same grayscale input. SG03 thresholds share
+grayscale input; morphology alternatives share its Otsu result. No OCR is run.
+Only fictional manifest samples are saved; this is not an upload storage path.
 """
 
 import argparse
@@ -22,7 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))  # Support execution from outside the checkout.
 
 from modules.preprocessing import (  # noqa: E402
-    denoise_image, enhance_contrast, load_image, to_grayscale,
+    apply_morphology, denoise_image, enhance_contrast, load_image,
+    run_pipeline, threshold_image, to_grayscale,
 )
 
 
@@ -151,17 +152,127 @@ def run_experiments(manifest_path, output_dir, kernel_size=3, clip_limit=2.0,
     return report
 
 
+def compare_sg03(image_bgr):
+    """Three independent thresholds, four independent Otsu morphologies, one pipeline."""
+    gray = to_grayscale(image_bgr)
+    alternatives = {"grayscale": (gray, {"input": "original", "conversion": "BGR2GRAY"})}
+    for method in ("global", "otsu", "adaptive"):
+        image, selected = threshold_image(gray, method)
+        alternatives[method] = (image, {
+            "input": "grayscale", "threshold": method, "global_threshold": 127,
+            "adaptive_block_size": 31, "adaptive_c": 11,
+            "adaptive_method": "gaussian", "selected_otsu_threshold": selected})
+    for method in ("erosion", "dilation", "opening", "closing"):
+        alternatives[method] = (apply_morphology(alternatives["otsu"][0], method, 2), {
+            "input": "otsu", "morphology": method, "morph_kernel_size": 2,
+            "kernel_shape": "rectangle", "iterations": 1, "anchor_xy": [1, 1],
+            "border": "constant neutral (erosion=255, dilation=0)",
+            "foreground": "inverted white text; restored after operation"})
+    pipeline = run_pipeline(image_bgr)
+    alternatives["pipeline_default"] = (pipeline["ocr_input"], pipeline["parameters"])
+    return alternatives, pipeline
+
+
+def save_sg03_comparison(alternatives, names, destination, title, crop=None):
+    """Fixed range and common crop, with no unused panels or clipped labels."""
+    fig, axes = plt.subplots(1, len(names), figsize=(4 * len(names), 3 if crop else 5),
+                             constrained_layout=True, squeeze=False)
+    for ax, name in zip(axes.flat, names):
+        image = alternatives[name][0]
+        if crop:
+            x0, y0, x1, y1 = crop
+            image = image[y0:y1, x0:x1]
+        ax.imshow(image, cmap="gray", vmin=0, vmax=255, interpolation="nearest")
+        ax.set_title(name)
+        ax.axis("off")
+    fig.suptitle(title)
+    fig.savefig(destination, dpi=120)
+    plt.close(fig)
+
+
+def run_sg03_experiments(manifest_path, output_dir):
+    """Save actual threshold/morphology outputs and every default pipeline stage."""
+    manifest_path, output_dir = Path(manifest_path), Path(output_dir)
+    manifest_bytes = manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    rows, pipelines = [], []
+    for sample in manifest["samples"]:
+        path = manifest_path.parent / sample["image_path"]
+        image_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        if image_hash != sample["image_sha256"]:
+            raise ValueError(f"Source image hash differs from manifest: {path}")
+        original = load_image(path)
+        before = original.copy()
+        alternatives, pipeline = compare_sg03(original)
+        np.testing.assert_array_equal(original, before)
+        sample_dir = output_dir / sample["id"]
+        sample_dir.mkdir(exist_ok=True)
+        for group, names in (("thresholds", ["grayscale", "global", "otsu", "adaptive"]),
+                             ("morphology", ["otsu", "erosion", "dilation", "opening", "closing"])):
+            title = f"{sample['id']} | {group} | fictional sample"
+            save_sg03_comparison(alternatives, names, sample_dir / f"{group}.png", title)
+            save_sg03_comparison(alternatives, names, sample_dir / f"{group}_detail.png",
+                                  title + " | common crop", (65, 190, 1100, 420))
+        stage_paths = {}
+        for name, image in pipeline["stages"].items():
+            relative = Path(sample["id"]) / f"stage_{name}.png"
+            if not cv2.imwrite(str(output_dir / relative), image):
+                raise OSError(f"Could not write {relative}")
+            stage_paths[name] = relative.as_posix()
+        pipelines.append({"sample_id": sample["id"], "parameters": pipeline["parameters"],
+                          "stage_images": stage_paths})
+        for method, (image, settings) in alternatives.items():
+            relative = Path(sample["id"]) / f"{method}.png"
+            if not cv2.imwrite(str(output_dir / relative), image):
+                raise OSError(f"Could not write {relative}")
+            rows.append({"sample_id": sample["id"], "condition": sample["condition"],
+                         "source_image": sample["image_path"], "source_sha256": image_hash,
+                         "method": method, "parameters": settings,
+                         "shape": list(image.shape), "dtype": str(image.dtype),
+                         "dark_pixel_count": int(np.count_nonzero(image < 128)),
+                         "dark_pixel_definition": "intensity < 128; not text accuracy",
+                         "is_binary": bool(np.isin(image, [0, 255]).all()),
+                         "output_image": relative.as_posix(),
+                         "output_sha256": hashlib.sha256((output_dir / relative).read_bytes()).hexdigest()})
+    report = {"sprint": "SG03", "purpose": "DIP demonstration only; no OCR results",
+              "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+              "versions": {"numpy": np.__version__, "opencv": cv2.__version__,
+                           "matplotlib": matplotlib.__version__},
+              "settings": {"max_dimension": 1800, "detail_crop_xyxy": [65, 190, 1100, 420],
+                           "threshold_input": "grayscale", "morphology_input": "otsu(grayscale)",
+                           "pipeline_candidate": "contract-v1 defaults; morphology bypassed"},
+              "rows": rows, "pipelines": pipelines}
+    (output_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    with (output_dir / "metrics.csv").open("w", newline="") as handle:
+        columns = list(rows[0])
+        writer = csv.DictWriter(handle, fieldnames=columns, lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({k: json.dumps(v, sort_keys=True) if isinstance(v, (dict, list)) else v
+                             for k, v in row.items()})
+    print(f"SG03: saved {len(rows)} measured rows, {len(pipelines)} pipelines to {output_dir}")
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--sprint", choices=("SG02", "SG03"), default="SG02")
     parser.add_argument("--manifest", type=Path, default=ROOT / "dataset/manifest.json")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs/experiments/SG02")
+    parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--kernel-size", type=int, default=3)
     parser.add_argument("--clip-limit", type=float, default=2.0)
     parser.add_argument("--tile-grid-size", type=int, nargs=2, default=(8, 8), metavar=("COLS", "ROWS"))
     args = parser.parse_args()
     try:
-        run_experiments(args.manifest, args.output_dir, args.kernel_size,
-                        args.clip_limit, args.tile_grid_size)
+        output_dir = args.output_dir or ROOT / "outputs/experiments" / args.sprint
+        if args.sprint == "SG03":
+            if (args.kernel_size, args.clip_limit, tuple(args.tile_grid_size)) != (3, 2.0, (8, 8)):
+                raise ValueError("SG03 comparisons use fixed documented settings; SG02 flags apply to SG02.")
+            run_sg03_experiments(args.manifest, output_dir)
+        else:
+            run_experiments(args.manifest, output_dir, args.kernel_size,
+                            args.clip_limit, args.tile_grid_size)
     except (OSError, ValueError) as exc:
         parser.exit(1, f"Experiment error: {exc}\n")
 

@@ -1,7 +1,7 @@
-"""Image input and independent SG02 DIP operations for Project 042.
+"""Image input, DIP helpers and contract-v1 pipeline for Project 042.
 
-All processing helpers return fresh uint8 arrays. The combined pipeline,
-thresholding and morphology are scheduled for SG03.
+All processing helpers return fresh uint8 arrays. Dark text on a light
+background is the document convention; morphology explicitly inverts it.
 """
 
 from io import BytesIO
@@ -127,3 +127,127 @@ def enhance_contrast(gray, method="clahe", clip_limit=2.0, tile_grid_size=(8, 8)
         return cv2.equalizeHist(gray)
     clahe = cv2.createCLAHE(clipLimit=float(clip_limit), tileGridSize=grid)
     return clahe.apply(gray)
+
+
+def _finite_number(value, name):
+    if (isinstance(value, bool) or not isinstance(value, Real)
+            or not np.isfinite(value)):
+        raise ValueError(f"{name} must be a finite number.")
+    return float(value)
+
+
+def _threshold_settings(method, global_threshold, adaptive_block_size, adaptive_c):
+    if not isinstance(method, str) or method not in ("none", "global", "otsu", "adaptive"):
+        raise ValueError("threshold must be none, global, otsu or adaptive.")
+    if (isinstance(global_threshold, bool) or not isinstance(global_threshold, Integral)
+            or not 0 <= global_threshold <= 255):
+        raise ValueError("global_threshold must be an integer from 0 to 255.")
+    block = _positive_integer(adaptive_block_size, "adaptive_block_size", odd=True)
+    if block <= 1:
+        raise ValueError("adaptive_block_size must be an odd integer greater than 1.")
+    return int(global_threshold), block, _finite_number(adaptive_c, "adaptive_c")
+
+
+def threshold_image(gray, method="otsu", global_threshold=127,
+                    adaptive_block_size=31, adaptive_c=11):
+    """Return (image, selected_otsu_threshold), preserving dark text on white.
+
+    Binary rule: intensity > threshold becomes 255; otherwise 0. Otsu selects
+    a global cutoff by minimizing within-group variance. Adaptive uses a
+    Gaussian-weighted neighborhood mean minus C, with replicated borders.
+    The Otsu cutoff is a float only for method='otsu', otherwise None.
+    Validate all settings even when bypassed; 'none' is an independent copy.
+    """
+    _validate_image(gray, 1)
+    cutoff, block, constant = _threshold_settings(
+        method, global_threshold, adaptive_block_size, adaptive_c)
+    if method == "none":
+        return gray.copy(), None
+    if method == "adaptive":
+        return cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                     cv2.THRESH_BINARY, block, constant), None
+    flags = cv2.THRESH_BINARY | (cv2.THRESH_OTSU if method == "otsu" else 0)
+    selected, result = cv2.threshold(gray, 0 if method == "otsu" else cutoff, 255, flags)
+    return result, float(selected) if method == "otsu" else None
+
+
+def _morphology_settings(method, kernel_size):
+    if not isinstance(method, str) or method not in (
+            "none", "erosion", "dilation", "opening", "closing"):
+        raise ValueError("morphology must be none, erosion, dilation, opening or closing.")
+    return _positive_integer(kernel_size, "morph_kernel_size")
+
+
+def apply_morphology(gray, method="none", kernel_size=2):
+    """Operate on inverted (white) text, then restore dark text on white.
+
+    Accept binary or grayscale uint8; grayscale uses neighborhood min/max.
+    Rectangular all-ones kernel, one iteration, anchor=(k//2, k//2).
+    OpenCV's constant neutral border ignores out-of-image pixels: 255 for
+    erosion and 0 for dilation. Even kernels are allowed by contract but
+    asymmetric around the anchor and can shift strokes; compare before use.
+    Opening = erosion then dilation; closing = dilation then erosion.
+    No automatic foreground guessing or extra threshold is performed.
+    """
+    _validate_image(gray, 1)
+    size = _morphology_settings(method, kernel_size)
+    if method == "none":
+        return gray.copy()
+    foreground = cv2.bitwise_not(gray)
+    kernel = np.ones((size, size), dtype=np.uint8)
+    operation = {"erosion": cv2.MORPH_ERODE, "dilation": cv2.MORPH_DILATE,
+                 "opening": cv2.MORPH_OPEN, "closing": cv2.MORPH_CLOSE}[method]
+    result = cv2.morphologyEx(foreground, operation, kernel,
+                              anchor=(size // 2, size // 2), iterations=1,
+                              borderType=cv2.BORDER_CONSTANT)
+    return cv2.bitwise_not(result)
+
+
+def run_pipeline(image_bgr, options=None):
+    """Run contract-v1 selected stages; return stages, ocr_input, parameters.
+
+    Only the nine public option keys in TEAM_CONTRACT.md are accepted. All
+    values (including inactive stage settings) are validated. Named bypass
+    stages and ocr_input are independent copies, so UI changes cannot mutate
+    the caller or another stage. Parameters contain resolved JSON-safe settings
+    plus fixed algorithm details and the actual selected Otsu cutoff.
+    """
+    _validate_image(image_bgr, 3)
+    defaults = {
+        "denoise": "median", "kernel_size": 3, "contrast": "clahe",
+        "threshold": "otsu", "global_threshold": 127,
+        "adaptive_block_size": 31, "adaptive_c": 11,
+        "morphology": "none", "morph_kernel_size": 2,
+    }
+    if options is not None:
+        if not isinstance(options, dict):
+            raise ValueError("options must be a dict or None.")
+        if any(key not in defaults for key in options):
+            raise ValueError("Unknown pipeline option; use the keys in TEAM_CONTRACT.md.")
+        defaults.update(options)
+    p = defaults
+    for key, allowed in (("denoise", ("none", "gaussian", "median")),
+                         ("contrast", ("none", "equalize", "clahe"))):
+        if not isinstance(p[key], str) or p[key] not in allowed:
+            raise ValueError(f"{key} must be one of {', '.join(allowed)}.")
+    p["kernel_size"] = _positive_integer(p["kernel_size"], "kernel_size", odd=True)
+    p["global_threshold"], p["adaptive_block_size"], p["adaptive_c"] = _threshold_settings(
+        p["threshold"], p["global_threshold"], p["adaptive_block_size"], p["adaptive_c"])
+    p["morph_kernel_size"] = _morphology_settings(p["morphology"], p["morph_kernel_size"])
+    stages = {"original": image_bgr.copy(), "grayscale": to_grayscale(image_bgr)}
+    stages["denoised"] = denoise_image(stages["grayscale"], p["denoise"], p["kernel_size"])
+    stages["enhanced"] = enhance_contrast(stages["denoised"], p["contrast"])
+    stages["thresholded"], selected = threshold_image(
+        stages["enhanced"], p["threshold"], p["global_threshold"],
+        p["adaptive_block_size"], p["adaptive_c"])
+    stages["morphology"] = apply_morphology(
+        stages["thresholded"], p["morphology"], p["morph_kernel_size"])
+    p.update({"selected_otsu_threshold": selected, "clahe_clip_limit": 2.0,
+              "clahe_tile_grid_size": [8, 8], "adaptive_method": "gaussian",
+              "morph_kernel_shape": "rectangle", "morph_iterations": 1,
+              "morph_anchor_xy": [p["morph_kernel_size"] // 2] * 2,
+              "morph_border": "constant neutral (erosion=255, dilation=0)",
+              "morph_foreground": "inverted white text; restored after operation",
+              "output_polarity": "dark text / light background (input convention)",
+              "input_shape": list(image_bgr.shape), "output_shape": list(stages["morphology"].shape)})
+    return {"stages": stages, "ocr_input": stages["morphology"].copy(), "parameters": p}

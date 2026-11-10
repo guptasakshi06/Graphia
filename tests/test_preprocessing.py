@@ -1,4 +1,4 @@
-"""SG01 input/dataset and SG02 numerical DIP checks; no OCR assertions."""
+"""SG01–SG03 input, numerical DIP, contract and artifact checks; no OCR assertions."""
 
 import hashlib
 from io import BytesIO
@@ -11,10 +11,10 @@ from unittest.mock import patch
 import numpy as np
 from PIL import Image
 
-from modules.preprocessing import (denoise_image, enhance_contrast, load_image,
-                                   to_grayscale)
+from modules.preprocessing import (apply_morphology, denoise_image, enhance_contrast,
+                                   load_image, run_pipeline, threshold_image, to_grayscale)
 from scripts.create_sample_dataset import create_dataset
-from scripts.run_experiments import compare_methods
+from scripts.run_experiments import compare_methods, compare_sg03
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -280,6 +280,216 @@ class ExperimentArtifactTests(unittest.TestCase):
                 with Image.open(folder / sample_id / name) as figure:
                     figure.verify()
 
+
+
+class ThresholdMorphologyPipelineTests(unittest.TestCase):
+    def test_global_boundary_and_bypass(self):
+        gray = np.array([[0, 90, 127, 128, 180, 255]], np.uint8)
+        result, selected = threshold_image(gray, "global")
+        np.testing.assert_array_equal(result, [[0, 0, 0, 255, 255, 255]])
+        self.assertIsNone(selected)
+        for cutoff, expected in ((0, [[0, 255, 255, 255, 255, 255]]),
+                                 (255, [[0, 0, 0, 0, 0, 0]])):
+            np.testing.assert_array_equal(threshold_image(gray, "global", cutoff)[0], expected)
+        bypass, selected = threshold_image(gray, "none")
+        np.testing.assert_array_equal(bypass, gray)
+        self.assertFalse(np.shares_memory(bypass, gray))
+        self.assertIsNone(selected)
+
+    def test_otsu_separates_two_groups_and_reports_cutoff(self):
+        gray = np.tile(np.array([40, 40, 200, 200], np.uint8), (16, 4))
+        before = gray.copy()
+        result, cutoff = threshold_image(gray)
+        self.assertEqual(cutoff, 40.0)
+        np.testing.assert_array_equal(result, np.where(gray == 40, 0, 255))
+        np.testing.assert_array_equal(gray, before)
+        for value in (0, 83, 255):
+            flat = np.full((3, 5), value, np.uint8)
+            result, cutoff = threshold_image(flat)
+            self.assertEqual(cutoff, 0.0)
+            self.assertTrue(np.all(result == (0 if value == 0 else 255)))
+
+    def test_adaptive_retains_dark_line_under_uneven_background(self):
+        gray = np.tile(np.linspace(100, 240, 101, dtype=np.uint8), (51, 1))
+        gray[24:27, :] -= 50
+        before = gray.copy()
+        adaptive, cutoff = threshold_image(gray, "adaptive", adaptive_block_size=15, adaptive_c=7)
+        self.assertIsNone(cutoff)
+        self.assertTrue(np.all(adaptive[25] == 0))
+        self.assertTrue(np.all(adaptive[5] == 255))
+        # A global cutoff loses the brighter end of the same text line.
+        global_result, _ = threshold_image(gray, "global")
+        self.assertEqual(int(global_result[25, -1]), 255)
+        np.testing.assert_array_equal(gray, before)
+
+    def test_morphology_known_geometry_polarity_and_no_mutation(self):
+        gray = np.full((15, 15), 255, np.uint8)
+        gray[5:10, 5:10] = 0
+        before = gray.copy()
+        for method, extent in (("erosion", (6, 9)), ("dilation", (4, 11)),
+                               ("opening", (5, 10)), ("closing", (5, 10))):
+            expected = np.full_like(gray, 255)
+            expected[extent[0]:extent[1], extent[0]:extent[1]] = 0
+            result = apply_morphology(gray, method, 3)
+            np.testing.assert_array_equal(result, expected)
+            self.assertEqual(result[0, 0], 255)
+            self.assertEqual(result[7, 7], 0)
+            self.assertFalse(np.shares_memory(result, gray))
+        np.testing.assert_array_equal(gray, before)
+        bypass = apply_morphology(gray)
+        np.testing.assert_array_equal(bypass, gray)
+        self.assertFalse(np.shares_memory(bypass, gray))
+
+    def test_opening_removes_speck_closing_fills_hole_and_thin_stroke_loss(self):
+        gray = np.full((17, 17), 255, np.uint8)
+        gray[5:12, 5:12] = 0
+        gray[2, 2] = 0
+        self.assertEqual(apply_morphology(gray, "opening", 3)[2, 2], 255)
+        gray[8, 8] = 255
+        self.assertEqual(apply_morphology(gray, "closing", 3)[8, 8], 0)
+        thin = np.full((9, 9), 255, np.uint8)
+        thin[2:7, 4] = 0
+        self.assertTrue(np.all(apply_morphology(thin, "erosion", 3) == 255))
+        self.assertTrue(np.all(apply_morphology(thin, "opening", 3) == 255))
+
+    def test_even_kernel_anchor_borders_and_grayscale(self):
+        gray = np.full((7, 7), 255, np.uint8)
+        gray[3, 3] = 0
+        expected = np.full_like(gray, 255)
+        expected[3:5, 3:5] = 0  # 2x2 anchor is (1, 1), not centered symmetrically.
+        np.testing.assert_array_equal(apply_morphology(gray, "dilation", 2), expected)
+        gray[:] = 0
+        for method in ("erosion", "dilation", "opening", "closing"):
+            self.assertTrue(np.all(apply_morphology(gray, method, 2) == 0))
+            self.assertTrue(np.all(apply_morphology(255 - gray, method, 2) == 255))
+            np.testing.assert_array_equal(apply_morphology(gray, method, 1), gray)
+        ramp = np.tile(np.array([40, 80, 120, 160, 200], np.uint8), (5, 1))
+        self.assertEqual(apply_morphology(ramp, "erosion", 3)[2, 2], 160)
+        self.assertEqual(apply_morphology(ramp, "dilation", 3)[2, 2], 80)
+
+    def test_pipeline_defaults_exact_keys_shapes_values_and_json(self):
+        bgr = np.random.default_rng(42).integers(0, 256, (43, 61, 3), dtype=np.uint8)
+        before = bgr.copy()
+        result = run_pipeline(bgr)
+        self.assertEqual(set(result), {"stages", "ocr_input", "parameters"})
+        stages, p = result["stages"], result["parameters"]
+        self.assertEqual(list(stages), ["original", "grayscale", "denoised", "enhanced",
+                                        "thresholded", "morphology"])
+        defaults = {"denoise": "median", "kernel_size": 3, "contrast": "clahe",
+                    "threshold": "otsu", "global_threshold": 127, "adaptive_block_size": 31,
+                    "adaptive_c": 11, "morphology": "none", "morph_kernel_size": 2}
+        for key, value in defaults.items():
+            self.assertEqual(p[key], value)
+        expected_gray = to_grayscale(bgr)
+        expected_denoised = denoise_image(expected_gray)
+        expected_enhanced = enhance_contrast(expected_denoised)
+        expected_thresholded, selected = threshold_image(expected_enhanced)
+        for key, expected in (("original", before), ("grayscale", expected_gray),
+                              ("denoised", expected_denoised), ("enhanced", expected_enhanced),
+                              ("thresholded", expected_thresholded), ("morphology", expected_thresholded)):
+            np.testing.assert_array_equal(stages[key], expected)
+            self.assertEqual(stages[key].dtype, np.uint8)
+        self.assertEqual(p["selected_otsu_threshold"], selected)
+        self.assertEqual(p["clahe_tile_grid_size"], [8, 8])
+        np.testing.assert_array_equal(result["ocr_input"], expected_thresholded)
+        arrays = [bgr, *stages.values(), result["ocr_input"]]
+        for i, left in enumerate(arrays):
+            for right in arrays[i + 1:]:
+                self.assertFalse(np.shares_memory(left, right))
+        np.testing.assert_array_equal(bgr, before)
+        json.dumps(p, allow_nan=False)
+
+    def test_pipeline_bypass_options_unchanged_and_numpy_settings_json(self):
+        bgr = np.full((2, 3, 3), 83, np.uint8)
+        options = {"denoise": "none", "contrast": "none", "threshold": "none",
+                   "morphology": "none", "kernel_size": np.int64(3),
+                   "adaptive_c": np.float32(-2.5), "morph_kernel_size": np.int64(2)}
+        before = options.copy()
+        result = run_pipeline(bgr, options)
+        self.assertEqual(options, before)
+        for key, image in result["stages"].items():
+            self.assertTrue(np.all(image == 83))
+        self.assertIsNone(result["parameters"]["selected_otsu_threshold"])
+        json.dumps(result["parameters"], allow_nan=False)
+        result["ocr_input"][:] = 0
+        self.assertTrue(np.all(result["stages"]["morphology"] == 83))
+        for denoise in ("none", "gaussian", "median"):
+            for contrast in ("none", "equalize", "clahe"):
+                for threshold in ("none", "global", "otsu", "adaptive"):
+                    for morphology in ("none", "erosion", "dilation", "opening", "closing"):
+                        result = run_pipeline(bgr, {"denoise": denoise, "contrast": contrast,
+                                                   "threshold": threshold, "morphology": morphology})
+                        self.assertEqual(result["ocr_input"].shape, (2, 3))
+                        self.assertEqual(result["ocr_input"].dtype, np.uint8)
+        # This is API branch coverage on tiny input, not a dataset parameter search.
+
+    def test_invalid_options_are_rejected_even_when_stage_bypassed(self):
+        bgr = np.zeros((5, 5, 3), np.uint8)
+        gray = bgr[:, :, 0]
+        bad_values = {"denoise": ["bad", [], None], "contrast": ["bad", 1, None],
+                      "threshold": ["bad", {}, None], "morphology": ["bad", [], None],
+                      "kernel_size": [0, 2, True, 3.0], "global_threshold": [-1, 256, True, 1.0],
+                      "adaptive_block_size": [0, 1, 2, True, 3.0],
+                      "adaptive_c": [True, "11", None, float("nan"), float("inf")],
+                      "morph_kernel_size": [0, -1, True, 2.0]}
+        for key, values in bad_values.items():
+            for bad in values:
+                options = {"denoise": "none", "contrast": "none", "threshold": "none",
+                           "morphology": "none", key: bad}
+                with self.subTest(key=key, value=bad), self.assertRaises(ValueError):
+                    run_pipeline(bgr, options)
+        for options in ([], "otsu", 0, {"typo": 3}, {1: 2}):
+            with self.assertRaises(ValueError):
+                run_pipeline(bgr, options)
+        for image in (None, np.zeros((5, 5), np.uint8), np.zeros((5, 5, 3), float)):
+            with self.assertRaises(ValueError):
+                run_pipeline(image)
+        for image in (None, [], bgr, gray.astype(float), np.zeros((0, 2), np.uint8)):
+            for helper in (threshold_image, apply_morphology):
+                with self.assertRaises(ValueError):
+                    helper(image)
+        for kwargs in ({"method": []}, {"global_threshold": 256}, {"adaptive_block_size": 1},
+                       {"adaptive_c": float("nan")}):
+            with self.assertRaises(ValueError):
+                threshold_image(gray, **kwargs)
+        for method, size in (("bad", 2), ([], 2), ("none", 0)):
+            with self.assertRaises(ValueError):
+                apply_morphology(gray, method, size)
+
+    def test_saved_sg03_artifacts_match_recomputed_outputs_and_sources(self):
+        import cv2
+        folder = ROOT / "outputs/experiments/SG03"
+        report = json.loads((folder / "metrics.json").read_text())
+        manifest_bytes = (ROOT / "dataset/manifest.json").read_bytes()
+        manifest = json.loads(manifest_bytes)
+        self.assertEqual(report["manifest_sha256"], hashlib.sha256(manifest_bytes).hexdigest())
+        self.assertEqual(len(report["rows"]), 72)
+        self.assertEqual(len({(r["sample_id"], r["method"]) for r in report["rows"]}), 72)
+        self.assertEqual(len(report["pipelines"]), 8)
+        for sample in manifest["samples"]:
+            source = ROOT / "dataset" / sample["image_path"]
+            expected, pipeline = compare_sg03(load_image(source))
+            rows = [r for r in report["rows"] if r["sample_id"] == sample["id"]]
+            self.assertEqual({r["method"] for r in rows}, set(expected))
+            for row in rows:
+                path = folder / row["output_image"]
+                image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+                np.testing.assert_array_equal(image, expected[row["method"]][0])
+                self.assertEqual(row["parameters"], expected[row["method"]][1])
+                self.assertEqual(row["shape"], list(image.shape))
+                self.assertEqual(row["dtype"], str(image.dtype))
+                self.assertEqual(row["is_binary"], bool(np.isin(image, [0, 255]).all()))
+                self.assertEqual(row["dark_pixel_count"], int(np.count_nonzero(image < 128)))
+                self.assertEqual(row["source_sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+                self.assertEqual(row["output_sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+            saved = next(p for p in report["pipelines"] if p["sample_id"] == sample["id"])
+            self.assertEqual(saved["parameters"], pipeline["parameters"])
+            for stage, path in saved["stage_images"].items():
+                np.testing.assert_array_equal(cv2.imread(str(folder / path), cv2.IMREAD_UNCHANGED),
+                                              pipeline["stages"][stage])
+            for figure in ("thresholds", "thresholds_detail", "morphology", "morphology_detail"):
+                with Image.open(folder / sample["id"] / f"{figure}.png") as image:
+                    image.verify()
 
 if __name__ == "__main__":
     unittest.main()
