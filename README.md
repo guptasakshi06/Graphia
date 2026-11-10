@@ -1,4 +1,4 @@
-# Project 042: Document Intelligence for Application Readiness
+# Project 042 Document Intelligence for Application Readiness
 
 Students: **Sakshi Gupta** and **Jigisha Baiswar**.
 
@@ -8,16 +8,13 @@ demonstration scholarship checklist. Readiness describes the configured
 presence and usable information only. It does not establish authenticity,
 official eligibility or whether documents belong to the same person.
 
-M01 integrates both students’ build tracks with real local Tesseract OCR. Final
-dataset evaluation and browser scenario evidence remain for SG05/JB05 and M02.
-Read `MERGE_HANDOFF.md` for checkpoint evidence and `HANDOFF.md` for the schedule.
+The technical package is complete at M03. The [delivery manifest](docs/DELIVERY.md)
+lists the submission files, verification and cover details still needed.
 
 ## Ubuntu setup
 
-The project folder is already the integration checkout; do not create a nested
-application directory here. On a new computer, choose a directory for a real
-copy of this repository before following these commands. The repository is
-[guptasakshi06/Graphia](https://github.com/guptasakshi06/Graphia); `origin` uses `https://github.com/guptasakshi06/Graphia.git`.
+Run these commands from a checkout of the verified M03 package. In the original
+workspace, the integration directory already contains the application.
 
 Check the tools first:
 
@@ -52,7 +49,6 @@ dependencies import, a virtual environment is active, and Tesseract runs with
 Use `.venv/bin/python` instead of activation when running automated commands.
 To reproduce the complete M00 dependency snapshot, install with
 `python -m pip install -r requirements.txt -c docs/merge/M00-requirements-lock.txt`.
-Later merge gates must reconcile that snapshot if dependencies change.
 
 NumPy represents pixel arrays; OpenCV performs DIP operations; Matplotlib shows
 comparisons; Pillow reads/creates images; Pytesseract calls the separate system
@@ -74,23 +70,9 @@ out on a branch. These worktrees share Git's history but have independent files
 and independent `.venv` folders. Never switch two chats' branches in one folder.
 Do not copy or move a `.venv`; recreate it from requirements in its checkout.
 
-Use the handoff inside your own checkout for future personal chats:
-
-- Sakshi: `worktrees/sakshi/SAKSHI_HANDOFF.md`, next SG05 after M01 synchronization.
-- Jigisha: `worktrees/jigisha/JIGISHA_HANDOFF.md`, next JB05 after M01 synchronization.
-- Integration: root `MERGE_HANDOFF.md`, next M02 after SG05 and JB05.
-
-During personal work, update only owned files and the owner's handoff. The root
-personal files are integration snapshots. `TEAM_CONTRACT.md` v1 defines public
-functions, options and report keys. Sakshi owns image loading/preprocessing and
-OCR. Jigisha owns classification, extraction, readiness, reports and the UI.
-Both continue independently from the synchronized M01 baseline. Fixture tests
-are development evidence only; M01 additionally verified actual OCR and browser uploads.
-
-At merge checkpoints, record clean intended branch tips, merge locally, test,
-and forward-merge integration into both clean personal branches. The initial
-GitHub publication was explicitly requested by the user; later pushes/publication
-still require user instructions. See `MERGE_HANDOFF.md` for the merge procedure.
+The [merge handoff](MERGE_HANDOFF.md) records the final integration. The personal
+handoffs in each checkout record its sprint history. The [team contract](TEAM_CONTRACT.md)
+documents the module interfaces, processing options and report fields.
 
 ## Folder layout and local launch
 
@@ -122,13 +104,53 @@ A type is usable when one candidate has sufficient OCR text and its configured
 fields. Coverage counts detected required types; readiness counts usable types,
 each divided by the number of required types. Duplicates count once.
 
-M01 evidence and real downloads: `docs/merge/M01.md`. SG02–SG04 experiment
-artifacts are preliminary; SG05/JB05 validate the integrated behavior before
-M02 freezes evidence. Related synthetic derivatives do not prove general OCR
-accuracy. Academic report, slides and final submission assembly remain gated.
-Use fictional/reusable samples. Keep private files under ignored
-`private_uploads/` if needed; do not commit uploads or environments. Selected
-public outputs and documentation are intentionally tracked.
+## Architecture and sample evidence
+
+Streamlit decodes each upload, runs the original and processed images through
+Tesseract, then uses the selected OCR text for title matching and field extraction.
+The readiness module checks those records against the selected JSON checklist.
+The [architecture diagram](docs/diagrams/architecture.png) shows the modules and
+the [workflow diagram](docs/diagrams/workflow.png) shows the three possible outcomes.
+
+The [dataset](dataset/README.md) contains eight labeled fictional images from four
+generated layouts. Four are clear and four are related low-contrast, noisy or
+slightly blurred derivatives. Original and default OCR tied at zero pooled
+character error rate on this set. Some alternatives damaged text. For example,
+global threshold 127 blanked the faint Income Certificate. If processing damages
+text, select original OCR and analyze again. The experiment did not measure
+accuracy on unfamiliar layouts, handwriting or real scans.
+
+The [experiment summary](outputs/experiments/SG05/summary.csv) and [browser evidence](docs/merge/M02.md)
+include the fixed methods, results and provenance. Verify the saved evidence or
+reproduce the study in a new directory with these commands:
+
+```bash
+.venv/bin/python docs/merge/verify_m02.py
+.venv/bin/python scripts/evaluate_dataset.py --output-dir /tmp/dip042-sg05-repeat
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Use fictional samples for the demo. The application does not save uploads by
+default, but a downloaded report can contain OCR text. Keep any private files
+and reports outside version control.
+
+## Six-minute demo
+
+1. Launch Streamlit with the command above. Upload the four clear fictional
+   files listed in the [demo script](docs/demo_script.md), then analyze. With
+   the default checklist, the expected result is Ready at 100% for both scores.
+2. Open the Income Certificate. Compare the processing stages and OCR results.
+3. Remove the Identity Proof and analyze again. The expected result is
+   Incomplete, with both scores at 75%. Add the fictional missing-name version
+   from the demo script and analyze. Coverage returns to 100% while readiness
+   stays at 75% and the status becomes Needs Attention. Download a report.
+
+## Submission files
+
+- Academic report [PDF](docs/project_report.pdf) and [editable DOCX](docs/project_report.docx)
+- [PowerPoint presentation](docs/project_042_presentation.pptx)
+- [Combined viva Q&A](docs/viva.md) and [demo script](docs/demo_script.md)
+- [Full delivery manifest](docs/DELIVERY.md)
 
 ## Setup troubleshooting
 
@@ -149,18 +171,9 @@ Verified setup versions and real command results are recorded in
 `docs/merge/M00.md` and its environment JSON files. Verify each new machine
 separately; checks on this machine do not verify a remote student's computer.
 
-## GitHub repository and branches
+## Git history
 
-The user requested initial publication on 2026-11-10 to
-[guptasakshi06/Graphia](https://github.com/guptasakshi06/Graphia). At the user's request, setup is published as **one commit named `M00`**.
-The three intermediate setup commits were replaced in the branch histories. `main` is the GitHub landing branch. Day-to-day development
-continues in `codex/integration`, `codex/sakshi-dip` and `codex/jigisha-app` in
-the existing separate checkouts. No local branch was renamed or switched.
-
-Handoffs, the public API contract, requirements, source and selected verification
-records are tracked. `.gitignore` excludes virtual environments, nested worktree
-folders, private uploads, caches and secrets. Each personal branch contains its
-own normal project files; the ignored nested folders are not committed as
-duplicate copies. Later commits can be published when requested, from the
-appropriate branch. M01 is integrated locally; no new push or main update is
-part of this checkpoint. Both full tracks and final M03 must finish first.
+The combined project is on local `main` and `codex/integration`. The owner
+branches preserve both students’ sprint commits. The [merge handoff](MERGE_HANDOFF.md)
+records the final local delivery and publication status. Git ignores virtual
+environments, nested worktrees, private uploads, caches and local secrets.

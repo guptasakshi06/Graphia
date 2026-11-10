@@ -53,9 +53,15 @@ Decode each upload and retain its original pixels. Show grayscale, denoised, enh
 
 Streamlit coordinates the local workflow. [8] Pillow decodes the upload, NumPy stores the arrays, and OpenCV performs the image operations. Pytesseract calls the local Tesseract engine. Python rules classify the selected OCR text and extract fields; the readiness module combines those records with the selected JSON checklist and produces Markdown and JSON downloads. Matplotlib generates the experimental comparisons separately from the upload flow.
 
-> Architecture diagram pending M03 insertion: `diagrams/architecture.png`
+![System components from image upload through OCR, rules, readiness and report download](diagrams/architecture.png)
 
-> Workflow diagram pending M03 insertion: `diagrams/workflow.png`
+**Figure A.** The local architecture. Original and processed OCR feed one selected text into the document rules.
+
+![Application workflow showing per-file analysis and the checklist decisions](diagrams/workflow.png)
+
+**Figure B.** The workflow separates each file’s analysis from the decision for each required document type.
+
+<!-- pagebreak -->
 
 ## Implementation
 

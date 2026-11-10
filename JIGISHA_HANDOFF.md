@@ -6,9 +6,9 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 16:04 Asia/Kolkata; **JB05 DONE and merged at M02**, evidence frozen and synchronized; **JB06 eligible**.
-- Active sprint: none; **JB05 completed and verified locally**, JB01–JB04 integrated at M01.
-- Next: **JB06 only**, now eligible from synchronized M02 freeze `46e4bf9`; use `docs/merge/M02.md` and the identical frozen results.
+- Updated: 2026-11-10 16:47 Asia/Kolkata; **JB06 DONE and merged at M03**.
+- Active sprint: none. **JB01–JB06 complete**.
+- Next: no personal sprint remains. See the final package in `docs/DELIVERY.md`.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -21,6 +21,7 @@
 - JB03 artifacts: `config/requirements.json`, `modules/readiness.py`, `tests/test_readiness.py`, `outputs/reports/JB03_fixture_report.json`, `outputs/reports/JB03_fixture_report.md`, `docs/sprint_notes/JB03.md`. All 46 methods PASS (23 readiness + previous 23), also with site packages disabled. Fixture example: six uploads, four detected / three usable required types, 100% coverage / 75% readiness. These JB03 fixture artifacts are not real OCR/browser evidence; M01 now supplies separate real integration evidence.
 - JB04 artifacts: `app.py`, `tests/test_ui.py`, `docs/sprint_notes/JB04.md`, `outputs/screenshots/JB04_preintegration_missing_modules.png`. Final suite 58 methods PASS (46 prior + 12 UI/orchestration); actual browser preview/missing-module state checked. JB04 evidence is pre-integration only; test providers confined to tests. JB01–JB04 are now merged at M01 with separate real OCR/browser evidence.
 - JB05 artifacts: `docs/validation/jigisha.md`, `docs/sprint_notes/JB05.md`, `outputs/reports/JB05/**`, `outputs/screenshots/JB05/**`. Eight actual browser JSON scenarios, three actual Markdown pairs, fifteen inspected screenshots and three settled invalidation DOMs PASS; 101 existing tests PASS. No production fixes needed. Merged, frozen and synchronized at M02.
+- JB06 artifacts: `docs/project_042_presentation.pptx`, `docs/presentation_outline.md`, `docs/diagrams/{architecture,workflow}.{svg,png}`, `docs/viva_jigisha.md`, `docs/demo_script.md`. Verified against M02 and reviewed all 12 slide renders. Checks and artifact hash in `docs/sprint_notes/JB06.md`. Local commit locator: `git log -1 --format=fuller -- docs/project_042_presentation.pptx`.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Jigisha's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Keep your own handoff current; do not change the master, Sakshi's handoff, shared dependencies or her image/OCR modules during parallel work.
@@ -36,7 +37,7 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 | JB03 | 1 | 60 min | JB02 | DONE | M01 (DONE, synchronized) |
 | JB04 | 1 | 90 min | JB03 | DONE | M01 (DONE, synchronized) |
 | JB05 | 2 | 75 min | JB04, M01 | DONE | M02 (DONE, synchronized) |
-| JB06 | 2 | 90 min | JB05, M02 | TODO | Not merged; target M03 |
+| JB06 | 2 | 90 min | JB05, M02 | DONE | M03 (verified) |
 
 ## JB01 — Rule fixtures and document classification
 
@@ -408,3 +409,24 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - No public API/default/dependency revision, pending peer request or required M02 user action. No source behavior changed; no expensive experiment/browser rerun needed. Original/default tie does not demonstrate improvement. Any future blocking behavior fix must invalidate and rerun affected evidence through integration.
 - Completion metadata is forwarded before merge-chat stop; final containing hash is `git rev-parse HEAD`. No JB06, M03, publication, push or main update was performed here. All further commits remain local until both full tracks and M03 verification complete.
 - Exact next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB06 only. Verify the work and update the handoff before stopping.`
+
+### JB06 start — 2026-11-10 16:32 Asia/Kolkata
+- TODO → IN_PROGRESS. Clean `codex/jigisha-app` at `bf3d34e` with M02 freeze `46e4bf9` in its history. Confirmed Jigisha's worktree-specific Git identity.
+- Work order: audit existing frozen evidence, trace the production path, then create two diagrams, a local PowerPoint, outline, viva notes and demo. Four recognized types with only three usable illustrate the distinction between coverage and readiness. Local file output is required for the sprint commit and M03.
+
+### JB06 evidence checkpoint — 2026-11-10 16:34 Asia/Kolkata
+- `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python docs/merge/verify_m02.py --json /tmp/dip042-JB06-m02-audit.json`: PASS, 387 files, seven comparison groups, 112 method rows, 282 repeated artifacts, eight browser scenarios and 15 screenshots. No fresh OCR or browser runs.
+- Traced production upload orchestration, independent original OCR, selected-source rules/fields, per-file usability and type-level aggregation. Proceed with the editable 12-slide PowerPoint, two report diagrams and teaching materials using only those results.
+
+### JB06 completion — 2026-11-10 16:39 Asia/Kolkata
+- IN_PROGRESS → DONE. **READY FOR M03**, pending integration. Jigisha checkout `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`, branch `codex/jigisha-app`, parent `bf3d34ef3684e54d951502188278988965ebd94e`.
+- Delivered editable 12-slide PowerPoint with both student names, slide outline, two editable SVG sources with matching report PNGs, app viva, demo script and verification notes. Used only frozen M02 claims and media. Original/default CER tie at zero on this eight-image fictional set. Browser contrast is four usable versus three usable at the same 100% coverage.
+- PASS final package and native-table checks, Artifact Tool re-import, 12-slide LibreOffice render and visual inspection, and padded-canvas overflow test. Fixed draft diagram text crossing box borders. Final content audit confirmed exact embedded evidence, frozen metrics, demo paths and all 387 M02 hashes. Exact commands, result boundaries, recoveries and final SHA-256 in `docs/sprint_notes/JB06.md`. No fresh OCR or browser evidence was generated.
+- No peer or dependency changes requested. M03 assembly uses `docs/diagrams/architecture.png` and `docs/diagrams/workflow.png`; both already exist in this branch. No student walkthrough or mock viva has taken place.
+- Local sprint commit subject `JB06: verify the presentation, diagrams and demo materials`, author and committer Jigisha Baiswar <146957478+jigishadebugging@users.noreply.github.com>. Resolve its immutable hash with `git log -1 --format=fuller -- docs/project_042_presentation.pptx`.
+- Next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute M03 only after verifying both live SG06 and JB06 handoffs and commits.` SG06's live handoff was observed DONE/READY in its clean checkout at `784544f`; recheck both at M03. Keep this JB06 commit local and stop here.
+
+### M03 merge annotation — 2026-11-10 16:47 Asia/Kolkata
+- JB06 DONE and merged at M03 from owner commit `6ad9d57` via `80e9e6a`. The PPTX and diagrams were verified in the combined package, and both diagrams were embedded in the report.
+- Final technical package and combined viva are in `docs/DELIVERY.md`. Resolve the final baseline with `git log -1 --format=%H -- docs/merge/M03.md`.
+- No personal sprint remains. The student-supplied report cover fields are listed in the manifest.
