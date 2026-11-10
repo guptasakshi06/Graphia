@@ -1,7 +1,7 @@
-"""Reproduce SG02 or SG03 comparisons. Run with this checkout's .venv/bin/python.
+"""Reproduce SG02, SG03 or preliminary SG04 comparisons in the local venv.
 
 SG02 alternatives start from the same grayscale input. SG03 thresholds share
-grayscale input; morphology alternatives share its Otsu result. No OCR is run.
+grayscale input; morphology alternatives share its Otsu result. SG04 runs OCR.
 Only fictional manifest samples are saved; this is not an upload storage path.
 """
 
@@ -25,6 +25,45 @@ from modules.preprocessing import (  # noqa: E402
     apply_morphology, denoise_image, enhance_contrast, load_image,
     run_pipeline, threshold_image, to_grayscale,
 )
+from modules.ocr import extract_text  # noqa: E402
+
+
+CER_NORMALIZATION = "Unicode casefold, collapse all whitespace to one ASCII space, trim; preserve punctuation; no other correction"
+
+
+def normalize_ocr_text(text):
+    """Normalize comparison copies only; never change saved raw OCR text."""
+    if not isinstance(text, str):
+        raise ValueError("CER text must be a string.")
+    return " ".join(text.casefold().split())
+
+
+def levenshtein_distance(reference, hypothesis):
+    """Unit-cost insertions/deletions/substitutions, with two DP rows in memory."""
+    if not isinstance(reference, str) or not isinstance(hypothesis, str):
+        raise ValueError("Edit distance inputs must be strings.")
+    if len(hypothesis) > len(reference):
+        reference, hypothesis = hypothesis, reference
+    previous = list(range(len(hypothesis) + 1))
+    for i, expected in enumerate(reference, 1):
+        current = [i]
+        for j, observed in enumerate(hypothesis, 1):
+            current.append(min(previous[j] + 1, current[j - 1] + 1,
+                               previous[j - 1] + (expected != observed)))
+        previous = current
+    return previous[-1]
+
+
+def character_error_rate(reference, hypothesis):
+    """Normalized Levenshtein/reference length; may exceed 1, never clipped.
+
+    An empty normalized reference is undefined and raises ValueError, including
+    empty/empty. An empty hypothesis with a nonempty reference has CER 1.
+    """
+    reference, hypothesis = normalize_ocr_text(reference), normalize_ocr_text(hypothesis)
+    if not reference:
+        raise ValueError("CER needs a nonempty normalized reference.")
+    return levenshtein_distance(reference, hypothesis) / len(reference)
 
 
 def compare_methods(image_bgr, kernel_size=3, clip_limit=2.0, tile_grid_size=(8, 8)):
@@ -255,9 +294,142 @@ def run_sg03_experiments(manifest_path, output_dir):
     return report
 
 
+def compare_sg04(image_bgr):
+    """Small fixed candidate set; no reference-dependent production selection."""
+    gray = to_grayscale(image_bgr)
+    default = run_pipeline(image_bgr)
+    otsu = run_pipeline(image_bgr, {"denoise": "none", "contrast": "none"})
+    return {
+        "original": (image_bgr.copy(), {"operation": "none", "max_dimension": 1800}),
+        "grayscale": (gray, {"conversion": "BGR2GRAY", "max_dimension": 1800}),
+        "pipeline_default": (default["ocr_input"], default["parameters"]),
+        "grayscale_otsu": (otsu["ocr_input"], otsu["parameters"]),
+    }
+
+
+def verified_ocr_samples(manifest_path):
+    """Refuse evaluation when source/reference hashes lack matching visual review."""
+    manifest_path = Path(manifest_path)
+    manifest = json.loads(manifest_path.read_text())
+    review_path = manifest_path.parent / manifest["visual_review_path"]
+    review = json.loads(review_path.read_text())
+    samples = []
+    for sample in manifest["samples"]:
+        inspected = review["samples"].get(sample["id"], {})
+        if inspected.get("status") != "visually_verified":
+            raise ValueError(f"No verified reference review for {sample['id']}")
+        for field, hash_key in (("image_path", "image_sha256"),
+                                ("reference_path", "reference_sha256")):
+            path = manifest_path.parent / sample[field]
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != sample[hash_key] or digest != inspected.get(hash_key):
+                raise ValueError(f"Source/review hash mismatch: {path}")
+        reference = (manifest_path.parent / sample["reference_path"]).read_text()
+        if not normalize_ocr_text(reference):
+            raise ValueError(f"Empty reference: {sample['id']}")
+        samples.append((sample, reference))
+    if not samples:
+        raise ValueError("No samples in manifest.")
+    return manifest, review_path, samples
+
+
+def run_sg04_experiments(manifest_path, output_dir):
+    """Save real raw OCR and preliminary CER for four methods on all samples.
+
+    Errors are recorded with null CER, never scored as successful blank OCR.
+    Failed OCR raises after saving the report so CLI exit status is nonzero.
+    """
+    import pytesseract
+
+    manifest_path, output_dir = Path(manifest_path), Path(output_dir)
+    manifest, review_path, samples = verified_ocr_samples(manifest_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for sample, reference in samples:
+        original = load_image(manifest_path.parent / sample["image_path"])
+        before = original.copy()
+        alternatives = compare_sg04(original)
+        sample_dir = output_dir / sample["id"]
+        sample_dir.mkdir(exist_ok=True)
+        (sample_dir / "reference_normalized.txt").write_text(normalize_ocr_text(reference) + "\n")
+        for method, (image, parameters) in alternatives.items():
+            result = extract_text(image, lang="eng", psm=6, timeout=20)
+            text_path = Path(sample["id"]) / f"{method}.txt"
+            (output_dir / text_path).write_text(result["text"])
+            image_path, image_hash = sample["image_path"], sample["image_sha256"]
+            if method != "original":
+                relative = Path(sample["id"]) / f"{method}.png"
+                if not cv2.imwrite(str(output_dir / relative), image):
+                    raise OSError(f"Could not write {relative}")
+                image_path = relative.as_posix()
+                image_hash = hashlib.sha256((output_dir / relative).read_bytes()).hexdigest()
+            normalized_ref = normalize_ocr_text(reference)
+            normalized_output = normalize_ocr_text(result["text"])
+            success = result["status"] != "error"
+            rows.append({
+                "sample_id": sample["id"], "condition": sample["condition"], "method": method,
+                "source_image": sample["image_path"], "source_sha256": sample["image_sha256"],
+                "reference_path": sample["reference_path"], "reference_sha256": sample["reference_sha256"],
+                "parameters": parameters, "shape": list(image.shape), "dtype": str(image.dtype),
+                "ocr_image": image_path, "ocr_image_base": "dataset" if method == "original" else "output_dir",
+                "ocr_image_sha256": image_hash, "raw_text_path": text_path.as_posix(),
+                "raw_text_sha256": hashlib.sha256((output_dir / text_path).read_bytes()).hexdigest(),
+                "ocr": result, "normalized_reference": normalized_ref,
+                "normalized_hypothesis": normalized_output, "reference_characters": len(normalized_ref),
+                "edit_distance": levenshtein_distance(normalized_ref, normalized_output) if success else None,
+                "cer": character_error_rate(reference, result["text"]) if success else None,
+            })
+            print(f"SG04: {sample['id']} / {method}: {result['status']}, CER={rows[-1]['cer']}", flush=True)
+        np.testing.assert_array_equal(original, before)
+    summary = {}
+    for method in ("original", "grayscale", "pipeline_default", "grayscale_otsu"):
+        scored = [row for row in rows if row["method"] == method and row["cer"] is not None]
+        summary[method] = {
+            "scored_count": len(scored), "error_count": len(samples) - len(scored),
+            "mean_cer": sum(row["cer"] for row in scored) / len(scored) if scored else None,
+            "total_edits": sum(row["edit_distance"] for row in scored),
+            "total_reference_characters": sum(row["reference_characters"] for row in scored),
+        }
+        total = summary[method]
+        total["pooled_cer"] = (total["total_edits"] / total["total_reference_characters"]
+                               if total["total_reference_characters"] else None)
+    # A failed version probe must not discard already collected OCR errors.
+    version, version_error = None, None
+    try:
+        version = str(pytesseract.get_tesseract_version())
+    except (OSError, RuntimeError) as exc:
+        version_error = str(exc)
+    report = {
+        "sprint": "SG04", "purpose": "Preliminary real OCR on related synthetic samples; not integrated/final evaluation",
+        "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "visual_review_sha256": hashlib.sha256(review_path.read_bytes()).hexdigest(),
+        "versions": {"tesseract": version, "pytesseract": pytesseract.__version__,
+                     "opencv": cv2.__version__, "numpy": np.__version__},
+        "engine_version_error": version_error,
+        "normalization": CER_NORMALIZATION, "empty_reference": "ValueError, including empty/empty",
+        "confidence": "null; not measured by the single text call; never an accuracy percentage",
+        "selected_default": "contract-v1 pipeline_default, processed OCR; original remains a manual alternative",
+        "rows": rows, "summary": summary,
+    }
+    (output_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    columns = ["sample_id", "condition", "method", "status", "error", "reference_characters",
+               "edit_distance", "cer", "raw_text_path", "engine_config", "parameters"]
+    with (output_dir / "metrics.csv").open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns, lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            values = {**row, **row["ocr"]}
+            writer.writerow({k: json.dumps(values[k], sort_keys=True) if isinstance(values[k], dict)
+                             else values[k] for k in columns})
+    if any(row["ocr"]["status"] == "error" for row in rows):
+        raise ValueError("OCR failures recorded in SG04 metrics; evaluation is incomplete.")
+    print(f"SG04: saved {len(rows)} real OCR comparisons to {output_dir}")
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--sprint", choices=("SG02", "SG03"), default="SG02")
+    parser.add_argument("--sprint", choices=("SG02", "SG03", "SG04"), default="SG02")
     parser.add_argument("--manifest", type=Path, default=ROOT / "dataset/manifest.json")
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--kernel-size", type=int, default=3)
@@ -266,10 +438,11 @@ def main():
     args = parser.parse_args()
     try:
         output_dir = args.output_dir or ROOT / "outputs/experiments" / args.sprint
-        if args.sprint == "SG03":
+        if args.sprint in ("SG03", "SG04"):
             if (args.kernel_size, args.clip_limit, tuple(args.tile_grid_size)) != (3, 2.0, (8, 8)):
-                raise ValueError("SG03 comparisons use fixed documented settings; SG02 flags apply to SG02.")
-            run_sg03_experiments(args.manifest, output_dir)
+                raise ValueError("SG03/SG04 comparisons use fixed documented settings; SG02 flags apply to SG02.")
+            runner = run_sg03_experiments if args.sprint == "SG03" else run_sg04_experiments
+            runner(args.manifest, output_dir)
         else:
             run_experiments(args.manifest, output_dir, args.kernel_size,
                             args.clip_limit, args.tile_grid_size)
