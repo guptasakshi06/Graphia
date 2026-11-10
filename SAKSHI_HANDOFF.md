@@ -6,9 +6,9 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 12:46 Asia/Kolkata; **M00 DONE**, personal work not started.
-- Active sprint: none.
-- Next: **SG01 — eligible; M00 DONE**.
+- Updated: 2026-11-10 13:08 Asia/Kolkata; **SG01 DONE locally**, verified; not merged.
+- Active sprint: none; **SG01 completed**.
+- Next: **SG02 — eligible; SG01 DONE**. Execute in a new chat using this handoff.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -21,7 +21,7 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| SG01 | 1 | 60 min | M00 | TODO | Not merged; target M01 |
+| SG01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
 | SG02 | 1 | 75 min | SG01 | TODO | Not merged; target M01 |
 | SG03 | 1 | 75 min | SG02 | TODO | Not merged; target M01 |
 | SG04 | 1 | 75 min | SG03 | TODO | Not merged; target M01 |
@@ -177,3 +177,45 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 
 ### One-commit baseline correction — 2026-11-10 12:56 Asia/Kolkata
 - User requested replacing the three intermediate setup commits with one root commit named `M00`. Keep this checkout on its existing codex branch and start from that root baseline. Historical hashes above describe pre-squash activity only; current baseline is obtained with `git rev-list --max-parents=0 HEAD`. Setup/evidence files and TODO sprint statuses are preserved.
+
+### SG01 start — 2026-11-10 13:03 Asia/Kolkata — session 1
+- Status: TODO → IN_PROGRESS. Read own/shared agreements and M00 evidence.
+- Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`; branch `codex/sakshi-dip`; actual HEAD/root baseline `464c884af09bb1d2db686559eaee16cdb9912d59` (`M00`); clean at start.
+- No supplied dataset found. Plan: deterministic Pillow fictional samples, reference text/fields, loader, contact sheet, focused tests and visual inspection. References remain unverified until inspected.
+- Scope: SG01 only; no filtering, OCR, peer/shared edits or publication.
+
+### SG01 checkpoint — 2026-11-10 13:07 Asia/Kolkata — session 1
+- Own environment rechecked: six imports, independent venv, Tesseract 5.3.4 (`eng`, `osd`), `pip check` and Streamlit CLI PASS. Evidence: `outputs/experiments/SG01_environment.json`.
+- Eight fictional PNGs generated with reference text and expected fields; four types, low contrast, seeded noise and mild blur represented. Six image-loader tests PASS.
+- Contact sheet and four full-size degraded pages inspected against all eight transcripts. No clipping or mismatches found; hash-bound inspection recorded in `dataset/visual_review.json`. This was assistant inspection, not human review.
+- Remaining before DONE: full dataset/integrity/reproducibility tests, syntax/diff check, teaching notes and final handoff. No blocker or peer request.
+
+### SG01 completion — 2026-11-10 13:08 Asia/Kolkata — session 1
+- Status before → after: TODO → IN_PROGRESS → **DONE**. All SG01 acceptance checks met; SG02–SG06 remain TODO.
+- Checkout / branch / baseline: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` / `codex/sakshi-dip` / `464c884af09bb1d2db686559eaee16cdb9912d59` (`M00`). HEAD remains M00. Changes are local, uncommitted and unmerged; no push performed. Clean at start; only owned paths changed.
+- Concepts explained before implementation and in `docs/sprint_notes/SG01.md`: pixels, `(height, width, channels)`, uint8, BGR/RGB, resolution, EXIF orientation, alpha-on-white, aspect ratio, area interpolation, and why verified references precede OCR.
+- Dataset checkpoint: eight fictional RGB PNGs, each 1400 × 1000, four types with four clear parents/four derivatives. Income low contrast (`scale=0.22`, `offset=185`); caste Gaussian noise (`seed=4201`, `sigma=18`); marksheet/identity mild Gaussian blur (`radius=1.2`/`1.5`). Seeds/settings, font/version hashes, provenance, parent IDs, full reference paths and expected fields are in `dataset/manifest.json`. No private data or official form claims.
+- Field coverage: name, application ID and ISO issue date on every sample; labeled certificate numbers on income/caste certificates only. Marksheet/identity certificate numbers are `null`. Eight full transcripts include banners and disclaimers; these are reference/test text, not OCR output.
+- Visual checkpoint: inspected all eight pages in `outputs/experiments/contact_sheet.png` against transcripts and all four degraded PNGs individually. All text/fields matched, no clipping; intended conditions visible. `dataset/visual_review.json` records assistant inspection and image/reference hashes; no human review claimed. Regeneration cannot create a new review; changed hashes require reinspection.
+- Loader checkpoint: `load_image(source, max_dimension=1800)` accepts path/bytes; EXIF applied, transparency composited on white, output BGR uint8, no enlargement, aspect-preserving downsampling with `INTER_AREA` and nearest whole-pixel dimensions. Source limit 40,000,000 pixels before decoding plus Pillow bomb guard. All samples stay 1400 × 1000 at default; tested 2400 × 1200 → 1800 × 900, portrait → 900 × 1800, sample limit 700 → 700 × 500. Invalid inputs/limits fail with `ValueError`. Contract unchanged; no filtering/pipeline/OCR implemented.
+- Changed owned files: `SAKSHI_HANDOFF.md`; `modules/preprocessing.py`; `scripts/create_sample_dataset.py`; `tests/test_preprocessing.py`; `dataset/README.md`, `dataset/manifest.json`, `dataset/visual_review.json`, eight PNGs in four type directories, eight `dataset/references/*.txt`; `outputs/experiments/contact_sheet.png`, `outputs/experiments/SG01_environment.json`, `outputs/experiments/SG01_tests.txt`; `docs/sprint_notes/SG01.md`.
+- Checks / actual results:
+  - `git status --short --branch`, `git worktree list --porcelain`, `git log -1 --format='%H %s'`: PASS; correct owner checkout/branch and actual M00 baseline.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json outputs/experiments/SG01_environment.json`: PASS; Python 3.12.3, own venv, all six imports; Tesseract 5.3.4 with `eng`/`osd`.
+  - `.venv/bin/python -m pip check`: PASS, no broken requirements (cache permission warning only). `.venv/bin/python -m streamlit --version`: PASS, 1.67.0.
+  - `.venv/bin/python scripts/create_sample_dataset.py`: PASS, eight samples plus manifest/transcripts/contact sheet.
+  - `.venv/bin/python -m unittest discover -s tests -p test_preprocessing.py -k ImageInput -v`: PASS, six loader tests.
+  - `.venv/bin/python -m unittest discover -s tests -p test_preprocessing.py -v > outputs/experiments/SG01_tests.txt 2>&1`: PASS, **8 tests**, including path/bytes, BGR, EXIF pixel placement, alpha/palette, grayscale input, resize/no enlargement, invalid/corrupt/truncated input, source-pixel guard, all dataset paths/decodes/dimensions/fields/review hashes, and byte-identical fresh generation in a temporary directory.
+  - `.venv/bin/python -m compileall -q modules/preprocessing.py scripts/create_sample_dataset.py tests/test_preprocessing.py`: PASS. `git diff --check`: PASS.
+- Acceptance unmet / errors / student-only action: none. No OCR accuracy, filtering improvement, application success or student review claimed.
+- Requested peer/dependency changes: none. Shared/peer files and dependencies untouched.
+- Remaining work: SG02–SG04 before Sakshi's package is ready for M01; later validation/report remain gated. Stop after SG01.
+- Exact next action: in a new chat request `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG02. Verify the work and update the handoff before stopping.`
+- Merge readiness: **SG01 complete locally; NOT READY for M01** until SG04 and peer build prerequisites pass. Merged at: **not yet**.
+
+### SG01 Git publication request — 2026-11-10 13:12 Asia/Kolkata
+- User explicitly requested committing this sprint to GitHub with a one-line explanation.
+- Commit subject: `SG01: Add reproducible sample documents and a tested image loader`. Destination: `origin` → `https://github.com/guptasakshi06/Graphia.git`, branch `codex/sakshi-dip`. Only Sakshi-owned SG01 work is included.
+- Before publication, `git ls-remote origin refs/heads/codex/sakshi-dip` confirmed remote base `464c884af09bb1d2db686559eaee16cdb9912d59` matches local M00. The sandbox's first attempt could not resolve GitHub; authorized network access succeeded.
+- Resolve the sprint commit with `git log -1 --format='%H %s'`; publication is checked by comparing `git rev-parse HEAD` with `git ls-remote origin refs/heads/codex/sakshi-dip`. The actual push result is reported in this chat.
+- SG01 remains DONE; not integrated at M01. Next: SG02 in this checkout. No merge, peer work, dependency change or later sprint is included.

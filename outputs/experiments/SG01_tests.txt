@@ -1,0 +1,13 @@
+test_generator_reproduces_assets_and_manifest (test_preprocessing.DatasetTests.test_generator_reproduces_assets_and_manifest) ... ok
+test_manifest_images_references_and_review_hashes (test_preprocessing.DatasetTests.test_manifest_images_references_and_review_hashes) ... ok
+test_exif_orientation_moves_pixels (test_preprocessing.ImageInputTests.test_exif_orientation_moves_pixels) ... ok
+test_grayscale_input (test_preprocessing.ImageInputTests.test_grayscale_input) ... ok
+test_invalid_input_and_limit_fail_clearly (test_preprocessing.ImageInputTests.test_invalid_input_and_limit_fail_clearly) ... ok
+test_paths_bytes_bgr_and_independent_result (test_preprocessing.ImageInputTests.test_paths_bytes_bgr_and_independent_result) ... ok
+test_resize_landscape_portrait_and_no_enlargement (test_preprocessing.ImageInputTests.test_resize_landscape_portrait_and_no_enlargement) ... ok
+test_rgba_and_palette_transparency_on_white (test_preprocessing.ImageInputTests.test_rgba_and_palette_transparency_on_white) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.551s
+
+OK
