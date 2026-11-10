@@ -6,9 +6,9 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 16:02 Asia/Kolkata; **JB05 DONE and merged at M02**, evidence verified; synchronization pending.
+- Updated: 2026-11-10 16:04 Asia/Kolkata; **JB05 DONE and merged at M02**, evidence frozen and synchronized; **JB06 eligible**.
 - Active sprint: none; **JB05 completed and verified locally**, JB01–JB04 integrated at M01.
-- Next: **JB06 after M02 synchronization**, using `docs/merge/M02.md` and the identical frozen results.
+- Next: **JB06 only**, now eligible from synchronized M02 freeze `46e4bf9`; use `docs/merge/M02.md` and the identical frozen results.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -20,7 +20,7 @@
 - Main delivery instruction (2026-11-10): keep personal sprint commits local; **add completed work to `main` only after all sprints and required verification are done**. Intermediate M01/M02 integration gates remain on `codex/integration`; this instruction does not authorize an early main update or push. Merge chat must carry this preference into the shared record at its next gate.
 - JB03 artifacts: `config/requirements.json`, `modules/readiness.py`, `tests/test_readiness.py`, `outputs/reports/JB03_fixture_report.json`, `outputs/reports/JB03_fixture_report.md`, `docs/sprint_notes/JB03.md`. All 46 methods PASS (23 readiness + previous 23), also with site packages disabled. Fixture example: six uploads, four detected / three usable required types, 100% coverage / 75% readiness. These JB03 fixture artifacts are not real OCR/browser evidence; M01 now supplies separate real integration evidence.
 - JB04 artifacts: `app.py`, `tests/test_ui.py`, `docs/sprint_notes/JB04.md`, `outputs/screenshots/JB04_preintegration_missing_modules.png`. Final suite 58 methods PASS (46 prior + 12 UI/orchestration); actual browser preview/missing-module state checked. JB04 evidence is pre-integration only; test providers confined to tests. JB01–JB04 are now merged at M01 with separate real OCR/browser evidence.
-- JB05 artifacts: `docs/validation/jigisha.md`, `docs/sprint_notes/JB05.md`, `outputs/reports/JB05/**`, `outputs/screenshots/JB05/**`. Eight actual browser JSON scenarios, three actual Markdown pairs, fifteen inspected screenshots and three settled invalidation DOMs PASS; 101 existing tests PASS. No production fixes needed. Merged and evidence verified at M02; synchronization pending.
+- JB05 artifacts: `docs/validation/jigisha.md`, `docs/sprint_notes/JB05.md`, `outputs/reports/JB05/**`, `outputs/screenshots/JB05/**`. Eight actual browser JSON scenarios, three actual Markdown pairs, fifteen inspected screenshots and three settled invalidation DOMs PASS; 101 existing tests PASS. No production fixes needed. Merged, frozen and synchronized at M02.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Jigisha's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Keep your own handoff current; do not change the master, Sakshi's handoff, shared dependencies or her image/OCR modules during parallel work.
@@ -35,7 +35,7 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 | JB02 | 1 | 60 min | JB01 | DONE | M01 (DONE, synchronized) |
 | JB03 | 1 | 60 min | JB02 | DONE | M01 (DONE, synchronized) |
 | JB04 | 1 | 90 min | JB03 | DONE | M01 (DONE, synchronized) |
-| JB05 | 2 | 75 min | JB04, M01 | DONE | M02 (verified; synchronization pending) |
+| JB05 | 2 | 75 min | JB04, M01 | DONE | M02 (DONE, synchronized) |
 | JB06 | 2 | 90 min | JB05, M02 | TODO | Not merged; target M03 |
 
 ## JB01 — Rule fixtures and document classification
@@ -401,3 +401,10 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - M02 verification PASS: 107 tests, environment/pip/compile/diff, 387 frozen hashes, all eight image/reference pairs, seven comparisons, 282-file repeat maps, eight actual browser report scenarios/three Markdown pairs/settled invalidation DOMs and 15 screenshot hashes. Exact commands/limits/artifacts: docs/merge/M02.md.
 - Original/default CER0 is a tie on a small synthetic set, not measured improvement/general accuracy. Browser missing-field identity is readable but unusable; blank/unknown/corrupt/duplicates remain distinct. Prior server interruption and identical invalidation viewport crops are documented honestly. No human review or new M02 browser experiment claimed.
 - Synchronization pending into both clean personal checkouts. Do not start JB06 until the M02 completion annotation below. No further sprint, push or main update performed.
+
+### M02 synchronization completion — 2026-11-10 16:04 Asia/Kolkata
+- M02 DONE. This branch fast-forwarded to verified freeze `46e4bf936518a747a3ce5fe7796ba2c9deede991` using `git merge --ff-only codex/integration --quiet`. All three tips matched and worktrees were clean; both personal handoffs and all frozen source/evidence are physically present and identical across checkouts. Own .venv audit of all 387 frozen files/eight browser reports, real provider imports and pip check PASS. Jigisha's worktree-specific identity preserved.
+- JB05 DONE and merged at M02; **JB06 remains TODO and is now the next eligible personal sprint**. Write submission materials against `docs/merge/M02.md`, `M02-freeze.json`, `outputs/experiments/SG05/` and `outputs/reports/JB05/` / `outputs/screenshots/JB05/`. Preserve numbers, sample limits and screenshot provenance. Historical candidate/unmerged statements above and inside original owner evidence are superseded by this annotation.
+- No public API/default/dependency revision, pending peer request or required M02 user action. No source behavior changed; no expensive experiment/browser rerun needed. Original/default tie does not demonstrate improvement. Any future blocking behavior fix must invalidate and rerun affected evidence through integration.
+- Completion metadata is forwarded before merge-chat stop; final containing hash is `git rev-parse HEAD`. No JB06, M03, publication, push or main update was performed here. All further commits remain local until both full tracks and M03 verification complete.
+- Exact next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB06 only. Verify the work and update the handoff before stopping.`
