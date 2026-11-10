@@ -10,10 +10,10 @@
 - **Integration lead:** Sakshi Gupta; Jigisha reviews the application and presentation. A merge chat performs the concrete integration work, rather than asking either person to manually combine code snippets.
 - **Planning date:** 2026-11-10, Asia/Kolkata. Update local timestamps during actual work.
 - **Workspace/integration checkout:** `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- **Current phase:** **M00 DONE**; **SG01 and JB01 DONE**, **SG02 and JB02 IN_PROGRESS** in their personal chats; not integrated. This is a tracking/Git-policy update, not M01.
-- **Next shared action:** M01 still waits for **SG02–SG04 and JB02–JB04**; SG01 and JB01 are DONE in their own checkouts.
-- **Next Sakshi action:** **Resume SG02 (IN_PROGRESS in another chat)**, using Sakshi's live checkout handoff. Leave her active worktree unchanged.
-- **Next Jigisha action:** **Resume JB02 (IN_PROGRESS in another chat)**, using Jigisha's live checkout handoff. Do not interrupt or synchronize into her active worktree.
+- **Current phase:** **M01 IN_PROGRESS**; SG01–SG04 and JB01–JB04 merged and verified; synchronization/completion record pending.
+- **Next shared action:** finish M01 synchronization, then M02 waits for verified SG05 and JB05.
+- **Next Sakshi action:** **SG05**, only after M01 synchronization; use Sakshi’s live checkout handoff.
+- **Next Jigisha action:** **JB05**, only after M01 synchronization; use Jigisha’s live checkout handoff.
 - **Original full requirements:** `PROJECT_BRIEF.md`, preserved without edits.
 - **Time budget:** Two focused days. Work estimates are targets, not calendar deadlines.
 
@@ -89,14 +89,14 @@ No shared experiment script or combined report file should be edited by both tra
 
 Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, plus a buffer of up to an hour each day. Individual sprint durations are not promises. The workload is parallel, so do not add both people's hours as elapsed project time. Keep optional features out if buffers are consumed.
 
-### Master status snapshot — tracking update, 2026-11-10 13:18 Asia/Kolkata; no M01 merge
+### Master status snapshot — M01 verification, 2026-11-10 14:36 Asia/Kolkata
 
 | Track | Sprints/checkpoints | Status | Merged state |
 |---|---|---|---|
 | Shared setup | M00 | DONE | Single root commit `M00`; no personal code merged |
-| Sakshi build | SG01; SG02; SG03–SG04 | SG01 DONE; SG02 IN_PROGRESS; remainder TODO | Not merged; SG01 commit `6629e0f` |
-| Jigisha build | JB01; JB02; JB03–JB04 | JB01 DONE; JB02 IN_PROGRESS; remainder TODO | Not merged; JB01 local commit `0b23f1e` |
-| Code integration | M01 | TODO | Waiting for both build tracks |
+| Sakshi build | SG01–SG04 | DONE | Merged at M01, source cutoff `93a07b1`, merge `8951039` |
+| Jigisha build | JB01–JB04 | DONE | Merged at M01, source cutoff `5bbd086`, merge `a8a0208` |
+| Code integration | M01 | IN_PROGRESS | Real OCR/browser verified; sync pending |
 | Sakshi validation | SG05 | TODO | Not merged |
 | Jigisha validation | JB05 | TODO | Not merged |
 | Evidence integration | M02 | TODO | Waiting for both validation tracks |
@@ -180,11 +180,11 @@ Deep learning, TensorFlow/PyTorch, CNNs, transformers, LLM services, cloud deplo
 | Deliverable | Owner/gate | Status | Verified path |
 |---|---|---|---|
 | Environment/dependencies/source organization | M00, M03 | M00 DONE; final audit at M03 | `requirements.txt`, `scripts/check_environment.py`, `docs/merge/M00*.json` |
-| Dataset + references + provenance | SG01 | DONE in personal checkout; not merged | `worktrees/sakshi/dataset/manifest.json`, `dataset/visual_review.json` in that checkout |
-| DIP pipeline + all comparisons | SG02–SG05 | TODO | — |
-| OCR + measured results/raw outputs | SG04–SG05 | TODO | — |
-| Classification/fields/readiness/report export | JB01–JB03 | JB01 classification DONE locally; JB02–JB03 TODO | `worktrees/jigisha/modules/classification.py`; live JB01 handoff/evidence |
-| Real integrated Streamlit application | JB04, M01, JB05 | TODO | — |
+| Dataset + references + provenance | SG01 | DONE, merged at M01 | `dataset/manifest.json`, `dataset/visual_review.json` |
+| DIP pipeline + all comparisons | SG02–SG05 | Build DONE/merged; final validation SG05 | `modules/preprocessing.py`, `outputs/experiments/SG02/`, `outputs/experiments/SG03/` |
+| OCR + measured results/raw outputs | SG04–SG05 | Build/preliminary CER DONE/merged; SG05 pending | `modules/ocr.py`, `outputs/experiments/SG04/` |
+| Classification/fields/readiness/report export | JB01–JB03 | DONE, merged at M01 | `modules/classification.py`, `modules/extraction.py`, `modules/readiness.py`, `config/requirements.json` |
+| Real integrated Streamlit application | JB04, M01, JB05 | M01 real flow PASS; final scenarios JB05 | `app.py`, `docs/merge/M01.md` |
 | Final experiment tables + screenshots | SG05, JB05, M02 | TODO | — |
 | README | M03 | Starter setup guide written; final guide at M03 | `README.md` |
 | Academic report, editable source + usable artifact | SG06 | TODO | — |
@@ -197,7 +197,7 @@ Deep learning, TensorFlow/PyTorch, CNNs, transformers, LLM services, cloud deplo
 
 Observed at M00: Ubuntu 24.04.4 LTS, Python 3.12.3, root pip 26.3; three independent `.venv` environments with all six imports and dependency checks PASS. NumPy 2.5.4, OpenCV headless 5.0.0.93, Matplotlib 3.11.2, Pytesseract 0.3.13, Streamlit 1.67.0, Pillow 13.0.0. System Tesseract 5.3.4 with `eng`/`osd`. All 42 installed distributions match the recorded snapshot. No apt/sudo installation was needed. Evidence: `docs/merge/M00.md` and adjacent JSON files.
 
-Current Git baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested replacing the three intermediate setup commits with this single commit. Existing setup evidence remains valid: code and dependencies are unchanged. All three workspaces retain their codex branches; GitHub `main` points to the same M00 baseline. Repository: `https://github.com/guptasakshi06/Graphia`. The M00 integration baseline contains no dataset/application modules. Personal SG01 now supplies the dataset/loader, and JB01 supplies classification; they are not yet integrated. No app or server has been verified. A temporary setup-only OCR phrase was read successfully; this is not dataset accuracy or end-to-end application evidence.
+Current Git baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested replacing the three intermediate setup commits with this single commit. Existing setup evidence remains valid: code and dependencies are unchanged. All three workspaces retain their codex branches; GitHub `main` points to the same M00 baseline. Repository: `https://github.com/guptasakshi06/Graphia`. M01 now merges both build tracks and verifies the local app with real Tesseract and browser uploads/downloads. Contract v1 and dependencies are unchanged. See `docs/merge/M01.md`; M00 setup-only evidence remains distinct from application evidence.
 
 | Decision | Reason |
 |---|---|
@@ -207,7 +207,7 @@ Current Git baseline: single root commit named `M00` (resolve with `git rev-list
 | Contract-first rules/UI development | Jigisha need not wait for Sakshi's OCR implementation |
 | Merge real code before final experiments and submission artifacts | Ensure all report/slide claims match the actual integrated application |
 
-Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; real OCR validation is still pending; college/roll-number/faculty metadata and report format are unknown; two days is tight. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
+Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; final integrated dataset/browser validation (SG05/JB05) is still pending; college/roll-number/faculty metadata and report format are unknown; two days is tight. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
 
 ## 10. Handoff maintenance after every sprint
 
@@ -240,3 +240,7 @@ At each M gate the integration chat reads both live handoffs, merges owned work,
 - Follow-up inspection at 2026-11-10 13:20 Asia/Kolkata: Jigisha's JB01 now exists as `0b23f1ef8948efa2d2b8d44bea9c8f4009df623c`, correctly authored/committed as Jigisha Baiswar with the confirmed GitHub no-reply address. Another chat has begun JB02 and has dirty owned files. Leave her worktree unchanged; synchronize the shared policy only at a clean, stable cutoff. Her live handoff already records local commits and deferring main until all work is finished.
 
 - Final concurrent-work check at 2026-11-10 13:20 Asia/Kolkata: Sakshi's SG02 is also IN_PROGRESS with owned loader/test/experiment edits. Both worktrees are active; do not merge policy documentation into either now. Shared policy is committed on `codex/integration`; synchronization is deferred until clean, idle cutoffs. Resume SG02/JB02 in their existing chats. Keep `main` unchanged until both tracks and M03 finish; then include both contributions in the final combined project. No additional push occurred.
+
+### M01 verification — 2026-11-10 14:36 Asia/Kolkata
+- Both live handoffs READY and clean: Sakshi `93a07b1`, Jigisha `5bbd086`; sequential normal merges `8951039` / `a8a0208` preserve both authors. All 101 tests PASS; final notice-only update passed 12 UI tests. Real production smoke: four samples/eight OCR calls, exact expected fields/types, six stages, corrupt record retained. Browser: two actual uploads/four OCR calls, 50% coverage/readiness, both downloads parsed, no browser warnings/errors.
+- M01 synchronization pending. No SG05/JB05, final evidence freeze, human review, push or main update. Evidence: `docs/merge/M01.md`.

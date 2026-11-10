@@ -207,8 +207,8 @@ def main():
     st.set_page_config(page_title="Document Intelligence — Project 042", layout="wide")
     st.title("Document Intelligence for Application Readiness")
     st.caption("Project 042 · Sakshi Gupta and Jigisha Baiswar · Local academic demonstration")
-    st.info("Pre-integration UI: real DIP/OCR integration must be verified at M01. "
-            "No fixture OCR is available in this application.")
+    st.info("Local DIP and Tesseract OCR process your uploaded images. "
+            "Compare the original and processed OCR before reviewing readiness.")
     st.write("Upload JPG, JPEG or PNG documents, choose a checklist and processing settings, "
              "then press Analyze documents. Review both OCR outputs before choosing a source.")
     st.warning("Demonstration checklist only. Readiness checks presence and usable information; "
@@ -250,7 +250,7 @@ def main():
         try:
             provider = load_real_provider()
         except (ImportError, OSError) as error:
-            st.error(f"Awaiting real DIP/OCR modules: {error}. Complete the M01 merge; no fake OCR fallback is used.")
+            st.error(f"Awaiting real DIP/OCR modules: {error}. Check the local installation and module files; no fake OCR fallback is used.")
         else:
             try:
                 with st.spinner("Processing images and running original/processed OCR…"):

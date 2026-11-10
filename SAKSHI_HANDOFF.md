@@ -6,14 +6,14 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 13:48 Asia/Kolkata; **SG04 DONE locally**; SG01–SG04 verified and READY FOR M01, not merged.
+- Updated: 2026-11-10 14:36 Asia/Kolkata; SG01–SG04 integrated and verified at M01; synchronization pending.
 - Active sprint: none; **SG04 completed**.
-- Next: root **M01** merge chat checks both build tracks and integrates them. **SG05 is gated on M01 and synchronization**; do not start it from this unmerged branch.
+- Next: **SG05** after M01 synchronization completes; read `docs/merge/M01.md` from this checkout.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
-- Build readiness: **Sakshi SG01–SG04 READY FOR M01**. Peer readiness is not asserted by this personal sprint.
-- Code/evidence merged: none.
+- Build readiness: **SG01–SG04 DONE and integrated at M01**; both source cutoffs verified by the merge chat.
+- Code/evidence merged: SG01–SG04 at M01; final validation remains SG05.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Sakshi's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Contract APIs are fixed across tracks. Keep your own handoff current; do not change the master, Jigisha's handoff, or shared dependencies during parallel work.
@@ -22,10 +22,10 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| SG01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
-| SG02 | 1 | 75 min | SG01 | DONE | Not merged; target M01 |
-| SG03 | 1 | 75 min | SG02 | DONE | Not merged; target M01 |
-| SG04 | 1 | 75 min | SG03 | DONE | Not merged; target M01 |
+| SG01 | 1 | 60 min | M00 | DONE | M01 (verified; sync pending) |
+| SG02 | 1 | 75 min | SG01 | DONE | M01 (verified; sync pending) |
+| SG03 | 1 | 75 min | SG02 | DONE | M01 (verified; sync pending) |
+| SG04 | 1 | 75 min | SG03 | DONE | M01 (verified; sync pending) |
 | SG05 | 2 | 75 min | SG04, M01 | TODO | Not merged; target M02 |
 | SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
 
@@ -346,3 +346,9 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - Next personal action only **after M01 passes and synchronizes**: execute SG05 from this checkout's handoff, with actual `docs/merge/M01.md` and real peer modules present. No SG05 started here. **Merged at: not yet.**
 - Staging verification: first sandboxed `git add` could not create the linked-worktree index lock (read-only Git metadata). The authorized elevated retry succeeded. Reviewed **76 staged files**, all Sakshi-owned SG04 code/notes/evidence; `git diff --cached --check` PASS. This is a filesystem sandbox retry, not a test failure or automatic-review rejection. No code changed after the final passing suite/reproduction.
 - Final local command: `git commit -m 'SG04: Add real Tesseract OCR and verified preliminary CER comparisons'`, followed by `git log -1 --format='%H %an <%ae> %s'` and `git status --short --branch`. The commit contains this record; use the resulting Git log as the authoritative hash/author and final response as the post-commit result.
+
+### M01 integration annotation — 2026-11-10 14:36 Asia/Kolkata
+- SG01–SG04 source cutoff `93a07b1` merged through normal history-preserving M01 merges (`8951039` Sakshi, `a8a0208` Jigisha). Earlier not-merged statements are historical.
+- Full combined suite 101 PASS; real four-sample production smoke and two-upload browser flow PASS; downloads verified. `docs/merge/M01.md` records exact evidence, commands and limitations. No public contract/default/dependency change or fixture in the production flow.
+- Only app notice/setup-error wording changed at integration; module behavior preserved. Recursive filesystem watching overflowed with nested worktrees; tested launch uses `--server.fileWatcherType=none`, requiring server restart after source changes.
+- Synchronization pending into both clean personal checkouts; do not start SG05 until the completion annotation below. No SG05, human review or final evidence freeze performed. All commits local; main unchanged.

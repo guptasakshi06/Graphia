@@ -6,20 +6,20 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 13:53 Asia/Kolkata; **JB01–JB04 DONE, READY FOR M01 (not merged)**.
-- Active sprint: none; **JB04 completed and verified**. Parent JB03 `82cf5dc`; JB04 commit locator: `git log -1 --format=fuller -- app.py`. No merge or push.
-- Next: root **M01** gate, after checking both live build tracks. **Do not start JB05 until M01 is verified and synchronized**. Stop after the required local JB04 commit.
+- Updated: 2026-11-10 14:36 Asia/Kolkata; JB01–JB04 integrated and verified at M01; synchronization pending.
+- Active sprint: none; **JB01–JB04 completed and integrated at M01**. Original JB04 tip `5bbd086`; no push.
+- Next: **JB05** after M01 synchronization completes; read `docs/merge/M01.md` from this checkout.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
-- Code/evidence merged: none.
+- Code/evidence merged: JB01–JB04 at M01; final validation remains JB05.
 - JB01 artifacts: `modules/classification.py`, `tests/fixtures/rule_cases.json`, `tests/test_classification.py`, `docs/sprint_notes/JB01.md`. 8 unittest methods PASS on 16 fictional reference cases; also PASS with site packages disabled. Fixture success is not real OCR evidence.
 - JB02 artifacts: `modules/extraction.py`, `tests/test_extraction.py`, fixture extensions (32 total cases), `docs/sprint_notes/JB02.md`. 23 methods PASS (15 extraction + 8 classification), also with site packages disabled. Eight peer reference transcripts matched expected fields in a read-only compatibility check; no real OCR run. No unmet JB02 acceptance checks.
 - Git authorization: local JB01/JB02 commits approved; latest project policy automatically authorizes a local commit after each verified sprint, including JB03, as **Jigisha Baiswar**, account `jigishadebugging`, using `146957478+jigishadebugging@users.noreply.github.com` for both author and committer. Use per-command identity overrides; shared/global Git identity stays unchanged. Existing Graphia repository confirmed. No push requested.
 - Local commit locators: `git log -1 --format=fuller -- modules/classification.py` identifies JB01; `git log -1 --format=fuller -- modules/extraction.py` identifies the JB02 commit carrying the updated handoff and five owned files. Both are local; checkout remains `codex/jigisha-app`.
 - Main delivery instruction (2026-11-10): keep personal sprint commits local; **add completed work to `main` only after all sprints and required verification are done**. Intermediate M01/M02 integration gates remain on `codex/integration`; this instruction does not authorize an early main update or push. Merge chat must carry this preference into the shared record at its next gate.
-- JB03 artifacts: `config/requirements.json`, `modules/readiness.py`, `tests/test_readiness.py`, `outputs/reports/JB03_fixture_report.json`, `outputs/reports/JB03_fixture_report.md`, `docs/sprint_notes/JB03.md`. All 46 methods PASS (23 readiness + previous 23), also with site packages disabled. Fixture example: six uploads, four detected / three usable required types, 100% coverage / 75% readiness. No real OCR/browser evidence. M01 NOT READY until JB04 and the other track prerequisites pass.
-- JB04 artifacts: `app.py`, `tests/test_ui.py`, `docs/sprint_notes/JB04.md`, `outputs/screenshots/JB04_preintegration_missing_modules.png`. Final suite 58 methods PASS (46 prior + 12 UI/orchestration); actual browser preview/missing-module state checked. No real OCR/end-to-end evidence; test providers confined to tests. Jigisha build track READY FOR M01; not merged.
+- JB03 artifacts: `config/requirements.json`, `modules/readiness.py`, `tests/test_readiness.py`, `outputs/reports/JB03_fixture_report.json`, `outputs/reports/JB03_fixture_report.md`, `docs/sprint_notes/JB03.md`. All 46 methods PASS (23 readiness + previous 23), also with site packages disabled. Fixture example: six uploads, four detected / three usable required types, 100% coverage / 75% readiness. These JB03 fixture artifacts are not real OCR/browser evidence; M01 now supplies separate real integration evidence.
+- JB04 artifacts: `app.py`, `tests/test_ui.py`, `docs/sprint_notes/JB04.md`, `outputs/screenshots/JB04_preintegration_missing_modules.png`. Final suite 58 methods PASS (46 prior + 12 UI/orchestration); actual browser preview/missing-module state checked. JB04 evidence is pre-integration only; test providers confined to tests. JB01–JB04 are now merged at M01 with separate real OCR/browser evidence.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Jigisha's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Keep your own handoff current; do not change the master, Sakshi's handoff, shared dependencies or her image/OCR modules during parallel work.
@@ -30,10 +30,10 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| JB01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
-| JB02 | 1 | 60 min | JB01 | DONE | Not merged; target M01 |
-| JB03 | 1 | 60 min | JB02 | DONE | Not merged; target M01 |
-| JB04 | 1 | 90 min | JB03 | DONE | Not merged; target M01 |
+| JB01 | 1 | 60 min | M00 | DONE | M01 (verified; sync pending) |
+| JB02 | 1 | 60 min | JB01 | DONE | M01 (verified; sync pending) |
+| JB03 | 1 | 60 min | JB02 | DONE | M01 (verified; sync pending) |
+| JB04 | 1 | 90 min | JB03 | DONE | M01 (verified; sync pending) |
 | JB05 | 2 | 75 min | JB04, M01 | TODO | Not merged; target M02 |
 | JB06 | 2 | 90 min | JB05, M02 | TODO | Not merged; target M03 |
 
@@ -350,3 +350,9 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - Local commit required/authorized: `JB04: add contract-based Streamlit UI and state checks`, author/committer `Jigisha Baiswar <146957478+jigishadebugging@users.noreply.github.com>`, explicit five-file scope. This record is included; obtain actual immutable hash after commit with `git log -1 --format=fuller -- app.py` rather than a self-reference. Verify commit parent/scope/attribution and clean worktree after committing; observed hash/result is reported in chat.
 - No unmet JB04 acceptance items, blocker or student-only action remains. Remaining track: M01 before JB05, M02 before JB06, final M03. Keep all further commits local and main deferred until both complete tracks and verified M03; preserve published SG01 history.
 - Exact next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute M01 only after verifying both live build tracks are ready.` This chat stops after JB04's local commit; do not execute M01 or JB05 here.
+
+### M01 integration annotation — 2026-11-10 14:36 Asia/Kolkata
+- JB01–JB04 source cutoff `5bbd086` merged through normal history-preserving M01 merges (`8951039` Sakshi, `a8a0208` Jigisha). Earlier not-merged statements are historical.
+- Full combined suite 101 PASS; real four-sample production smoke and two-upload browser flow PASS; downloads verified. `docs/merge/M01.md` records exact evidence, commands and limitations. No public contract/default/dependency change or fixture in the production flow.
+- Only app notice/setup-error wording changed at integration; module behavior preserved. Recursive filesystem watching overflowed with nested worktrees; tested launch uses `--server.fileWatcherType=none`, requiring server restart after source changes.
+- Synchronization pending into both clean personal checkouts; do not start JB05 until the completion annotation below. No JB05, human review or final evidence freeze performed. All commits local; main unchanged.

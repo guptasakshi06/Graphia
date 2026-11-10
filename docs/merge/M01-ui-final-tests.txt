@@ -1,0 +1,22 @@
+test_display_bgr_gray_and_preview_normalization (test_ui.OrchestrationTests.test_display_bgr_gray_and_preview_normalization) ... ok
+test_ocr_exception_and_no_text_keep_all_records (test_ui.OrchestrationTests.test_ocr_exception_and_no_text_keep_all_records) ... ok
+test_pipeline_failure_keeps_original_available (test_ui.OrchestrationTests.test_pipeline_failure_keeps_original_available) ... ok
+test_production_missing_provider_has_no_fixture_fallback (test_ui.OrchestrationTests.test_production_missing_provider_has_no_fixture_fallback) ... ok
+test_selected_ocr_drives_fields_and_duplicate_report (test_ui.OrchestrationTests.test_selected_ocr_drives_fields_and_duplicate_report) ... ok
+test_signature_and_state_invalidation_all_inputs (test_ui.OrchestrationTests.test_signature_and_state_invalidation_all_inputs) ... ok
+test_stable_distinct_ids_even_identical_name_and_bytes (test_ui.OrchestrationTests.test_stable_distinct_ids_even_identical_name_and_bytes) ... ok
+test_download_payloads_match_the_visible_fixture_report (test_ui.StreamlitInteractionTests.test_download_payloads_match_the_visible_fixture_report) ... 2026-11-10 14:32:54.064 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_fixture_render_downloads_and_all_input_changes_clear_results (test_ui.StreamlitInteractionTests.test_fixture_render_downloads_and_all_input_changes_clear_results) ... 2026-11-10 14:32:54.226 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_missing_modules_clear_message_and_no_downloads (test_ui.StreamlitInteractionTests.test_missing_modules_clear_message_and_no_downloads) ... 2026-11-10 14:32:54.421 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_production_start_empty_selection_and_no_uploads (test_ui.StreamlitInteractionTests.test_production_start_empty_selection_and_no_uploads) ... 2026-11-10 14:32:54.507 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_retry_failure_clears_previous_report (test_ui.StreamlitInteractionTests.test_retry_failure_clears_previous_report) ... 2026-11-10 14:32:54.607 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.658s
+
+OK

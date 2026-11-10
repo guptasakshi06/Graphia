@@ -5,16 +5,16 @@
 ## Current position
 
 - Integration lead: **Sakshi Gupta**. Application/presentation reviewer: **Jigisha Baiswar**.
-- Updated: 2026-11-10 13:18 Asia/Kolkata; **M00 DONE**, SG01/JB01 DONE personally; local-commit policy updated. No M01 code merge.
-- Active checkpoint: none; **M00 completed**.
-- Next checkpoint: **M01 — waiting for SG02–SG04 and JB02–JB04**; SG01/JB01 DONE, SG02/JB02 IN_PROGRESS in other chats; neither track merged.
+- Updated: 2026-11-10 14:39 Asia/Kolkata; **M01 IN_PROGRESS**; both complete build tracks merged and real flow verified; final synchronization pending.
+- Active checkpoint: **M01 IN_PROGRESS**, started 2026-11-10 13:57 Asia/Kolkata; both live build tracks DONE/READY and clean.
+- Next checkpoint: finish M01 real integration verification, then synchronize both tracks for SG05/JB05.
 - Integration checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- Integration branch: `codex/integration`; current baseline is the single root commit named `M00`.
+- Integration branch: `codex/integration`; both build tracks merged at `a8a0208`; verified M01 baseline commit/synchronization pending.
 - Sakshi branch/checkout: `codex/sakshi-dip`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`.
 - Jigisha branch/checkout: `codex/jigisha-app`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`.
 - Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. GitHub main retains M00. Sakshi's branch also has the previously authorized SG01 commit `6629e0f`; future development commits remain local under the latest user policy.
 - Environment evidence: root, Sakshi and Jigisha PASS; all six imports, `pip check`, Streamlit CLI, Tesseract English and exact 42-distribution snapshot match. See `docs/merge/M00*.json`.
-- Latest repository policy: local commits for both owners with one-line sprint explanations; preserve both histories and integrate at the existing gates. No further push until both tracks and verified M03 finish. No personal code has been merged at M01.
+- Latest repository policy: local commits for both owners with one-line sprint explanations; preserve both histories and integrate at the existing gates. No further push until both tracks and verified M03 finish. SG01–SG04 and JB01–JB04 are now merged at M01; final validation remains SG05/JB05.
 
 Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and both personal handoffs. The master defines file ownership and academic scope. All commands below are execution instructions for future checkpoints, not claims they have run.
 
@@ -23,7 +23,7 @@ Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` an
 | Checkpoint | Depends on | Status | Expected output | Actual commit/evidence |
 |---|---|---|---|---|
 | M00 | Planning files | DONE | Tested baseline, fixed interfaces, two separate checkouts | `M00` single root commit; `docs/merge/M00.md` + JSON evidence |
-| M01 | M00, SG01–SG04, JB01–JB04 | TODO | Real integrated application with first complete upload test | — |
+| M01 | M00, SG01–SG04, JB01–JB04 | IN_PROGRESS | Real integrated application with first complete upload test | — |
 | M02 | M01, SG05, JB05 | TODO | Frozen tested code and measured evidence for report/slides | — |
 | M03 | M02, SG06, JB06 | TODO | Verified submission package and final master status | — |
 
@@ -243,3 +243,19 @@ Update this file and the master at every checkpoint or interruption. When person
 - Documentation synchronization is deferred for both personal branches: a subsequent inspection found Sakshi's SG02 is also active and dirty. No policy merge was attempted there. Preserve both active sprints and synchronize only when each has a clean, idle cutoff. No remote push or early main update.
 
 - Final scope/check at 2026-11-10 13:20 Asia/Kolkata: root changes are only `AGENTS.md`, `HANDOFF.md`, `MERGE_HANDOFF.md`; no application files copied/merged. Both live handoffs report second sprints IN_PROGRESS. Do not execute those sprints in this policy chat. Before the next policy synchronization, recheck branch tips, clean status and owner handoffs; then merge `codex/integration` locally with normal history-preserving merges. `main` stays unchanged until verified M03 and both full tracks finish. All new commits remain local.
+
+### M01 — 2026-11-10 13:57 Asia/Kolkata — session 1 — start
+- TODO → IN_PROGRESS. Read required project instructions, brief, contract v1, master/merge, M00 foundation evidence and both live personal handoffs/evidence inventories.
+- Integration cutoff: codex/integration / f99cafe69af397f02aa978b65dbea10b476a748f, clean.
+- Sakshi cutoff: worktrees/sakshi / codex/sakshi-dip / 93a07b1ffe5da4f59941ed65d46e1ad881b115c7, clean, SG01–SG04 DONE/READY; no peer/dependency requests.
+- Jigisha cutoff: worktrees/jigisha / codex/jigisha-app / 5bbd086569566c7e7e52fdb18bcd013649123ca3, clean, JB01–JB04 DONE/READY; no peer/dependency requests.
+- Both handoffs stop at M01; no active edits observed. Preserve owner histories through sequential normal merges. Local commits only; no push or main update.
+- Verify real module contracts, full suite/environment, actual real-OCR sample and browser upload/download. Keep fixture-only tests distinct. SG05/JB05 not executed here.
+
+### M01 — 2026-11-10 14:39 Asia/Kolkata — session 1 — verified code cutoff
+- M01 remains IN_PROGRESS only for completion synchronization. Sequential normal merges PASS: Sakshi merge `8951039`, Jigisha merge `a8a0208`; no conflicts or owner-code algorithm fixes. Owner sprint authorship intact. No contract/default/dependency revisions.
+- PASS: environment/Tesseract English, pip check; 101 combined tests; final wording-only update 12 UI tests; compile and diff checks. Real four-sample/eight-OCR smoke matches expected fields/types; corrupt fifth file retained, Ready/100%. Repeatable `docs/merge/verify_m01.py` also PASS.
+- Actual browser PASS: two existing fictional sample uploads, six stages per file, original/processed OCR ok, fields/type/readability, 2/4 types = 50% coverage/readiness, Incomplete; both report downloads parsed and copied. Final app restarted/reuploaded/analyzed after wording update. Browser warning/error logs were empty at download check. All paths/commands: `docs/merge/M01.md`.
+- Runtime issue: recursive Streamlit watching overflowed with nested environments/worktrees; resolved with tested `--server.fileWatcherType=none`, documented in README. Restart after code edits. No system-watch setting changed.
+- Browser origin access was declined during an optional later screenshot-framing adjustment. Stopped all browser actions; did not circumvent it. Earlier downloaded reports, complete final DOM and saved partial-viewport screenshot remain valid. This is not a failed OCR/browser acceptance check or automatic shell-approval rejection.
+- Root handoffs/master/README updated; source worktrees rechecked clean and still at recorded tips. Commit this verified baseline, then forward-merge it sequentially into both tracks. No SG05/JB05 or later M gate started; no push/main update.
