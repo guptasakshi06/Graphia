@@ -106,6 +106,9 @@ by Other Backward Classes,” install optional Hindi OCR data on Ubuntu with
 as the OCR source. This mode uses Tesseract page segmentation mode 4. The app
 reads the holder from the certification sentence and the number from the
 Hindi certificate label. The app still displays both OCR outputs for review.
+The bilingual mode also handles supported Hindi income certificate titles and
+applicant or certificate-number labels. A PAN card with a supported card heading
+and an explicit holder name label counts under **Identity Proof** in the demo.
 
 A type is usable when one candidate has sufficient OCR text and its configured
 fields. Coverage counts detected required types; readiness counts usable types,

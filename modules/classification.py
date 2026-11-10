@@ -9,6 +9,19 @@ import re
 
 
 OBC_CERTIFICATE_HEADING = "form of certificate to be produced by other backward classes"
+PAN_CARD_HEADING = re.compile(
+    r"^[ \t]*(?P<title>permanent\s+account\s+number\s+card|pan\s+card)[ \t]*\r?$",
+    re.IGNORECASE | re.MULTILINE,
+)
+HINDI_INCOME_HEADING = re.compile(
+    r"^[ \t]*(?:कार्यालय[ \t]+तहसीलदार[ \t]+द्वारा[ \t]+प्रदत्त[ \t]+)?"
+    r"(?P<title>आय[ \t]+प्रमाण[ \t-]*पत्र)[ \t।]*\r?$",
+    re.MULTILINE,
+)
+DOCUMENT_HEADINGS = {
+    "income_certificate": HINDI_INCOME_HEADING,
+    "identity_proof": PAN_CARD_HEADING,
+}
 
 # Keep order fixed so evidence and test results are reproducible.
 TITLE_KEYWORDS = {
@@ -42,6 +55,9 @@ def classify_document(text):
             keyword for keyword in keywords
             if re.search(r"(?<!\w)" + re.escape(keyword) + r"(?!\w)", normalized)
         ]
+        heading_pattern = DOCUMENT_HEADINGS.get(doc_type)
+        if heading_pattern and (heading := heading_pattern.search(text)):
+            matches.append(" ".join(heading.group("title").casefold().split()))
         if matches:
             matched_types.append(doc_type)
             evidence.extend(matches)

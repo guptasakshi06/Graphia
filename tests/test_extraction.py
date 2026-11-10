@@ -14,6 +14,47 @@ EMPTY_FIELDS = dict.fromkeys(FIELD_KEYS)
 
 
 class ExtractionTests(unittest.TestCase):
+    def test_pan_card_uses_the_explicit_holder_label(self):
+        heading = "INCOME TAX DEPARTMENT\nPermanent Account Number Card\n"
+        for name in ("Name: Asha Example", "Name\nAsha Example", "नाम / Name: Asha Example"):
+            with self.subTest(name=name):
+                text = heading + name + "\nFather's Name\nBela Example"
+                self.assertEqual(classify_document(text)["doc_type"], "identity_proof")
+                self.assertEqual(extract_fields(text, "identity_proof"), {
+                    **EMPTY_FIELDS, "student_name": "Asha Example",
+                })
+        parent_only = heading + "Name\nFather's Name\nBela Example"
+        self.assertEqual(extract_fields(parent_only, "identity_proof"), EMPTY_FIELDS)
+        self.assertEqual(extract_fields(heading + "Name\nSignature", "identity_proof"), EMPTY_FIELDS)
+        self.assertEqual(extract_fields(heading + "Name: Asha Example\nName: Bela Example",
+                                        "identity_proof"), EMPTY_FIELDS)
+        self.assertEqual(classify_document("Apply for a permanent account number card")["doc_type"], "unknown")
+        self.assertEqual(classify_document("Income Certificate\n" + heading)["doc_type"], "unknown")
+
+    def test_bilingual_income_uses_applicant_and_certificate_labels(self):
+        heading = "कार्यालय तहसीलदार द्वारा प्रदत्त आय प्रमाण-पत्र\n"
+        numbers = "आवेदन क्र०: 000000000000004\nप्रमाणपत्र संख्या: 000000000042\n"
+        for label, name in (("Applicant Name", "Asha Example"),
+                            ("आवेदक का नाम / Applicant Name", "Asha Example"),
+                            ("1. उम्मीदवार का नाम", "आशा उदाहरण")):
+            with self.subTest(label=label):
+                text = heading + numbers + f"{label}: {name}\nपिता का नाम: Other Example"
+                self.assertEqual(classify_document(text)["doc_type"], "income_certificate")
+                self.assertEqual(extract_fields(text, "income_certificate"), {
+                    **EMPTY_FIELDS, "student_name": name, "certificate_number": "000000000042",
+                })
+        self.assertEqual(classify_document("आय प्रमाण-पत्र हेतु आवेदन-पत्र")["doc_type"], "unknown")
+        application_only = heading + "आवेदन क्र०: 000000000000004\nपिता का नाम: Other Example"
+        self.assertEqual(extract_fields(application_only, "income_certificate"), EMPTY_FIELDS)
+        damaged_label = heading + "प्रमाणपत्र Feat: 000000000042"
+        self.assertEqual(extract_fields(damaged_label, "income_certificate")["certificate_number"],
+                         "000000000042")
+        for line in ("आवेदन Feat: 000000000042", "प्रमाणपत्र Feat 000000000042",
+                     "प्रमाणपत्र Feat: 000000000042 000000000043"):
+            self.assertIsNone(extract_fields(heading + line, "income_certificate")["certificate_number"])
+        narrative = heading + numbers + "This is to certify that Shri Asha Example daughter of Other Example"
+        self.assertEqual(extract_fields(narrative, "income_certificate")["student_name"], "Asha Example")
+
     def test_obc_form_uses_holder_sentence_and_labeled_certificate_number(self):
         heading = ("FORM OF CERTIFICATE TO BE PRODUCED BY\n"
                    "OTHER BACKWARD CLASSES")
