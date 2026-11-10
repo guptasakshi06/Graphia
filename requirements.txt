@@ -1,0 +1,8 @@
+# M00: exact direct versions verified on Ubuntu 24.04 / Python 3.12.3.
+# Tesseract 5.3.4 + eng are separate Ubuntu system dependencies.
+numpy==2.5.4
+opencv-python-headless==5.0.0.93
+matplotlib==3.11.2
+pytesseract==0.3.13
+streamlit==1.67.0
+Pillow==13.0.0

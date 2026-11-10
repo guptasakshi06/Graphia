@@ -1,0 +1,29 @@
+# Local environments and nested personal checkouts
+.venv/
+worktrees/
+
+# Python/tool caches and temporary files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.ipynb_checkpoints/
+*.tmp
+*.swp
+*~
+.DS_Store
+
+# Private inputs and local settings; retain selected public output evidence
+private_uploads/
+uploads/
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Environment-owned metadata must never enter the project baseline
+.agents/
+.codex/
+.aws/

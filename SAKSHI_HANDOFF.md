@@ -1,0 +1,179 @@
+# Sakshi Gupta — Personal sprint handoff
+
+> A new chat receiving this file's path must execute **Sakshi's next eligible SG sprint only**, update this handoff in her own checkout, and stop. Do not start Jigisha's work or a merge automatically.
+
+## Current position
+
+- Owner: **Sakshi Gupta**.
+- Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
+- Updated: 2026-11-10 12:46 Asia/Kolkata; **M00 DONE**, personal work not started.
+- Active sprint: none.
+- Next: **SG01 — eligible; M00 DONE**.
+- Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
+- GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
+- M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
+- Code/evidence merged: none.
+- Peer requests: none.
+
+Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Sakshi's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Contract APIs are fixed across tracks. Keep your own handoff current; do not change the master, Jigisha's handoff, or shared dependencies during parallel work.
+
+## Sprint ledger
+
+| Sprint | Day | Target | Depends on | Status | Integrated at |
+|---|---|---:|---|---|---|
+| SG01 | 1 | 60 min | M00 | TODO | Not merged; target M01 |
+| SG02 | 1 | 75 min | SG01 | TODO | Not merged; target M01 |
+| SG03 | 1 | 75 min | SG02 | TODO | Not merged; target M01 |
+| SG04 | 1 | 75 min | SG03 | TODO | Not merged; target M01 |
+| SG05 | 2 | 75 min | SG04, M01 | TODO | Not merged; target M02 |
+| SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
+
+## SG01 — Dataset and correct image input
+
+**Build:** A reproducible sample set and image loader. You do not depend on Jigisha's implementations; use the frozen field labels/type IDs in `TEAM_CONTRACT.md`.
+
+1. Verify you are in Sakshi's checkout on the recorded branch; verify your local environment using the M00 setup instructions. Never assume the other checkout's `.venv` applies here.
+2. Explain pixels, shape/dtype, BGR/RGB, resolution and resize interpolation. Explain why reference text must exist before OCR experiments.
+3. Use student-supplied fictional/reusable images if available. Otherwise create `scripts/create_sample_dataset.py` with Pillow: four clear fictional document types plus four degraded derivatives, approximately eight images total. Add a visible synthetic/sample label without pretending these are official certificates. Cover low contrast, seeded noise and slight blur; record deterministic seeds/settings.
+4. Follow the contract's sample title/field labels. Include names on all samples and labeled certificate numbers on the two certificate types; include issue date and application ID where reasonable. Do not force every field onto every type.
+5. Create `dataset/manifest.json`, ground-truth text and expected fields. Record type, condition, provenance, derivative relationship, settings and reference path. Manually inspect rendered images against transcripts; label reference text unverified until actually checked.
+6. Implement `load_image(source, max_dimension=1800)` in `modules/preprocessing.py` according to the contract: paths/bytes, orientation, alpha-to-white, BGR, aspect ratio and invalid-input handling.
+7. Save and inspect a contact sheet. Check all manifest paths, decodes, dimensions and colors. Do not start filtering yet.
+
+**Owned outputs:** `dataset/**`, `scripts/create_sample_dataset.py`, loading portion of `modules/preprocessing.py`, relevant `tests/test_preprocessing.py`, `outputs/experiments/contact_sheet.png`, `docs/sprint_notes/SG01.md`.
+
+**Acceptance:** Approximately eight decodable samples; all four types/quality variations represented; ground truth visually verified; path and bytes loading both work; an invalid image fails clearly; colors/orientation/aspect ratio are correct.
+
+**Handoff:** Record generation/verification commands, chosen resize policy, sample provenance and field coverage. Mark SG01 done only with evidence, then stop. Next SG02.
+
+## SG02 — Grayscale, denoising, contrast and histograms
+
+**Build:** Explainable DIP functions and a repeatable experiment runner.
+
+1. Teach approximate grayscale weights, weighted Gaussian neighborhoods, median selection with a small numeric example, and the noise/detail tradeoff.
+2. Extend preprocessing with grayscale, Gaussian and median filtering. Validate kernels and preserve the original image array.
+3. Implement histogram equalization and CLAHE; explain histograms, local tiles and clipping. Record CLAHE settings rather than hiding defaults.
+4. Create `scripts/run_experiments.py` to compare original/grayscale, Gaussian/median and original/equalized/CLAHE on the same inputs. Do not chain competing methods by default.
+5. Save figures/histograms and actual grayscale standard-deviation contrast values. Explain that this simple contrast measure is not OCR accuracy and high contrast need not improve text.
+6. Inspect a clean, a noisy and a low-contrast image. Record any smoothing/enhancement that damages text or amplifies noise.
+
+**Owned outputs:** Preprocessing functions, experiment script, focused preprocessing checks, `outputs/experiments/**`, SG02 teaching notes.
+
+**Acceptance:** Expected shapes/dtypes; unchanged input; valid/invalid kernel checks; actual comparison images and contrast values saved. Do not claim an OCR improvement yet.
+
+**Handoff:** Record exact settings and provisional recommendations. Stop; next SG03.
+
+## SG03 — Thresholds, morphology and contract pipeline
+
+**Build:** All required threshold and morphology demonstrations and `run_pipeline`.
+
+1. Explain a simple global cutoff, Otsu's variance intuition and adaptive thresholds under uneven lighting.
+2. Implement global, Otsu and adaptive thresholding. Validate adaptive odd block size greater than one; report selected Otsu threshold.
+3. Explain structuring elements and white foreground. Implement erosion, dilation, opening and closing. Invert deliberately for morphology if needed; restore dark-text/light-background before OCR.
+4. Implement the exact `run_pipeline(image_bgr, options=None)` API and output keys from `TEAM_CONTRACT.md`. Every named stage remains available when bypassed. Reject invalid option names/values. Return resolved JSON-safe parameters.
+5. Extend comparisons to global/Otsu/adaptive, erosion/dilation, opening/closing. Inspect where operations remove noise or damage character strokes.
+6. Keep a small practical candidate set and optional morphology; do not run an exhaustive parameter search.
+
+**Owned outputs:** Complete `modules/preprocessing.py`, runner updates, focused checks, comparison artifacts, SG03 notes.
+
+**Acceptance:** Three threshold and four morphology methods all execute with visible output; polarity is verified; image arrays match the contract; original remains unchanged; required parameters/defaults are documented.
+
+**Handoff:** Record exact public API availability and any requested contract changes for M01. Stop; next SG04.
+
+## SG04 — Real OCR and preliminary CER
+
+**Build:** Tesseract wrapper and honest original/processed comparison. This finishes Sakshi's pre-merge code.
+
+1. Explain OCR as a downstream recognition stage, how Tesseract uses page segmentation, and why Python Pytesseract needs the system executable.
+2. Implement `extract_text` in `modules/ocr.py` exactly as contracted. Detect missing engine/language data, enforce timeout and handle blank text. Confidence, if exposed, excludes invalid entries and is labeled heuristic.
+3. Run OCR on original and selected processed images; store actual text, settings and errors. Do not let failure become a successful empty result.
+4. Add a small CER utility to the experiment runner: Levenshtein distance / reference character count. Document normalization and empty-reference behavior; CER may exceed 1. Verify known insertion/deletion/substitution examples.
+5. Run preliminary dataset comparisons using verified transcripts. Save raw texts and CSV/JSON metrics. Compare at least clear and degraded inputs; ideally run all eight within this sprint.
+6. Select a documented default pipeline based on actual demo results. Keep original/grayscale alternatives when preprocessing hurts; do not use ground truth to automatically choose a production output per uploaded image.
+
+**Owned outputs:** `modules/ocr.py`, `tests/test_ocr.py`, `tests/test_metrics.py`, experiment outputs, SG04 notes.
+
+**Acceptance:** Clear image yields real OCR text; original/processed outputs and CER exist; no-text and setup/error states are tested; contract returns match; no fabricated improvement. A missing system engine means this sprint is not done.
+
+**Handoff:** Mark build package READY FOR M01 with changed-file list, executed checks, branch tip/local diff, dataset paths and OCR artifact paths. Do not claim merged. Stop and provide the root `MERGE_HANDOFF.md` path. SG05 must wait for M01 and synchronize to the merged baseline.
+
+## SG05 — Integrated pipeline evaluation and final experiments
+
+**Build:** Final measured evidence from real merged modules, including Jigisha's classifier/extractor.
+
+1. Verify `docs/merge/M01.md` and actual merged code exist. Synchronize your clean branch from integration following the merge handoff; record the baseline. Do not rely only on a stale master status.
+2. Run all samples through actual image → DIP → OCR → classification/extraction → readiness code. Add `scripts/evaluate_dataset.py` if useful. Compare expected/observed types and supported fields; distinguish OCR failures from rule failures.
+3. Re-run all seven DIP/OCR comparisons with final settings. Save final tables with sample IDs, exact methods/settings, contrast and original/processed CER, plus raw OCR/reference normalization.
+4. Document incorrect classifications, missed fields, no-text/worse-preprocessing cases and dataset limitations. Use actual denominators for counts/accuracy; do not inflate certainty from eight related samples.
+5. Fix only your owned bugs, then rerun affected checks. Send peer-owned bug requests through this handoff; M02 must resolve them before evidence freezes.
+6. Write `docs/validation/sakshi.md` and distinguish final data from preliminary SG04 output. Mark invalidated artifacts if settings changed.
+
+**Owned outputs:** Final `outputs/experiments/**`, evaluation script, Sakshi validation summary, relevant module fixes, SG05 notes.
+
+**Acceptance:** All final tables can be reproduced; ground truth checked; all seven comparisons represented; observed type/field results recorded; limitations and failures are honest. No report prose or slides claiming unverified improvements.
+
+**Handoff:** Mark READY FOR M02 with artifact paths and unresolved peer requests. Stop; SG06 requires M02's frozen evidence.
+
+## SG06 — Academic report and DIP/OCR viva material
+
+**Build:** A report based on the frozen integrated results. Jigisha separately handles slides/diagrams/app viva.
+
+1. Verify M02 has frozen measurements and browser results. Use its exact output paths; do not substitute preliminary numbers.
+2. Write `docs/project_report.md` with Abstract, Introduction, Problem Statement, Objectives, Existing Approach, Proposed Methodology, DIP Techniques, System Architecture, Implementation, Experimental Results, Limitations, Future Scope, Conclusion and References.
+3. Use the known student names Sakshi Gupta and Jigisha Baiswar. Leave clearly labeled placeholders only for missing roll numbers, college, department, faculty and required cover format.
+4. Include actual measured tables and DIP figures. Diagrams will be supplied by Jigisha in JB06; use agreed paths `docs/diagrams/architecture.png` and `docs/diagrams/workflow.png`. If they are not available yet, do not mark rendering complete: use a labeled placeholder and let M03 insert/re-render the final diagrams. Do not recreate competing diagrams in her directory.
+5. Produce an editable college report and usable DOCX, with PDF if practical. Read and apply relevant document/PDF skills when generating artifacts, render and inspect pages. Keep layout simple; do not claim visual verification without doing it.
+6. Write `docs/viva_sakshi.md` covering project choice/DIP relevance, grayscale, histograms/CLAHE, Gaussian versus median, global/Otsu/adaptive thresholding, erosion/dilation/opening/closing, OCR/Tesseract and experiments. Give natural beginner-level answers and small mathematical examples.
+7. Record source URLs actually consulted; never invent citations, experiments or features. Label future improvements honestly.
+
+**Owned outputs:** Report Markdown/DOCX/optional PDF, `docs/report_assets/**`, `docs/viva_sakshi.md`, SG06 notes.
+
+**Acceptance:** Required report sections exist; figures/results match M02; names correct; report opens/renders; no false capability claims; viva explanations are technically sound. Record final diagram insertion as an explicit M03 assembly task if needed.
+
+**Handoff:** Mark READY FOR M03 and list all artifacts, rendering evidence, any remaining assembly/metadata items. Stop. Do not claim final project merge or submission.
+
+## Update this handoff after every session
+
+Update the current position, own ledger, active/next sprint, branch/checkout, merge-readiness and peer requests. Do not edit the shared master during parallel work. Append a record using this template; preserve previous records:
+
+```markdown
+### SGxx — YYYY-MM-DD HH:MM Asia/Kolkata — session N
+- Status before → after:
+- Checkout / branch / baseline / commit or dirty diff:
+- Checkpoints completed and concepts explained:
+- Changed owned files:
+- Checks: exact command, actual result, PASS/FAIL/NOT RUN:
+- Evidence paths and teaching notes:
+- Acceptance still unmet / errors / student-only action:
+- Requested peer or dependency changes:
+- Remaining work and exact resume action:
+- Next eligible sprint or merge gate:
+- Merge readiness: NOT READY / READY; merged at: not yet / gate + commit:
+```
+
+## Session history
+
+2026-11-10: Personal track planned. All SG sprints TODO; no code, dataset, environment checks or merges performed.
+
+### M00 foundation annotation — 2026-11-10 12:43 Asia/Kolkata
+- This integration-session setup annotation does not execute a personal sprint. All personal sprint statuses remain TODO; no code/evidence has been merged at M01.
+- Actual checkout/branch: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` / `codex/sakshi-dip`. Created from common setup baseline `09893da4d1fea88d985baa12c0c77221c9750a4e`.
+- In this checkout: `python3 -m venv .venv` and `.venv/bin/python -m pip install --no-cache-dir --no-index --find-links /tmp/dip042-wheelhouse -r requirements.txt -c docs/merge/M00-requirements-lock.txt`: PASS. The /tmp wheel cache is local convenience only; future machines install from the package index.
+- In this checkout: `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/docs/merge/M00-environment-sakshi.json`: PASS; `.venv/bin/python -m pip check`: PASS; `.venv/bin/python -m streamlit --version`: PASS (1.67.0).
+- Independent venv prefix verified; `.venv/bin/python -m pip freeze` matches all 42 distributions in the common M00 snapshot. System Tesseract is shared on this machine; Python environments are separate.
+- Contract v1 frozen without signature/schema changes. No human walkthrough, dataset evaluation or application success claimed.
+- Shared foundation record will be synchronized from integration before this sprint begins. Use only your own handoff after that sync; master/peer handoffs are snapshots.
+- Next action after M00 DONE: read this handoff in this checkout and execute **SG01 only**. Do not implement the peer track or the next merge gate.
+
+### M00 completed — 2026-11-10 12:46 Asia/Kolkata
+- M00 DONE. Shared setup baseline `09893da4d1fea88d985baa12c0c77221c9750a4e`; verified foundation record `01b3e869f64a7c58f2c4aee31e0cd65cf25c1058` was forward-merged into this clean personal checkout using `git merge --ff-only codex/integration`.
+- Own handoff, contract, requirements, environment checker and shared records were compared with integration after the sync: PASS. All environment checks above passed on this machine. Final completion metadata is documentation only and is synchronized before this chat ends.
+- No personal sprint executed; all sprint ledger rows remain TODO; no personal code/evidence merged at M01. No open peer/dependency requests.
+- Exact next action: in a new personal chat, request execution of **SG01 only** using `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md`. Work in this checkout and update this copy of the handoff. Do not edit the root/peer handoffs or shared requirements during personal work.
+
+### GitHub setup annotation — 2026-11-10 12:53 Asia/Kolkata
+- User requested initial publication to `https://github.com/guptasakshi06/Graphia`. Initial M00 tip `7cc5a4f` was pushed to `main` and all three codex branches; this checkout stays on `codex/sakshi-dip`.
+- Remote guidance is included in the single M00 commit and synchronized before this chat ends. No personal sprint, dataset, application or test result changed. All sprint statuses remain TODO; work in this checkout using this handoff.
+
+### One-commit baseline correction — 2026-11-10 12:56 Asia/Kolkata
+- User requested replacing the three intermediate setup commits with one root commit named `M00`. Keep this checkout on its existing codex branch and start from that root baseline. Historical hashes above describe pre-squash activity only; current baseline is obtained with `git rev-list --max-parents=0 HEAD`. Setup/evidence files and TODO sprint statuses are preserved.
