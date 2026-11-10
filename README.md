@@ -2,14 +2,14 @@
 
 Students: **Sakshi Gupta** and **Jigisha Baiswar**.
 
-This local Python project will demonstrate image preprocessing, Tesseract OCR,
+This local Python project demonstrates image preprocessing, Tesseract OCR,
 rule-based document classification, field extraction and a configurable
-demonstration scholarship checklist. Readiness will describe the configured
-presence and usable information only. It will not establish authenticity,
+demonstration scholarship checklist. Readiness describes the configured
+presence and usable information only. It does not establish authenticity,
 official eligibility or whether documents belong to the same person.
 
-M00 provides the environment, API contract and separate workspaces. Application
-modules, sample images and the Streamlit app are added in later owner sprints.
+M01 integrates both students’ build tracks with real local Tesseract OCR. Final
+dataset evaluation and browser scenario evidence remain for SG05/JB05 and M02.
 Read `MERGE_HANDOFF.md` for checkpoint evidence and `HANDOFF.md` for the schedule.
 
 ## Ubuntu setup
@@ -56,7 +56,7 @@ Later merge gates must reconcile that snapshot if dependencies change.
 
 NumPy represents pixel arrays; OpenCV performs DIP operations; Matplotlib shows
 comparisons; Pillow reads/creates images; Pytesseract calls the separate system
-Tesseract engine; Streamlit will provide the UI. `opencv-python-headless` avoids
+Tesseract engine; Streamlit provides the UI. `opencv-python-headless` avoids
 desktop GUI dependencies and works with Streamlit/Matplotlib. Do not install a
 second OpenCV wheel alongside it. No optional PDF or direct Pandas dependency is
 needed; Streamlit may install Pandas as one of its own dependencies.
@@ -76,30 +76,30 @@ Do not copy or move a `.venv`; recreate it from requirements in its checkout.
 
 Use the handoff inside your own checkout for future personal chats:
 
-- Sakshi: `worktrees/sakshi/SAKSHI_HANDOFF.md`, next SG01 after M00.
-- Jigisha: `worktrees/jigisha/JIGISHA_HANDOFF.md`, next JB01 after M00.
-- Integration: root `MERGE_HANDOFF.md`, next M01 after SG04 and JB04.
+- Sakshi: `worktrees/sakshi/SAKSHI_HANDOFF.md`, next SG05 after M01 synchronization.
+- Jigisha: `worktrees/jigisha/JIGISHA_HANDOFF.md`, next JB05 after M01 synchronization.
+- Integration: root `MERGE_HANDOFF.md`, next M02 after SG05 and JB05.
 
 During personal work, update only owned files and the owner's handoff. The root
 personal files are integration snapshots. `TEAM_CONTRACT.md` v1 defines public
 functions, options and report keys. Sakshi owns image loading/preprocessing and
 OCR. Jigisha owns classification, extraction, readiness, reports and the UI.
-Both can begin independently using that contract. Fixture tests are development
-evidence only; M01 must connect and verify real OCR through the browser.
+Both continue independently from the synchronized M01 baseline. Fixture tests
+are development evidence only; M01 additionally verified actual OCR and browser uploads.
 
 At merge checkpoints, record clean intended branch tips, merge locally, test,
 and forward-merge integration into both clean personal branches. The initial
 GitHub publication was explicitly requested by the user; later pushes/publication
 still require user instructions. See `MERGE_HANDOFF.md` for the merge procedure.
 
-## Folder layout and future launch
+## Folder layout and local launch
 
 ```text
-modules/             Plain Python processing modules (M00: package marker only)
-scripts/             Environment check; later dataset and experiment scripts
-config/              Future demonstration requirements JSON
-dataset/             Future labeled fictional/reusable samples and references
-tests/fixtures/      Future labeled development fixtures
+modules/             Plain Python DIP, OCR, classification, extraction and readiness
+scripts/             Environment check, dataset generator and experiment scripts
+config/              Fictional demonstration requirements JSON
+dataset/             Eight labeled fictional samples, references and provenance
+tests/fixtures/      Labeled development fixtures (not OCR evidence)
 outputs/             Selected experiment, screenshot and report evidence
 docs/merge/          Executed merge-checkpoint evidence and setup versions
 docs/sprint_notes/   Owner teaching and verification records
@@ -107,14 +107,25 @@ worktrees/           Ignored independent personal checkouts
 .venv/               Ignored checkout-local Python environment
 ```
 
-The following launch command is **planned**; `app.py` does not exist at M00:
+Run from the chosen checkout (each has its own environment):
 
 ```bash
-.venv/bin/python -m streamlit run app.py
+.venv/bin/python -m streamlit run app.py --server.address=127.0.0.1 --server.fileWatcherType=none --browser.gatherUsageStats=false
 ```
 
-Later sprints implement and verify the app, experiments, report and slides.
-No application success, OCR accuracy or final submission is claimed at setup.
+Open the printed local URL, upload fictional images from `dataset/`, keep the
+demonstration checklist/default settings and press **Analyze documents**. Review
+six image stages, original/processed OCR, type, fields and readiness; download
+JSON or Markdown. Changing inputs clears results until Analyze is pressed again.
+The default is median 3 → CLAHE 2.0/8×8 → Otsu → no morphology, English PSM 6.
+A type is usable when one candidate has sufficient OCR text and its configured
+fields. Coverage counts detected required types; readiness counts usable types,
+each divided by the number of required types. Duplicates count once.
+
+M01 evidence and real downloads: `docs/merge/M01.md`. SG02–SG04 experiment
+artifacts are preliminary; SG05/JB05 validate the integrated behavior before
+M02 freezes evidence. Related synthetic derivatives do not prove general OCR
+accuracy. Academic report, slides and final submission assembly remain gated.
 Use fictional/reusable samples. Keep private files under ignored
 `private_uploads/` if needed; do not commit uploads or environments. Selected
 public outputs and documentation are intentionally tracked.
@@ -128,6 +139,9 @@ public outputs and documentation are intentionally tracked.
   reinstalling Pytesseract alone cannot provide them.
 - Package download fails: check network access and retry the install. An
   existing pip version does not prove an attempted upgrade reached the index.
+- Repeated `Inotify queue overflowed`: nested worktrees/environments can overload
+  recursive watching. The launch command above disables watching; restart the
+  server after code changes. This was observed and resolved during M01.
 - `pip check` reports conflicts: keep the exact error and resolve it in an
   integration chat; personal tracks must not change shared requirements.
 
@@ -148,5 +162,5 @@ records are tracked. `.gitignore` excludes virtual environments, nested worktree
 folders, private uploads, caches and secrets. Each personal branch contains its
 own normal project files; the ignored nested folders are not committed as
 duplicate copies. Later commits can be published when requested, from the
-appropriate branch. M01 still awaits both build tracks; the application
-has not been implemented yet.
+appropriate branch. M01 is integrated locally; no new push or main update is
+part of this checkpoint. Both full tracks and final M03 must finish first.

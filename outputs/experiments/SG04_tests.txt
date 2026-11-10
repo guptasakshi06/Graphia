@@ -1,0 +1,48 @@
+test_empty_reference_undefined_and_cer_over_one (test_metrics.CERTests.test_empty_reference_undefined_and_cer_over_one) ... ok
+test_error_saved_with_null_metrics_and_nonzero_cli_signal (test_metrics.CERTests.test_error_saved_with_null_metrics_and_nonzero_cli_signal) ... ok
+test_invalid_text_rejected (test_metrics.CERTests.test_invalid_text_rejected) ... ok
+test_known_insert_delete_substitute_and_mixed (test_metrics.CERTests.test_known_insert_delete_substitute_and_mixed) ... ok
+test_normalization_and_punctuation (test_metrics.CERTests.test_normalization_and_punctuation) ... ok
+test_reference_hash_and_review_checks (test_metrics.CERTests.test_reference_hash_and_review_checks) ... ok
+test_actual_saved_ocr_images_raw_text_cer_and_summary (test_metrics.SavedOCRAuditTests.test_actual_saved_ocr_images_raw_text_cer_and_summary) ... ok
+test_bgr_to_rgb_and_input_preserved (test_ocr.OCRContractTests.test_bgr_to_rgb_and_input_preserved) ... ok
+test_engine_failures_are_never_no_text (test_ocr.OCRContractTests.test_engine_failures_are_never_no_text) ... ok
+test_grayscale_copy_and_custom_parameters (test_ocr.OCRContractTests.test_grayscale_copy_and_custom_parameters) ... ok
+test_invalid_arrays_and_settings (test_ocr.OCRContractTests.test_invalid_arrays_and_settings) ... ok
+test_raw_text_exact_result_and_settings (test_ocr.OCRContractTests.test_raw_text_exact_result_and_settings) ... ok
+test_successful_blank_or_punctuation_is_no_text (test_ocr.OCRContractTests.test_successful_blank_or_punctuation_is_no_text) ... ok
+test_clear_sample_contains_real_title_and_name (test_ocr.RealTesseractTests.test_clear_sample_contains_real_title_and_name) ... ok
+test_real_missing_executable (test_ocr.RealTesseractTests.test_real_missing_executable) ... ok
+test_real_missing_language_data (test_ocr.RealTesseractTests.test_real_missing_language_data) ... ok
+test_real_timeout (test_ocr.RealTesseractTests.test_real_timeout) ... ok
+test_white_page_is_successful_no_text (test_ocr.RealTesseractTests.test_white_page_is_successful_no_text) ... ok
+test_generator_reproduces_assets_and_manifest (test_preprocessing.DatasetTests.test_generator_reproduces_assets_and_manifest) ... ok
+test_manifest_images_references_and_review_hashes (test_preprocessing.DatasetTests.test_manifest_images_references_and_review_hashes) ... ok
+test_saved_metrics_images_histograms_and_source_identity (test_preprocessing.ExperimentArtifactTests.test_saved_metrics_images_histograms_and_source_identity) ... ok
+test_comparison_uses_same_gray_not_chained_outputs (test_preprocessing.GrayscaleFilterContrastTests.test_comparison_uses_same_gray_not_chained_outputs) ... ok
+test_equalization_known_mapping_and_clahe_output (test_preprocessing.GrayscaleFilterContrastTests.test_equalization_known_mapping_and_clahe_output) ... ok
+test_filters_preserve_flat_images_shapes_and_bypass_copies (test_preprocessing.GrayscaleFilterContrastTests.test_filters_preserve_flat_images_shapes_and_bypass_copies) ... ok
+test_gaussian_neighborhood_and_median_impulse (test_preprocessing.GrayscaleFilterContrastTests.test_gaussian_neighborhood_and_median_impulse) ... ok
+test_grayscale_known_color_weights_and_input_preserved (test_preprocessing.GrayscaleFilterContrastTests.test_grayscale_known_color_weights_and_input_preserved) ... ok
+test_invalid_arrays_methods_and_settings (test_preprocessing.GrayscaleFilterContrastTests.test_invalid_arrays_methods_and_settings) ... ok
+test_exif_orientation_moves_pixels (test_preprocessing.ImageInputTests.test_exif_orientation_moves_pixels) ... ok
+test_grayscale_input (test_preprocessing.ImageInputTests.test_grayscale_input) ... ok
+test_invalid_input_and_limit_fail_clearly (test_preprocessing.ImageInputTests.test_invalid_input_and_limit_fail_clearly) ... ok
+test_paths_bytes_bgr_and_independent_result (test_preprocessing.ImageInputTests.test_paths_bytes_bgr_and_independent_result) ... ok
+test_resize_landscape_portrait_and_no_enlargement (test_preprocessing.ImageInputTests.test_resize_landscape_portrait_and_no_enlargement) ... ok
+test_rgba_and_palette_transparency_on_white (test_preprocessing.ImageInputTests.test_rgba_and_palette_transparency_on_white) ... ok
+test_adaptive_retains_dark_line_under_uneven_background (test_preprocessing.ThresholdMorphologyPipelineTests.test_adaptive_retains_dark_line_under_uneven_background) ... ok
+test_even_kernel_anchor_borders_and_grayscale (test_preprocessing.ThresholdMorphologyPipelineTests.test_even_kernel_anchor_borders_and_grayscale) ... ok
+test_global_boundary_and_bypass (test_preprocessing.ThresholdMorphologyPipelineTests.test_global_boundary_and_bypass) ... ok
+test_invalid_options_are_rejected_even_when_stage_bypassed (test_preprocessing.ThresholdMorphologyPipelineTests.test_invalid_options_are_rejected_even_when_stage_bypassed) ... ok
+test_morphology_known_geometry_polarity_and_no_mutation (test_preprocessing.ThresholdMorphologyPipelineTests.test_morphology_known_geometry_polarity_and_no_mutation) ... ok
+test_opening_removes_speck_closing_fills_hole_and_thin_stroke_loss (test_preprocessing.ThresholdMorphologyPipelineTests.test_opening_removes_speck_closing_fills_hole_and_thin_stroke_loss) ... ok
+test_otsu_separates_two_groups_and_reports_cutoff (test_preprocessing.ThresholdMorphologyPipelineTests.test_otsu_separates_two_groups_and_reports_cutoff) ... ok
+test_pipeline_bypass_options_unchanged_and_numpy_settings_json (test_preprocessing.ThresholdMorphologyPipelineTests.test_pipeline_bypass_options_unchanged_and_numpy_settings_json) ... ok
+test_pipeline_defaults_exact_keys_shapes_values_and_json (test_preprocessing.ThresholdMorphologyPipelineTests.test_pipeline_defaults_exact_keys_shapes_values_and_json) ... ok
+test_saved_sg03_artifacts_match_recomputed_outputs_and_sources (test_preprocessing.ThresholdMorphologyPipelineTests.test_saved_sg03_artifacts_match_recomputed_outputs_and_sources) ... ok
+
+----------------------------------------------------------------------
+Ran 43 tests in 5.750s
+
+OK

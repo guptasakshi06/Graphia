@@ -1,0 +1,283 @@
+{
+  "profile_name": "Demonstration scholarship checklist",
+  "configuration": {
+    "profile_name": "Demonstration scholarship checklist",
+    "required_documents": {
+      "income_certificate": [
+        "student_name",
+        "certificate_number"
+      ],
+      "caste_certificate": [
+        "student_name",
+        "certificate_number"
+      ],
+      "marksheet": [
+        "student_name"
+      ],
+      "identity_proof": [
+        "student_name"
+      ]
+    },
+    "readability": {
+      "min_alnum_chars": 20
+    }
+  },
+  "required_types": [
+    "income_certificate",
+    "caste_certificate",
+    "marksheet",
+    "identity_proof"
+  ],
+  "required_type_count": 4,
+  "submitted_file_count": 2,
+  "detected_required_type_count": 2,
+  "usable_required_type_count": 2,
+  "missing_types": [
+    "marksheet",
+    "identity_proof"
+  ],
+  "unusable_types": [],
+  "coverage_percent": 50.0,
+  "readiness_percent": 50.0,
+  "overall_status": "Incomplete",
+  "documents": [
+    {
+      "id": "0-a15f1e0deac4f32807b01e4e5463a3cb2ddf05b4abf8f523f77fc084db81e2c7",
+      "filename": "income_certificate_clear.png",
+      "ocr_original": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nIncome Certificate\n\nStudent Name: Asha Verma\n\nCertificate Number: INC-2026-0042\n\nApplication ID: APP-2026-0101\n\nIssue Date: 2026-01-15\n\nAnnual Family Income: INR 120000\n\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "ocr_processed": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nIncome Certificate\n\nStudent Name: Asha Verma\n\nCertificate Number: INC-2026-0042\n\nApplication ID: APP-2026-0101\n\nIssue Date: 2026-01-15\n\nAnnual Family Income: INR 120000\n\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nIncome Certificate\n\nStudent Name: Asha Verma\n\nCertificate Number: INC-2026-0042\n\nApplication ID: APP-2026-0101\n\nIssue Date: 2026-01-15\n\nAnnual Family Income: INR 120000\n\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": "Asha Verma",
+        "certificate_number": "INC-2026-0042",
+        "application_id": "APP-2026-0101",
+        "issue_date": "2026-01-15"
+      },
+      "processing_parameters": {
+        "requested_options": {
+          "denoise": "median",
+          "kernel_size": 3,
+          "contrast": "clahe",
+          "threshold": "otsu",
+          "global_threshold": 127,
+          "adaptive_block_size": 31,
+          "adaptive_c": 11.0,
+          "morphology": "none",
+          "morph_kernel_size": 2
+        },
+        "max_dimension": 1800,
+        "loaded_dimensions": {
+          "width": 1400,
+          "height": 1000
+        },
+        "resolved_pipeline": {
+          "denoise": "median",
+          "kernel_size": 3,
+          "contrast": "clahe",
+          "threshold": "otsu",
+          "global_threshold": 127,
+          "adaptive_block_size": 31,
+          "adaptive_c": 11.0,
+          "morphology": "none",
+          "morph_kernel_size": 2,
+          "selected_otsu_threshold": 155.0,
+          "clahe_clip_limit": 2.0,
+          "clahe_tile_grid_size": [
+            8,
+            8
+          ],
+          "adaptive_method": "gaussian",
+          "morph_kernel_shape": "rectangle",
+          "morph_iterations": 1,
+          "morph_anchor_xy": [
+            1,
+            1
+          ],
+          "morph_border": "constant neutral (erosion=255, dilation=0)",
+          "morph_foreground": "inverted white text; restored after operation",
+          "output_polarity": "dark text / light background (input convention)",
+          "input_shape": [
+            1000,
+            1400,
+            3
+          ],
+          "output_shape": [
+            1000,
+            1400
+          ]
+        }
+      },
+      "doc_type": "income_certificate",
+      "is_required": true,
+      "alnum_char_count": 238,
+      "readable": true,
+      "required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "missing_required_fields": [],
+      "usable": true,
+      "problems": []
+    },
+    {
+      "id": "1-2dcfc270cf2ada44313d8c4d7712af16949a4181aa702039828c255bb13250db",
+      "filename": "caste_certificate_clear.png",
+      "ocr_original": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nCaste Certificate\n\nStudent Name: Neel Rao\n\nCertificate Number: CST-2026-0043\n\nApplication ID: APP-2026-0102\n\nIssue Date: 2026-01-16\n\nCategory: Fictional demonstration category\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "ocr_processed": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nCaste Certificate\n\nStudent Name: Neel Rao\n\nCertificate Number: CST-2026-0043\n\nApplication ID: APP-2026-0102\n\nIssue Date: 2026-01-16\n\nCategory: Fictional demonstration category\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "SYNTHETIC SAMPLE - NOT AN OFFICIAL DOCUMENT\nCaste Certificate\n\nStudent Name: Neel Rao\n\nCertificate Number: CST-2026-0043\n\nApplication ID: APP-2026-0102\n\nIssue Date: 2026-01-16\n\nCategory: Fictional demonstration category\nPurpose: Classroom demonstration\n\nFictional classroom data. No official validity.\n",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20.0
+        }
+      },
+      "classification": {
+        "doc_type": "caste_certificate",
+        "evidence": [
+          "caste certificate"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": "Neel Rao",
+        "certificate_number": "CST-2026-0043",
+        "application_id": "APP-2026-0102",
+        "issue_date": "2026-01-16"
+      },
+      "processing_parameters": {
+        "requested_options": {
+          "denoise": "median",
+          "kernel_size": 3,
+          "contrast": "clahe",
+          "threshold": "otsu",
+          "global_threshold": 127,
+          "adaptive_block_size": 31,
+          "adaptive_c": 11.0,
+          "morphology": "none",
+          "morph_kernel_size": 2
+        },
+        "max_dimension": 1800,
+        "loaded_dimensions": {
+          "width": 1400,
+          "height": 1000
+        },
+        "resolved_pipeline": {
+          "denoise": "median",
+          "kernel_size": 3,
+          "contrast": "clahe",
+          "threshold": "otsu",
+          "global_threshold": 127,
+          "adaptive_block_size": 31,
+          "adaptive_c": 11.0,
+          "morphology": "none",
+          "morph_kernel_size": 2,
+          "selected_otsu_threshold": 155.0,
+          "clahe_clip_limit": 2.0,
+          "clahe_tile_grid_size": [
+            8,
+            8
+          ],
+          "adaptive_method": "gaussian",
+          "morph_kernel_shape": "rectangle",
+          "morph_iterations": 1,
+          "morph_anchor_xy": [
+            1,
+            1
+          ],
+          "morph_border": "constant neutral (erosion=255, dilation=0)",
+          "morph_foreground": "inverted white text; restored after operation",
+          "output_polarity": "dark text / light background (input convention)",
+          "input_shape": [
+            1000,
+            1400,
+            3
+          ],
+          "output_shape": [
+            1000,
+            1400
+          ]
+        }
+      },
+      "doc_type": "caste_certificate",
+      "is_required": true,
+      "alnum_char_count": 246,
+      "readable": true,
+      "required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "missing_required_fields": [],
+      "usable": true,
+      "problems": []
+    }
+  ],
+  "limitations": [
+    "This demonstration checklist is fictional, not official scholarship policy.",
+    "Readability is a heuristic: selected OCR status ok and the configured minimum alphanumeric character count. It does not prove OCR accuracy or human readability.",
+    "Readiness checks configured presence and usable information only; it does not verify authenticity, official eligibility, or that documents belong to the same student.",
+    "Each required type needs one individually usable file. Fields are never combined across files; duplicate types count once. OCR confidence is not accuracy."
+  ]
+}
