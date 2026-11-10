@@ -5,16 +5,16 @@
 ## Current position
 
 - Integration lead: **Sakshi Gupta**. Application/presentation reviewer: **Jigisha Baiswar**.
-- Updated: 2026-11-10 12:53 Asia/Kolkata; **M00 DONE**, GitHub publication requested and initial push verified.
+- Updated: 2026-11-10 13:18 Asia/Kolkata; **M00 DONE**, SG01/JB01 DONE personally; local-commit policy updated. No M01 code merge.
 - Active checkpoint: none; **M00 completed**.
-- Next checkpoint: **M01 — waiting for SG01–SG04 and JB01–JB04** (all TODO).
+- Next checkpoint: **M01 — waiting for SG02–SG04 and JB02–JB04**; SG01/JB01 DONE, SG02/JB02 IN_PROGRESS in other chats; neither track merged.
 - Integration checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
 - Integration branch: `codex/integration`; current baseline is the single root commit named `M00`.
 - Sakshi branch/checkout: `codex/sakshi-dip`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`.
 - Jigisha branch/checkout: `codex/jigisha-app`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`.
-- Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. GitHub main and all three codex branches use the same baseline.
+- Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. GitHub main retains M00. Sakshi's branch also has the previously authorized SG01 commit `6629e0f`; future development commits remain local under the latest user policy.
 - Environment evidence: root, Sakshi and Jigisha PASS; all six imports, `pip check`, Streamlit CLI, Tesseract English and exact 42-distribution snapshot match. See `docs/merge/M00*.json`.
-- Latest repository setup: user-requested one-commit M00 history on all work branches; no personal code has been merged at M01.
+- Latest repository policy: local commits for both owners with one-line sprint explanations; preserve both histories and integrate at the existing gates. No further push until both tracks and verified M03 finish. No personal code has been merged at M01.
 
 Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and both personal handoffs. The master defines file ownership and academic scope. All commands below are execution instructions for future checkpoints, not claims they have run.
 
@@ -31,10 +31,10 @@ Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` an
 
 1. Inspect Git history/branches/worktrees/remotes and all dirty changes first. Preserve unrelated work; never use destructive reset, forced checkout, clean, forced push, blanket stash, or an automatic 'ours/theirs' resolution.
 2. Use separate checkouts for concurrent people. Never have two chats switch branches in the same directory. Each checkout uses its own `.venv`; system Tesseract can be shared only on the same machine.
-3. Merge only locally unless the user later asks for a remote workflow. Do not invent a GitHub URL or send messages to the other person through tools.
+3. Latest user Git policy (2026-11-10): automatically create a local commit after each verified SG/JB sprint and M checkpoint, using a one-line explanation. Keep all further commits local until both SG01–SG06 and JB01–JB06 and final M03 are complete and verified. Preserve the already-published SG01 history; do not undo it. Combine both owners' contributions through the existing M01/M02/M03 gates, preserving their authorship; do not merge incomplete tracks early or push intermediate work. Do not invent a GitHub URL or send messages to the other person through tools.
 4. Personal handoffs contain live status. Inspect actual personal branches/checkouts and evidence before accepting them as ready. DONE is not proof of a merge; retain separate merged-at records.
 5. Both tracks must pause edits during a merge cutoff. Verify clean/recorded states and intended branch tips; do not race a live writer. If an active student edit prevents a stable cutoff, record the concrete obstacle and wait rather than overwriting it.
-6. Commit only intended changes after review; explicit file lists are safer than adding the entire workspace. Local commits are necessary to make the separate-branch/merge workflow concrete. Never include `.venv`, private uploads, unrelated files, nested worktrees or secrets.
+6. Commit only intended changes after review; use explicit file lists and one-line explanations. Local sprint/checkpoint commits are authorized by the latest user instruction. Preserve correct owner attribution with worktree-specific Git identity settings. Never include `.venv`, private uploads, unrelated files, nested worktrees or secrets.
 7. A merge checkpoint can resolve cross-owner integration bugs in the integration checkout, but must log each fix, rerun affected checks and synchronize the fixes back before either personal track continues.
 8. Prefer normal local merges preserving both histories. Before merging, record both branch tips; after merging, record the resulting commit, commands, conflict resolutions, checks and unresolved limitations. No merge-success claim until conflicts and verification are resolved.
 9. At a completed checkpoint, update master status, delivery tracker, this ledger and the personal merge annotations in the integrated copies. Preserve personal completion/test history. Write `docs/merge/Mxx.md` with the acceptance evidence.
@@ -227,3 +227,19 @@ Update this file and the master at every checkpoint or interruption. When person
 - Replace exactly main and the three codex refs using an atomic push with an explicit `--force-with-lease=<ref>:7cc5a4ff424ec8c1e89b2b069b940a58b97430dd` for every ref. Reject any intervening remote change. No blanket force push.
 - Before ending: verify one commit named M00, no parent, clean worktrees, matching local/remote hashes and default main. Resolve the final baseline with `git rev-list --max-parents=0 HEAD`; a commit cannot contain its own hash.
 - Historical intermediate SHA records above and in M00 evidence describe completed setup steps before the squash; they are not the new baseline.
+
+### Local-commit policy / tracking update — 2026-11-10 13:18 Asia/Kolkata
+- Administrative update requested by user; no M checkpoint or personal sprint executed. M00 remains DONE, M01–M03 TODO.
+- Root starts clean at `464c884af09bb1d2db686559eaee16cdb9912d59`; Sakshi is clean at published SG01 `6629e0f240023aadb8027032f1e60b6071e34d27`; Jigisha has exactly the five JB01-owned files listed in her handoff, uncommitted at inspection. Preserve every owned implementation/fixture/test file.
+- User now authorizes automatic local commits for verified work in both tracks, with one-line descriptions, and no further development pushes until both tracks and M03 finish. Final combined project must include both histories through M01/M02/M03. Earlier SG01 publication is historical and is not undone.
+- User confirmed `jigishadebugging` for Jigisha. Read-only public GitHub API confirmed login `jigishadebugging`, ID `146957478`, created 2023-10-04; GitHub's documented ID-based no-reply format gives `146957478+jigishadebugging@users.noreply.github.com`. Local author is Jigisha Baiswar in her worktree only; no GitHub login or global/shared identity replacement is required.
+- Verified Jigisha's current JB01 classifier with `.venv/bin/python -m unittest discover -s tests -p test_classification.py -v` and the same command with `-S`: both PASS, 8 methods including 16 fictional cases. These are rule tests, not real OCR.
+- Commit the shared policy/tracker files locally and synchronize only into clean, idle personal checkouts. Jigisha's active worktree must wait for a stable cutoff. Preserve separate code tracks; documentation synchronization does not satisfy M01. Resolve actual commit hashes with `git log` in each checkout; record synchronization in the appropriate live handoff.
+- Remaining gate: **SG02–SG04**, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md`; **JB02–JB04**, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md`. Next eligible sprints are SG02 and JB02, one per chat. No push in this update.
+
+- Concurrent work discovered at 2026-11-10 13:20 Asia/Kolkata: Jigisha's existing JB01 commit `0b23f1ef8948efa2d2b8d44bea9c8f4009df623c` is correctly attributed to `Jigisha Baiswar <146957478+jigishadebugging@users.noreply.github.com>` (author and committer). Her other chat has started JB02: handoff/fixtures modified and extraction module/tests being added. Do not edit, stage, commit, or merge into that worktree during this active sprint. No duplicate JB01 commit is needed.
+- Attempted `git merge --ff-only codex/integration` in Jigisha's worktree exited 128 because her newly created JB01 commit diverged from the policy branch; Git refused before any changes. No merge state, staged edits, or owner file modification resulted. Stop that synchronization until clean/idle; her live handoff already records the local-only/deferred-main preference.
+- Effective identity setup verified: only `.git/worktrees/jigisha/config.worktree` overrides name/email after enabling `extensions.worktreeConfig`; Sakshi/root still resolve to Sakshi. This complements the other chat's per-command Jigisha overrides; no credentials or shared/global user identity changed.
+- Documentation synchronization is deferred for both personal branches: a subsequent inspection found Sakshi's SG02 is also active and dirty. No policy merge was attempted there. Preserve both active sprints and synchronize only when each has a clean, idle cutoff. No remote push or early main update.
+
+- Final scope/check at 2026-11-10 13:20 Asia/Kolkata: root changes are only `AGENTS.md`, `HANDOFF.md`, `MERGE_HANDOFF.md`; no application files copied/merged. Both live handoffs report second sprints IN_PROGRESS. Do not execute those sprints in this policy chat. Before the next policy synchronization, recheck branch tips, clean status and owner handoffs; then merge `codex/integration` locally with normal history-preserving merges. `main` stays unchanged until verified M03 and both full tracks finish. All new commits remain local.
