@@ -1,0 +1,57 @@
+{
+  "reviewed_at": "2026-11-10T13:06:27+05:30",
+  "reviewer": "Codex assistant visual inspection; no student/human review claimed",
+  "method": "Viewed full contact sheet containing all eight pages and compared every visible line against dataset/references/*.txt; also opened each of the four degraded PNGs individually at 1400x1000. Checked titles, field labels/values, synthetic banner, footer, border, cropping and intended degradation.",
+  "result": "All eight images agree with their transcripts and expected fields. All text is visible, including low-contrast text; noise and mild blur retain intended text. No clipping found.",
+  "scope": "Reference verification only; no OCR, authenticity, eligibility or end-to-end success measured.",
+  "samples": {
+    "income_certificate_clear": {
+      "status": "visually_verified",
+      "image_sha256": "b045274bbf0945e52b594708aff8f1e0adf12c31b5c13995c137971e0025ac5c",
+      "reference_sha256": "c60f1b221dcd06bf199775c90575e4e7b58b4482654cbf3a537e1cc85cc81f68",
+      "observations": "Asha Verma; INC-2026-0042; APP-2026-0101; 2026-01-15; income INR 120000; purpose and disclaimer match."
+    },
+    "income_certificate_low_contrast": {
+      "status": "visually_verified",
+      "image_sha256": "7fff5186f847f197647a8c0b159ee41e9436811f89f456e1359d1356931497a4",
+      "reference_sha256": "c60f1b221dcd06bf199775c90575e4e7b58b4482654cbf3a537e1cc85cc81f68",
+      "observations": "Asha Verma; INC-2026-0042; APP-2026-0101; 2026-01-15; income INR 120000; purpose and disclaimer match."
+    },
+    "caste_certificate_clear": {
+      "status": "visually_verified",
+      "image_sha256": "e86f1a30a5cc06c91ead076251fd8c1ae4cb58a675a548f748ff7039f4972f4a",
+      "reference_sha256": "967820490df23c505dd5b79b534f9fba88277d23a100cd3ff3fc2473d337bd75",
+      "observations": "Neel Rao; CST-2026-0043; APP-2026-0102; 2026-01-16; fictional category, purpose and disclaimer match."
+    },
+    "caste_certificate_noisy": {
+      "status": "visually_verified",
+      "image_sha256": "e605586797a9b2e0c670558e422b1f201d782702bd34efca96747f01df0dd7ba",
+      "reference_sha256": "967820490df23c505dd5b79b534f9fba88277d23a100cd3ff3fc2473d337bd75",
+      "observations": "Neel Rao; CST-2026-0043; APP-2026-0102; 2026-01-16; fictional category, purpose and disclaimer match."
+    },
+    "marksheet_clear": {
+      "status": "visually_verified",
+      "image_sha256": "fa452ddfe75eeea354d0c746b8ad5e6af56720d46753cf4771b9b05fea217fed",
+      "reference_sha256": "d985b923fc0f6c81e612855517742706d7973f2fc08f41f65a22603c0ce8366b",
+      "observations": "Mira Sen; APP-2026-0103; 2026-01-17; Sample Semester; Mathematics 81 / 100; Computer Science 87 / 100; Pass; disclaimer match. No certificate number."
+    },
+    "marksheet_slightly_blurred": {
+      "status": "visually_verified",
+      "image_sha256": "3eaa4cec6ec7d65e49cf8e4d89a2bf18af4e702f0da82e41a594d545b419c929",
+      "reference_sha256": "d985b923fc0f6c81e612855517742706d7973f2fc08f41f65a22603c0ce8366b",
+      "observations": "Mira Sen; APP-2026-0103; 2026-01-17; Sample Semester; Mathematics 81 / 100; Computer Science 87 / 100; Pass; disclaimer match. No certificate number."
+    },
+    "identity_proof_clear": {
+      "status": "visually_verified",
+      "image_sha256": "ff0e15cfa08185d51e98daaac209975ae51056b0fe951f6eb3eb9011653e7b59",
+      "reference_sha256": "75b22a521ee2dbbbcafda2e36a71557c2a50c3628801a10bcf66eb56687d5486",
+      "observations": "Dev Mehta; APP-2026-0104; 2026-01-18; Example Learning Centre; DEMO-042-04; disclaimer match. No certificate number."
+    },
+    "identity_proof_slightly_blurred": {
+      "status": "visually_verified",
+      "image_sha256": "3dbc42edd1780a5c3e55eb8ac6ab18c3b080e7a622cc615211ff4b3f13414886",
+      "reference_sha256": "75b22a521ee2dbbbcafda2e36a71557c2a50c3628801a10bcf66eb56687d5486",
+      "observations": "Dev Mehta; APP-2026-0104; 2026-01-18; Example Learning Centre; DEMO-042-04; disclaimer match. No certificate number."
+    }
+  }
+}
