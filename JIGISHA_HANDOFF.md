@@ -6,9 +6,9 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 16:39 Asia/Kolkata; **JB06 DONE and READY FOR M03**, pending integration.
+- Updated: 2026-11-10 16:47 Asia/Kolkata; **JB06 DONE and merged at M03**.
 - Active sprint: none. **JB01–JB06 complete**.
-- Next: **M03** in a separate merge chat. Insert the final diagrams into Sakshi’s report and run the final package checks at that gate.
+- Next: no personal sprint remains. See the final package in `docs/DELIVERY.md`.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -37,7 +37,7 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 | JB03 | 1 | 60 min | JB02 | DONE | M01 (DONE, synchronized) |
 | JB04 | 1 | 90 min | JB03 | DONE | M01 (DONE, synchronized) |
 | JB05 | 2 | 75 min | JB04, M01 | DONE | M02 (DONE, synchronized) |
-| JB06 | 2 | 90 min | JB05, M02 | DONE | Not merged; target M03 |
+| JB06 | 2 | 90 min | JB05, M02 | DONE | M03 (verified) |
 
 ## JB01 — Rule fixtures and document classification
 
@@ -425,3 +425,8 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - No peer or dependency changes requested. M03 assembly uses `docs/diagrams/architecture.png` and `docs/diagrams/workflow.png`; both already exist in this branch. No student walkthrough or mock viva has taken place.
 - Local sprint commit subject `JB06: verify the presentation, diagrams and demo materials`, author and committer Jigisha Baiswar <146957478+jigishadebugging@users.noreply.github.com>. Resolve its immutable hash with `git log -1 --format=fuller -- docs/project_042_presentation.pptx`.
 - Next request: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md and execute M03 only after verifying both live SG06 and JB06 handoffs and commits.` SG06's live handoff was observed DONE/READY in its clean checkout at `784544f`; recheck both at M03. Keep this JB06 commit local and stop here.
+
+### M03 merge annotation — 2026-11-10 16:47 Asia/Kolkata
+- JB06 DONE and merged at M03 from owner commit `6ad9d57` via `80e9e6a`. The PPTX and diagrams were verified in the combined package, and both diagrams were embedded in the report.
+- Final technical package and combined viva are in `docs/DELIVERY.md`. Resolve the final baseline with `git log -1 --format=%H -- docs/merge/M03.md`.
+- No personal sprint remains. The student-supplied report cover fields are listed in the manifest.

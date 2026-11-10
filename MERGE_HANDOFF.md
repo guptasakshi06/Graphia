@@ -5,16 +5,16 @@
 ## Current position
 
 - Integration lead: **Sakshi Gupta**. Application/presentation reviewer: **Jigisha Baiswar**.
-- Updated: 2026-11-10 16:04 Asia/Kolkata; **M02 DONE**, validation evidence verified, frozen and synchronized locally.
-- Active checkpoint: none; **M02 completed and verified**.
-- Next checkpoint: **M03**, waiting for SG06 and JB06 DONE/READY. Both submission sprints are now eligible from the synchronized M02 freeze.
+- Updated: 2026-11-10 16:47 Asia/Kolkata; **M03 DONE**, final technical package verified.
+- Active checkpoint: none. Both owner tracks and M00–M03 are complete.
+- Final package: [delivery manifest](docs/DELIVERY.md) and [M03 verification](docs/merge/M03.md). Fill in the report cover details before college submission.
 - Integration checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- Integration branch: `codex/integration`; verified M02 freeze `46e4bf936518a747a3ce5fe7796ba2c9deede991` synchronized into both clean tracks; completion metadata follows locally.
+- Final local delivery refs: `codex/integration` and `main`. Resolve the M03 commit with `git log -1 --format=%H -- docs/merge/M03.md`.
 - Sakshi branch/checkout: `codex/sakshi-dip`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`.
 - Jigisha branch/checkout: `codex/jigisha-app`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`.
-- Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. GitHub main retains M00. Sakshi's branch also has the previously authorized SG01 commit `6629e0f`; future development commits remain local under the latest user policy.
+- Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. Cached `origin/main` is M00. Previously published SG01 `6629e0f` remains in the combined history. M03 delivery is local.
 - Environment evidence: root, Sakshi and Jigisha PASS; all six imports, `pip check`, Streamlit CLI, Tesseract English and exact 42-distribution snapshot match. See `docs/merge/M00*.json`.
-- Latest repository policy: local commits for both owners with one-line sprint explanations; preserve both histories and integrate at the existing gates. No further push until both tracks and verified M03 finish. SG01–SG04/JB01–JB04 are merged at M01; SG05/JB05 are merged and frozen at M02; SG06/JB06 and M03 remain.
+- Latest repository policy: local commits for both owners with one-line sprint explanations; preserve both histories and integrate at the existing gates. No further push until both tracks and verified M03 finish. SG01–SG04/JB01–JB04 are merged at M01; SG05/JB05 are merged and frozen at M02; SG06/JB06 are merged and verified at M03. GitHub publication requires a separate user request.
 
 Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and both personal handoffs. The master defines file ownership and academic scope. All commands below are execution instructions for future checkpoints, not claims they have run.
 
@@ -25,7 +25,7 @@ Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` an
 | M00 | Planning files | DONE | Tested baseline, fixed interfaces, two separate checkouts | `M00` single root commit; `docs/merge/M00.md` + JSON evidence |
 | M01 | M00, SG01–SG04, JB01–JB04 | DONE | Real integrated application with first complete upload test | `c1c155d`; `docs/merge/M01.md`; synchronized both tracks |
 | M02 | M01, SG05, JB05 | DONE | Frozen tested code and measured evidence for report/slides | 46e4bf9; docs/merge/M02.md + freeze/audit/sync records; synchronized both tracks |
-| M03 | M02, SG06, JB06 | TODO | Verified submission package and final master status | — |
+| M03 | M02, SG06, JB06 | DONE | Verified submission package and final master status | [M03 record](docs/merge/M03.md), [delivery manifest](docs/DELIVERY.md), commit containing this record |
 
 ## General merge rules
 
@@ -300,3 +300,20 @@ Update this file and the master at every checkpoint or interruption. When person
 - Exact next Sakshi action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG06 only. Verify the work and update the handoff before stopping.`
 - Exact next Jigisha action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB06 only. Verify the work and update the handoff before stopping.`
 - Next merge: M03 at /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md after both submission sprints are verified. Stop after final metadata synchronization.
+
+### M03 — 2026-11-10 16:43 Asia/Kolkata — session 1 — start
+- TODO → IN_PROGRESS. Clean integration cutoff `bf3d34e` and both clean, idle owner checkouts verified before editing this ledger.
+- Sakshi `codex/sakshi-dip` at `784544fee91755c79b3f42d4af9d21618b0289e7` (SG06 DONE); Jigisha `codex/jigisha-app` at `6ad9d573c554c1fb8ac95049726963af5d1dd7d4` (JB06 DONE). Each is the single owner-authored commit after the common M02 tip; both completion handoffs and actual report/deck artifacts are committed. JB06 deck SHA-256 matches its recorded verification. All twelve sprint commits exist with the correct owners.
+- Merge the recorded commits, insert both diagrams, rerender, audit frozen evidence and perform a real application smoke test before finalizing.
+
+### M03 — 2026-11-10 16:45 Asia/Kolkata — session 1 — verification checkpoint
+- Both normal merges passed without conflicts: Sakshi `d39c7c8`, Jigisha `80e9e6a`. Production files and frozen inputs are unchanged from M02.
+- PASS: 107 tests, environment and pip checks, compile check, fresh eight-call Tesseract smoke, Streamlit health, 387 frozen hashes and saved scenario audit.
+- PASS: inspected all 10 report pages and all 12 slides. Both final diagrams and six frozen images match the report embeds, and the deck content and frozen media checks passed. The PDF is the inspected DOCX export. Final package inventory and status updates follow.
+
+### M03 — 2026-11-10 16:47 Asia/Kolkata — session 1 — completion
+- TODO → IN_PROGRESS → DONE. Integration started at `bf3d34e`. Both idle source cutoffs were clean: SG06 `784544f`, JB06 `6ad9d57`. Merges `d39c7c8` and `80e9e6a` preserve both owners’ histories. No conflicts or unrelated edits.
+- Both JB06 diagrams are embedded in the rebuilt report. The PowerPoint is the verified JB06 artifact. The final viva contains 25 questions and the demo includes both roles. The master, delivery tracker and integrated personal handoffs record the merged status.
+- PASS: 107 tests, real eight-call OCR smoke, local Streamlit health, 387 frozen hashes and the saved M02 browser scenarios, ten report pages, twelve slides, and all 14 brief deliverables. Exact commands, scope and file hashes are in `docs/merge/M03.md`. M03 reused the frozen browser evidence.
+- After package verification, commit the M03 delivery with Sakshi's worktree identity. Sequentially run `git -C worktrees/sakshi merge --ff-only codex/integration` and `git -C worktrees/jigisha merge --ff-only codex/integration` after rechecking both cutoffs. Create local `main` at the same verified commit and confirm all four refs agree and the three checkouts are clean. The final commit is located by `git log -1 --format=%H -- docs/merge/M03.md`. Publication is separate.
+- No later sprint or checkpoint is pending. Before college submission, fill in both roll numbers, college, department and faculty guide in `docs/project_report.docx`, apply any prescribed cover format and export the updated PDF. Run the local demo from `docs/demo_script.md`. No college submission, student walkthrough or mock viva was recorded.

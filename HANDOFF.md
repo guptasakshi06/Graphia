@@ -10,10 +10,9 @@
 - **Integration lead:** Sakshi Gupta; Jigisha reviews the application and presentation. A merge chat performs the concrete integration work, rather than asking either person to manually combine code snippets.
 - **Planning date:** 2026-11-10, Asia/Kolkata. Update local timestamps during actual work.
 - **Workspace/integration checkout:** `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- **Current phase:** **M02 DONE**; SG01–SG05 and JB01–JB05 merged, verified and synchronized locally.
-- **Next shared action:** **M03** waits for verified SG06 and JB06.
-- **Next Sakshi action:** **SG06**, now eligible from M02; use Sakshi’s live checkout handoff and frozen evidence.
-- **Next Jigisha action:** **JB06**, now eligible from M02; use Jigisha’s live checkout handoff and frozen evidence.
+- **Current phase:** **M03 DONE**. SG01–SG06 and JB01–JB06 are integrated and the technical delivery is verified.
+- **Final local package:** [delivery manifest](docs/DELIVERY.md) and [verification](docs/merge/M03.md).
+- **Remaining action:** Complete the student-supplied report cover information before college submission. No further sprint or merge is queued.
 - **Original full requirements:** `PROJECT_BRIEF.md`, preserved without edits.
 - **Time budget:** Two focused days. Work estimates are targets, not calendar deadlines.
 
@@ -89,7 +88,7 @@ No shared experiment script or combined report file should be edited by both tra
 
 Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, plus a buffer of up to an hour each day. Individual sprint durations are not promises. The workload is parallel, so do not add both people's hours as elapsed project time. Keep optional features out if buffers are consumed.
 
-### Master status snapshot — M02 completion, 2026-11-10 16:04 Asia/Kolkata
+### Master status snapshot — M03 completion, 2026-11-10 16:47 Asia/Kolkata
 
 | Track | Sprints/checkpoints | Status | Merged state |
 |---|---|---|---|
@@ -100,9 +99,9 @@ Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, pl
 | Sakshi validation | SG05 | DONE | Merged at M02 from c98d893 through c335709 |
 | Jigisha validation | JB05 | DONE | Merged at M02 from 80a38e4 through bc35ef9 |
 | Evidence integration | M02 | DONE | Verified freeze 46e4bf9 synchronized into both tracks |
-| Sakshi report | SG06 | TODO | Not merged |
-| Jigisha slides/viva | JB06 | TODO | Not merged |
-| Final integration | M03 | TODO | Waiting for both submission tracks |
+| Sakshi report | SG06 | DONE | Merged at M03 from `784544f` via `d39c7c8` |
+| Jigisha slides/viva | JB06 | DONE | Merged at M03 from `6ad9d57` via `80e9e6a` |
+| Final integration | M03 | DONE | [Verified local delivery](docs/merge/M03.md) |
 
 Each M checkpoint has its own work order in `MERGE_HANDOFF.md`. Each SG/JB sprint has detailed tasks and acceptance checks in its personal handoff. M00 records the real checkout paths; M01/M02/M03 must record actual branch tips, checks and resolutions.
 
@@ -179,25 +178,26 @@ Deep learning, TensorFlow/PyTorch, CNNs, transformers, LLM services, cloud deplo
 
 | Deliverable | Owner/gate | Status | Verified path |
 |---|---|---|---|
-| Environment/dependencies/source organization | M00, M03 | M00 DONE; final audit at M03 | `requirements.txt`, `scripts/check_environment.py`, `docs/merge/M00*.json` |
+| Environment/dependencies/source organization | M00, M03 | DONE; final audit at M03 | `requirements.txt`, `scripts/check_environment.py`, `docs/merge/M00*.json` |
 | Dataset + references + provenance | SG01 | DONE, merged at M01 | `dataset/manifest.json`, `dataset/visual_review.json` |
 | DIP pipeline + all comparisons | SG02–SG05 | DONE; merged/verified at M02 | `modules/preprocessing.py`, `outputs/experiments/SG05/` |
 | OCR + measured results/raw outputs | SG04–SG05 | DONE; final SG05 evidence verified at M02 | `modules/ocr.py`, `outputs/experiments/SG05/metrics.json`, `outputs/experiments/SG05/summary.csv` |
 | Classification/fields/readiness/report export | JB01–JB03 | DONE, merged at M01 | `modules/classification.py`, `modules/extraction.py`, `modules/readiness.py`, `config/requirements.json` |
 | Real integrated Streamlit application | JB04, M01, JB05 | DONE; actual browser scenarios verified at M02 | `app.py`, `docs/validation/jigisha.md`, `outputs/reports/JB05/` |
 | Final experiment tables + screenshots | SG05, JB05, M02 | DONE; frozen and synchronized at M02 | `docs/merge/M02.md`, `docs/merge/M02-freeze.json`, `outputs/experiments/SG05/`, `outputs/screenshots/JB05/` |
-| README | M03 | Starter setup guide written; final guide at M03 | `README.md` |
-| Academic report, editable source + usable artifact | SG06 | TODO | — |
-| Actual PowerPoint `.pptx` | JB06 | TODO | — |
-| Architecture + workflow diagrams | JB06 | TODO | — |
-| Combined viva Q&A and demo script | SG06, JB06, M03 | TODO | — |
+| README | M03 | DONE at M03 | `README.md` |
+| Academic report, editable source + usable artifact | SG06, M03 | DONE; both diagrams inserted and ten pages verified | `docs/project_report.md`, `docs/project_report.docx`, `docs/project_report.pdf` |
+| Actual PowerPoint `.pptx` | JB06, M03 | DONE; twelve slides verified | `docs/project_042_presentation.pptx` |
+| Architecture + workflow diagrams | JB06, M03 | DONE | `docs/diagrams/{architecture,workflow}.{svg,png}` |
+| Combined viva Q&A and demo script | SG06, JB06, M03 | DONE | `docs/viva.md`, `docs/demo_script.md` |
+| Final delivery manifest | M03 | DONE | `docs/DELIVERY.md` |
 | Interactive mock viva | Optional follow-up | NOT CONDUCTED | — |
 
 ## 9. Current environment and decisions
 
 Observed at M00: Ubuntu 24.04.4 LTS, Python 3.12.3, root pip 26.3; three independent `.venv` environments with all six imports and dependency checks PASS. NumPy 2.5.4, OpenCV headless 5.0.0.93, Matplotlib 3.11.2, Pytesseract 0.3.13, Streamlit 1.67.0, Pillow 13.0.0. System Tesseract 5.3.4 with `eng`/`osd`. All 42 installed distributions match the recorded snapshot. No apt/sudo installation was needed. Evidence: `docs/merge/M00.md` and adjacent JSON files.
 
-Current Git baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested replacing the three intermediate setup commits with this single commit. Existing setup evidence remains valid: code and dependencies are unchanged. All three workspaces retain their codex branches; GitHub `main` points to the same M00 baseline. Repository: `https://github.com/guptasakshi06/Graphia`. M01 now merges both build tracks and verifies the local app with real Tesseract and browser uploads/downloads. Contract v1 and dependencies are unchanged. See `docs/merge/M01.md`; M02 now freezes SG05/JB05 evidence at synchronized commit `46e4bf9`, with 387 hashes and full paths/limits in `docs/merge/M02.md`. M00 setup-only evidence remains distinct from application evidence.
+Current Git baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested replacing the three intermediate setup commits with this single commit. Existing setup evidence remains valid: code and dependencies are unchanged. All three workspaces retain their codex branches; Cached `origin/main` points to M00. Local `main` carries the verified M03 package. Repository: `https://github.com/guptasakshi06/Graphia`. M01 now merges both build tracks and verifies the local app with real Tesseract and browser uploads/downloads. Contract v1 and dependencies are unchanged. See `docs/merge/M01.md`; M02 now freezes SG05/JB05 evidence at synchronized commit `46e4bf9`, with 387 hashes and full paths/limits in `docs/merge/M02.md`. M00 setup-only evidence remains distinct from application evidence.
 
 | Decision | Reason |
 |---|---|
@@ -207,7 +207,7 @@ Current Git baseline: single root commit named `M00` (resolve with `git rev-list
 | Contract-first rules/UI development | Jigisha need not wait for Sakshi's OCR implementation |
 | Merge real code before final experiments and submission artifacts | Ensure all report/slide claims match the actual integrated application |
 
-Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; SG05/JB05 validation is verified at M02 with a small synthetic set and no general-accuracy claim; college/roll-number/faculty metadata and report format are unknown; two days is tight. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
+Open risks: system-install access was not needed or tested; samples are fictional/generated and derivatives are related; SG05/JB05 validation is verified at M02 with a small synthetic set and no general-accuracy claim; the report cover needs both roll numbers, the college, department, faculty guide and any prescribed format. Names **Sakshi Gupta** and **Jigisha Baiswar** are known and should appear accurately in final materials. Use placeholders only for missing metadata.
 
 ## 10. Handoff maintenance after every sprint
 
@@ -258,3 +258,5 @@ At each M gate the integration chat reads both live handoffs, merges owned work,
 - 107 tests, 387-file source/data/evidence hash inventory, seven comparisons, 112 measured method rows, 282-file stored independent repeat, eight actual browser scenarios/three Markdown pairs/invalidation DOMs/15 screenshots verified. Commands, source baseline, exact final paths and honest limitations in docs/merge/M02.md; synchronization observations in docs/merge/M02-sync.json.
 - Current/runtime defaults unchanged; no affected evidence invalidation required. Original/default CER0 tie is not improvement or general accuracy. No new M02 browser experiment, student review, final artifacts, push or main update. Completion metadata follows locally and is forward-synchronized before stopping.
 - Next independent sprints: SG06 at worktrees/sakshi/SAKSHI_HANDOFF.md; JB06 at worktrees/jigisha/JIGISHA_HANDOFF.md. Use the identical frozen evidence for report/slides. M03 waits for both; stop this chat after M02 synchronization.
+
+- 2026-11-10 16:47 Asia/Kolkata: **M03 DONE**. Verified both owner cutoffs and merged SG06/JB06. Final report includes both diagrams. Passed 107 tests, real OCR and server smoke, M02 evidence audit, report and slide rendering, and all 14 delivery items. See `docs/merge/M03.md` and `docs/DELIVERY.md`. The M03 delivery commit is the final local baseline for both worktrees, integration and local `main`. Student-supplied cover information remains.

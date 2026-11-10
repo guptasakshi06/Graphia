@@ -81,16 +81,18 @@ def main():
     figures = re.findall(r"^!\[([^\]]+)\]\(([^)]+)\)$", source, re.M)
     hashes = set()
     frozen_count = 0
+    diagrams = set()
     for alt, relative in figures:
         path = (DOCS / relative).resolve(strict=True)
         sha = hashlib.sha256(path.read_bytes()).hexdigest()
         repo_path = path.relative_to(ROOT).as_posix()
         if repo_path.startswith("docs/diagrams/"):
-            assert repo_path in ("docs/diagrams/architecture.png", "docs/diagrams/workflow.png")
+            diagrams.add(repo_path)
         else:
             assert freeze[repo_path] == sha, repo_path
             frozen_count += 1
         hashes.add(sha)
+    assert diagrams == {"docs/diagrams/architecture.png", "docs/diagrams/workflow.png"}
     with ZipFile(docx_path) as archive:
         embedded = {
             hashlib.sha256(archive.read(name)).hexdigest()
@@ -106,7 +108,7 @@ def main():
                 assert (DOCS / target).exists(), target
     print("PASS: 14 required sections; both authors; 15 viva questions; Markdown links resolve.")
     print("PASS: 14 DOCX result rows match frozen SG05 and eight browser rows match JB05.")
-    print("PASS: six frozen images are embedded byte for byte with matching alternative text.")
+    print("PASS: six frozen images and both final diagrams are embedded byte for byte with matching alternative text.")
 
 
 if __name__ == "__main__":
