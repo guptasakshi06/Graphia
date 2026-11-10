@@ -1,0 +1,444 @@
+{
+  "profile_name": "Demonstration scholarship checklist — FICTIONAL FIXTURE EXAMPLE, NOT REAL OCR",
+  "configuration": {
+    "profile_name": "Demonstration scholarship checklist — FICTIONAL FIXTURE EXAMPLE, NOT REAL OCR",
+    "required_documents": {
+      "income_certificate": [
+        "student_name",
+        "certificate_number"
+      ],
+      "caste_certificate": [
+        "student_name",
+        "certificate_number"
+      ],
+      "marksheet": [
+        "student_name"
+      ],
+      "identity_proof": [
+        "student_name"
+      ]
+    },
+    "readability": {
+      "min_alnum_chars": 20
+    }
+  },
+  "required_types": [
+    "income_certificate",
+    "caste_certificate",
+    "marksheet",
+    "identity_proof"
+  ],
+  "required_type_count": 4,
+  "submitted_file_count": 6,
+  "detected_required_type_count": 4,
+  "usable_required_type_count": 3,
+  "missing_types": [],
+  "unusable_types": [
+    "identity_proof"
+  ],
+  "coverage_percent": 100.0,
+  "readiness_percent": 75.0,
+  "overall_status": "Needs Attention",
+  "documents": [
+    {
+      "id": "fixture-0",
+      "filename": "FICTIONAL_fixture-0.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: INC-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: INC-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: INC-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": "Asha Example",
+        "certificate_number": "INC-00017",
+        "application_id": "APP-00041",
+        "issue_date": "2026-01-15"
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "income_certificate",
+      "is_required": true,
+      "alnum_char_count": 134,
+      "readable": true,
+      "required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "missing_required_fields": [],
+      "usable": true,
+      "problems": []
+    },
+    {
+      "id": "fixture-1",
+      "filename": "FICTIONAL_fixture-1.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nCaste Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: CST-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nCaste Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: CST-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nCaste Certificate\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15\nCertificate Number: CST-00017",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "caste_certificate",
+        "evidence": [
+          "caste certificate"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": "Asha Example",
+        "certificate_number": "CST-00017",
+        "application_id": "APP-00041",
+        "issue_date": "2026-01-15"
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "caste_certificate",
+      "is_required": true,
+      "alnum_char_count": 133,
+      "readable": true,
+      "required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "missing_required_fields": [],
+      "usable": true,
+      "problems": []
+    },
+    {
+      "id": "fixture-2",
+      "filename": "FICTIONAL_fixture-2.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nMarksheet\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nMarksheet\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nMarksheet\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "marksheet",
+        "evidence": [
+          "marksheet"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": "Asha Example",
+        "certificate_number": null,
+        "application_id": "APP-00041",
+        "issue_date": "2026-01-15"
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "marksheet",
+      "is_required": true,
+      "alnum_char_count": 101,
+      "readable": true,
+      "required_fields": [
+        "student_name"
+      ],
+      "missing_required_fields": [],
+      "usable": true,
+      "problems": []
+    },
+    {
+      "id": "fixture-3",
+      "filename": "FICTIONAL_fixture-3.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIdentity Proof\nStudent Name:\nApplication ID: APP-00041",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIdentity Proof\nStudent Name:\nApplication ID: APP-00041",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIdentity Proof\nStudent Name:\nApplication ID: APP-00041",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "identity_proof",
+        "evidence": [
+          "identity proof"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": "APP-00041",
+        "issue_date": null
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "identity_proof",
+      "is_required": true,
+      "alnum_char_count": 77,
+      "readable": true,
+      "required_fields": [
+        "student_name"
+      ],
+      "missing_required_fields": [
+        "student_name"
+      ],
+      "usable": false,
+      "problems": [
+        "Missing required fields: student_name."
+      ]
+    },
+    {
+      "id": "fixture-bad-duplicate",
+      "filename": "FICTIONAL_fixture-bad-duplicate.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name:",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name:",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name:",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "income_certificate",
+        "evidence": [
+          "income certificate"
+        ],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "income_certificate",
+      "is_required": true,
+      "alnum_char_count": 60,
+      "readable": true,
+      "required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "missing_required_fields": [
+        "student_name",
+        "certificate_number"
+      ],
+      "usable": false,
+      "problems": [
+        "Missing required fields: student_name, certificate_number."
+      ]
+    },
+    {
+      "id": "fixture-unknown",
+      "filename": "FICTIONAL_fixture-unknown.png",
+      "ocr_original": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nUnrelated receipt\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_processed": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nUnrelated receipt\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "ocr_source": "processed",
+      "ocr": {
+        "text": "FICTIONAL REFERENCE ONLY - NOT REAL OCR\nUnrelated receipt\nStudent Name: Asha Example\nApplication ID: APP-00041\nIssue Date: 2026-01-15",
+        "status": "ok",
+        "confidence": null,
+        "error": null,
+        "engine_config": {
+          "lang": "eng",
+          "psm": 6,
+          "timeout": 20
+        }
+      },
+      "classification": {
+        "doc_type": "unknown",
+        "evidence": [],
+        "ambiguous": false
+      },
+      "fields": {
+        "student_name": null,
+        "certificate_number": null,
+        "application_id": null,
+        "issue_date": null
+      },
+      "processing_parameters": {
+        "fixture_only": true
+      },
+      "doc_type": "unknown",
+      "is_required": false,
+      "alnum_char_count": 108,
+      "readable": true,
+      "required_fields": [],
+      "missing_required_fields": [],
+      "usable": false,
+      "problems": [
+        "Unknown document type; it cannot satisfy the checklist."
+      ]
+    }
+  ],
+  "limitations": [
+    "This demonstration checklist is fictional, not official scholarship policy.",
+    "Readability is a heuristic: selected OCR status ok and the configured minimum alphanumeric character count. It does not prove OCR accuracy or human readability.",
+    "Readiness checks configured presence and usable information only; it does not verify authenticity, official eligibility, or that documents belong to the same student.",
+    "Each required type needs one individually usable file. Fields are never combined across files; duplicate types count once. OCR confidence is not accuracy."
+  ]
+}
