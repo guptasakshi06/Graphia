@@ -1,0 +1,38 @@
+[
+  {
+    "level": "error",
+    "message": "Client Error in reaching server endpoint - No response received when attempting to reach /_stcore/health",
+    "timestamp": "2026-11-10T09:36:10.940Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Streamlit server is not responding. Are you connected to the internet?",
+    "timestamp": "2026-11-10T09:36:10.941Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Client Error in reaching server endpoint - No response received when attempting to reach /_stcore/health",
+    "timestamp": "2026-11-10T09:36:14.677Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Streamlit server is not responding. Are you connected to the internet?",
+    "timestamp": "2026-11-10T09:36:14.677Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Client Error in reaching server endpoint - No response received when attempting to reach /_stcore/health",
+    "timestamp": "2026-11-10T09:36:18.289Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Streamlit server is not responding. Are you connected to the internet?",
+    "timestamp": "2026-11-10T09:36:18.289Z",
+    "url": "http://127.0.0.1:8505/static/js/index.DormvYxC.js"
+  }
+]
