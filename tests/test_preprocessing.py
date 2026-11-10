@@ -1,4 +1,4 @@
-"""SG01 image-boundary and dataset integrity checks; no OCR assertions."""
+"""SG01 input/dataset and SG02 numerical DIP checks; no OCR assertions."""
 
 import hashlib
 from io import BytesIO
@@ -11,8 +11,10 @@ from unittest.mock import patch
 import numpy as np
 from PIL import Image
 
-from modules.preprocessing import load_image
+from modules.preprocessing import (denoise_image, enhance_contrast, load_image,
+                                   to_grayscale)
 from scripts.create_sample_dataset import create_dataset
+from scripts.run_experiments import compare_methods
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,6 +148,137 @@ class DatasetTests(unittest.TestCase):
                     self.assertEqual(row["expected_fields"], parent["expected_fields"])
                     self.assertEqual(row["reference_sha256"], parent["reference_sha256"])
                     self.assertNotEqual(row["image_sha256"], parent["image_sha256"])
+
+
+class GrayscaleFilterContrastTests(unittest.TestCase):
+    def test_grayscale_known_color_weights_and_input_preserved(self):
+        bgr = np.array([[[255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255]]],
+                       dtype=np.uint8)
+        before = bgr.copy()
+        gray = to_grayscale(bgr)
+        np.testing.assert_array_equal(gray, [[29, 150, 76, 255]])
+        np.testing.assert_array_equal(bgr, before)
+        self.assertEqual(gray.dtype, np.uint8)
+        self.assertFalse(np.shares_memory(bgr, gray))
+
+    def test_gaussian_neighborhood_and_median_impulse(self):
+        impulse = np.zeros((7, 7), dtype=np.uint8)
+        impulse[3, 3] = 240
+        gaussian = denoise_image(impulse, "gaussian", 3)
+        # Interior 3x3 Gaussian sigma=0 uses [1,2,1]/4 on each axis.
+        np.testing.assert_array_equal(gaussian[2:5, 2:5],
+                                      [[15, 30, 15], [30, 60, 30], [15, 30, 15]])
+        self.assertEqual(int(gaussian.sum()), 240)
+        self.assertTrue(np.all(denoise_image(impulse, "median", 3) == 0))
+        neighborhood = np.array([[10, 10, 10], [10, 250, 20], [20, 20, 20]], dtype=np.uint8)
+        self.assertEqual(int(denoise_image(neighborhood, "median", 3)[1, 1]), 20)
+        self.assertEqual(int(impulse[3, 3]), 240)
+
+    def test_filters_preserve_flat_images_shapes_and_bypass_copies(self):
+        gray = np.full((13, 11), 83, dtype=np.uint8)
+        for method in ("none", "gaussian", "median"):
+            for size in (1, 3, 5):
+                result = denoise_image(gray, method, size)
+                np.testing.assert_array_equal(result, gray)
+                self.assertEqual(result.dtype, np.uint8)
+                self.assertFalse(np.shares_memory(result, gray))
+
+    def test_equalization_known_mapping_and_clahe_output(self):
+        low_contrast = np.tile(np.array([190, 190, 210, 210], dtype=np.uint8), (32, 8))
+        before = low_contrast.copy()
+        equalized = enhance_contrast(low_contrast, "equalize")
+        np.testing.assert_array_equal(equalized[:, :4], np.tile([0, 0, 255, 255], (32, 1)))
+        clahe = enhance_contrast(low_contrast, "clahe", 2.0, (8, 8))
+        self.assertEqual(clahe.shape, low_contrast.shape)
+        self.assertEqual(clahe.dtype, np.uint8)
+        self.assertFalse(np.shares_memory(clahe, low_contrast))
+        self.assertFalse(np.array_equal(clahe, low_contrast))
+        np.testing.assert_array_equal(low_contrast, before)
+        bypass = enhance_contrast(low_contrast, "none")
+        np.testing.assert_array_equal(bypass, low_contrast)
+        self.assertFalse(np.shares_memory(bypass, low_contrast))
+
+    def test_invalid_arrays_methods_and_settings(self):
+        for bad in (None, [], np.zeros((0, 2), np.uint8), np.zeros((2, 2), float),
+                    np.zeros((2, 2, 1), np.uint8), np.zeros((2, 2, 4), np.uint8)):
+            with self.subTest(shape=getattr(bad, "shape", None)):
+                for function in (to_grayscale, denoise_image, enhance_contrast):
+                    with self.assertRaisesRegex(ValueError, "uint8"):
+                        function(bad)
+        with self.assertRaises(ValueError):
+            to_grayscale(np.zeros((2, 2), np.uint8))
+        with self.assertRaises(ValueError):
+            denoise_image(np.zeros((2, 2, 3), np.uint8))
+        gray = np.zeros((8, 8), np.uint8)
+        for bad in (0, -3, 2, True, 3.0, "3", None):
+            with self.subTest(kernel=bad), self.assertRaisesRegex(ValueError, "positive odd"):
+                denoise_image(gray, "gaussian", bad)
+        for bad in ("bad", None, [], 1):
+            for function in (denoise_image, enhance_contrast):
+                with self.assertRaisesRegex(ValueError, "method"):
+                    function(gray, bad)
+        for bad in (0, -1, True, float("nan"), float("inf"), "2", None):
+            with self.assertRaisesRegex(ValueError, "clip_limit"):
+                enhance_contrast(gray, clip_limit=bad)
+        for bad in ((0, 8), (8, -1), (True, 8), (2.5, 8), [8], None, "88"):
+            with self.assertRaisesRegex(ValueError, "tile_grid_size"):
+                enhance_contrast(gray, tile_grid_size=bad)
+
+    def test_comparison_uses_same_gray_not_chained_outputs(self):
+        bgr = np.random.default_rng(42).integers(0, 256, (32, 48, 3), dtype=np.uint8)
+        before = bgr.copy()
+        alternatives = compare_methods(bgr)
+        gray = to_grayscale(bgr)
+        expected = {"original": bgr, "grayscale": gray,
+                    "gaussian": denoise_image(gray, "gaussian"),
+                    "median": denoise_image(gray, "median"),
+                    "equalized": enhance_contrast(gray, "equalize"),
+                    "clahe": enhance_contrast(gray, "clahe")}
+        self.assertEqual(set(alternatives), set(expected))
+        for name, (image, settings) in alternatives.items():
+            np.testing.assert_array_equal(image, expected[name])
+            self.assertEqual(image.dtype, np.uint8)
+            self.assertFalse(np.shares_memory(image, bgr))
+            json.dumps(settings, allow_nan=False)
+        np.testing.assert_array_equal(bgr, before)
+
+
+class ExperimentArtifactTests(unittest.TestCase):
+    def test_saved_metrics_images_histograms_and_source_identity(self):
+        import cv2
+
+        folder = ROOT / "outputs/experiments/SG02"
+        report = json.loads((folder / "metrics.json").read_text())
+        manifest = json.loads((ROOT / "dataset/manifest.json").read_text())
+        self.assertEqual(report["manifest_sha256"],
+                         hashlib.sha256((ROOT / "dataset/manifest.json").read_bytes()).hexdigest())
+        self.assertFalse(report["settings"]["alternatives_chained"])
+        self.assertEqual(len(report["rows"]), 48)
+        self.assertEqual(len({(r["sample_id"], r["method"]) for r in report["rows"]}), 48)
+        sample_ids = {sample["id"] for sample in manifest["samples"]}
+        self.assertEqual({r["sample_id"] for r in report["rows"]}, sample_ids)
+        for row in report["rows"]:
+            with self.subTest(sample=row["sample_id"], method=row["method"]):
+                image = cv2.imread(str(folder / row["output_image"]), cv2.IMREAD_UNCHANGED)
+                self.assertIsNotNone(image)
+                self.assertEqual(list(image.shape), row["shape"])
+                self.assertEqual(str(image.dtype), row["dtype"])
+                gray = to_grayscale(image) if image.ndim == 3 else image
+                self.assertAlmostEqual(float(gray.std()), row["grayscale_stddev"], places=10)
+                self.assertAlmostEqual(float(gray.mean()), row["grayscale_mean"], places=10)
+                np.testing.assert_array_equal(np.bincount(gray.ravel(), minlength=256),
+                                              row["histogram_counts"])
+                self.assertEqual(sum(row["histogram_counts"]), gray.size)
+                self.assertEqual(int(gray.min()), row["grayscale_min"])
+                self.assertEqual(int(gray.max()), row["grayscale_max"])
+                source = ROOT / "dataset" / row["source_image"]
+                self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), row["source_sha256"])
+                if row["method"] == "original":
+                    np.testing.assert_array_equal(image, load_image(source))
+        for sample_id in sample_ids:
+            for name in ("comparison.png", "detail.png", "histograms.png"):
+                with Image.open(folder / sample_id / name) as figure:
+                    figure.verify()
 
 
 if __name__ == "__main__":

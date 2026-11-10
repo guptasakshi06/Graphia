@@ -6,9 +6,9 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 13:08 Asia/Kolkata; **SG01 DONE locally**, verified; not merged.
-- Active sprint: none; **SG01 completed**.
-- Next: **SG02 — eligible; SG01 DONE**. Execute in a new chat using this handoff.
+- Updated: 2026-11-10 13:21 Asia/Kolkata; **SG02 DONE locally**, verified; not merged.
+- Active sprint: none; **SG02 completed**.
+- Next: **SG03 — eligible; SG02 DONE**. Execute in a new chat using this handoff.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -22,7 +22,7 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
 | SG01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
-| SG02 | 1 | 75 min | SG01 | TODO | Not merged; target M01 |
+| SG02 | 1 | 75 min | SG01 | DONE | Not merged; target M01 |
 | SG03 | 1 | 75 min | SG02 | TODO | Not merged; target M01 |
 | SG04 | 1 | 75 min | SG03 | TODO | Not merged; target M01 |
 | SG05 | 2 | 75 min | SG04, M01 | TODO | Not merged; target M02 |
@@ -219,3 +219,50 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - Before publication, `git ls-remote origin refs/heads/codex/sakshi-dip` confirmed remote base `464c884af09bb1d2db686559eaee16cdb9912d59` matches local M00. The sandbox's first attempt could not resolve GitHub; authorized network access succeeded.
 - Resolve the sprint commit with `git log -1 --format='%H %s'`; publication is checked by comparing `git rev-parse HEAD` with `git ls-remote origin refs/heads/codex/sakshi-dip`. The actual push result is reported in this chat.
 - SG01 remains DONE; not integrated at M01. Next: SG02 in this checkout. No merge, peer work, dependency change or later sprint is included.
+
+### SG02 start — 2026-11-10 13:14 Asia/Kolkata — session 1
+- Status: TODO → IN_PROGRESS. Read AGENTS/master/brief/contract/own handoff and M00 foundation evidence. SG01 prerequisite exists in actual commit `6629e0f240023aadb8027032f1e60b6071e34d27`; M00 root `464c884af09bb1d2db686559eaee16cdb9912d59`.
+- Checkout/branch: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` / `codex/sakshi-dip`; clean at start. No branch switch, merge or peer/shared edit needed.
+- Explained grayscale weights, Gaussian weighted neighborhoods, median example, detail tradeoff, histograms and global/local clipped enhancement before coding.
+- Plan: independent grayscale/filter/contrast helpers, repeatable SG02 experiment runner, focused checks and visual inspection of clear/noisy/low-contrast samples. SG03 pipeline/threshold/morphology and OCR stay pending.
+- No blockers or dependency/peer requests. Update here at checkpoints and completion; no publication requested.
+
+### SG02 checkpoint — 2026-11-10 13:18 Asia/Kolkata — session 1
+- Implemented independent `to_grayscale`, `denoise_image` and `enhance_contrast` helpers. Input/type/kernel/CLAHE validation and copy behavior tested; original loader preserved.
+- `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json outputs/experiments/SG02_environment.json`: PASS; own venv and all six imports available. Initial preprocessing suite: 14 tests PASS (Matplotlib default-cache warning only; subsequent commands use writable MPLCONFIGDIR).
+- Runner executed for all eight samples: 48 measured rows, independent alternatives, 48 full-size PNGs, eight comparison figures, eight detail figures and eight histogram figures. Adjusted detail crop/layout after inspection to avoid slicing the title; regenerated outputs.
+- Inspected full-page clear income, low-contrast income and noisy caste comparisons, their corrected detail crops, and low-contrast/noisy histogram figures. Equalization strongly expands low contrast but amplifies noisy background; CLAHE is milder at clip 2/grid 8x8. Gaussian softens edges; median rounds some corners. No lost field line observed at these settings; no OCR inference made.
+- Next before DONE: saved-output audit, reproducibility comparison, final tests/notes/handoff. No blocker, contract change or peer request.
+
+### SG02 completion — 2026-11-10 13:21 Asia/Kolkata — session 1
+- Status before → after: TODO → IN_PROGRESS → **DONE**. SG02 acceptance met; SG03–SG06 remain TODO. Stop after this sprint.
+- Checkout / branch / baseline / local diff: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` / `codex/sakshi-dip`; HEAD `6629e0f240023aadb8027032f1e60b6071e34d27` (SG01), M00 root `464c884af09bb1d2db686559eaee16cdb9912d59`. Clean at start; SG02 changes are local/uncommitted/unmerged. No commit/push requested in this chat; none performed.
+- Concepts explained before coding and in `docs/sprint_notes/SG02.md`: grayscale BGR weights; 3x3 Gaussian weighted neighborhood; numeric median example; noise/detail tradeoff; 256-bin histograms; global equalization; local clipped CLAHE; grayscale population standard deviation versus OCR accuracy.
+- Functions available: existing `load_image` preserved; added `to_grayscale(image_bgr)`, `denoise_image(gray, method="median", kernel_size=3)`, `enhance_contrast(gray, method="clahe", clip_limit=2.0, tile_grid_size=(8,8))`. Helpers validate nonempty uint8 arrays and appropriate channel shapes; filters validate positive odd kernels; contrast validates methods, finite positive clip limit and positive integer tile grid. Results/copies do not share input memory. Contract public defaults unchanged; `run_pipeline` remains SG03 work.
+- Exact experiment settings: no resize of these 1400x1000 samples under 1800 limit; Gaussian/median **3x3**; Gaussian `sigmaX=0`, `BORDER_REFLECT_101`; median replicated borders. Global histogram equalization; CLAHE **clipLimit=2.0, tileGridSize=(8,8)**. Each alternative starts from original/grayscale, not the preceding competing method. Display fixed gray range 0–255, BGR→RGB only for plotting, shared detail crop `(65,190,1100,420)`.
+- Runner: all eight hash-verified fictional samples, six alternatives each, **48 measured rows**, 48 full-size method PNGs plus 24 comparison/detail/histogram figures. CSV/JSON include exact settings, versions, source hashes and grayscale contrast; JSON includes shapes/dtypes and all 256 histogram counts. Original contrast uses grayscale conversion, so it equals grayscale contrast.
+- Visual evidence: assistant inspected full-page clear income, low-contrast income and noisy caste comparisons; corrected crops for all three; low-contrast/noisy histograms. All 24 figure files decode, but no visual inspection of the other five comparison sets or student review is claimed. Gaussian softens character edges; median rounds some corners; no field line vanished in inspected outputs. Equalization makes low-contrast text darker but amplifies noisy background strongly. CLAHE is milder at these settings and still amplifies noisy speckle.
+- Actual examples (grayscale stddev, not accuracy): clear income original **42.3519**, Gaussian **38.1779**, median **42.0576**; low-contrast income original **9.3507**, equalized **55.7899**, CLAHE **10.8864**; noisy caste original **42.4010**, equalized **97.9022**, CLAHE **47.9676**. Full eight-sample table is in SG02 notes/metrics.
+- Provisional recommendations: keep original/grayscale for clean documents; compare equalization for uniformly faint pages; compare denoising before enhancement on noisy pages. Keep the small alternative set; do not infer OCR improvement or change contract defaults until real OCR comparisons. No OCR, thresholds, morphology or end-to-end application success claimed.
+- Changed owned files: `modules/preprocessing.py`, `scripts/run_experiments.py`, `tests/test_preprocessing.py`, `docs/sprint_notes/SG02.md`, `SAKSHI_HANDOFF.md`; generated `outputs/experiments/SG02/**` (74 files), `outputs/experiments/SG02_environment.json`, `outputs/experiments/SG02_tests.txt`, `outputs/experiments/SG02_reproducibility.json`. Dataset and SG01 outputs unchanged; peer/shared files untouched.
+- Checks / exact commands and real results:
+  - `git status --short --branch`, `git worktree list --porcelain`, `git log -2 --format='%H %s'`: PASS; correct personal branch/worktree; actual SG01 prerequisite commit and M00 root verified.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json outputs/experiments/SG02_environment.json`: PASS, own Python 3.12.3 venv, all six imports and Tesseract setup available. This is environment evidence only.
+  - `.venv/bin/python -m unittest discover -s tests -p test_preprocessing.py -v`: initial **14 tests PASS**; Matplotlib default-cache warning only. Subsequent commands set a writable MPLCONFIGDIR.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/run_experiments.py`: PASS, **48 rows / 8 samples**; rerun after crop/layout correction also PASS.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python -m unittest discover -s tests -p test_preprocessing.py -v > outputs/experiments/SG02_tests.txt 2>&1`: PASS, **15 tests**, including previous SG01 checks, known numerical DIP cases, input preservation, invalid settings, independent comparisons and saved-output audit. Audit recomputes all saved metrics/histograms, checks source hashes and original pixels, and verifies all 24 figure PNGs.
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/run_experiments.py --output-dir /tmp/dip042-sg02-reproduce`: PASS. Python file-set/byte comparison with saved SG02 output: **74/74 files identical**, including figures and CSV/JSON. Command and artifact SHA256 values recorded in `outputs/experiments/SG02_reproducibility.json`.
+  - `.venv/bin/python -m compileall -q modules/preprocessing.py scripts/run_experiments.py tests/test_preprocessing.py`: PASS. `git diff --check`: PASS.
+- Acceptance still unmet / errors / student-only action: none for SG02. No fabricated data, OCR claim or human review. No external source citations used; observations come from executed local experiments.
+- Requested peer or dependency changes: none. `HANDOFF.md`, `MERGE_HANDOFF.md`, `TEAM_CONTRACT.md`, `requirements.txt` and peer paths unchanged.
+- Remaining: SG03 thresholds/morphology/exact contract pipeline, then SG04 real OCR/CER before M01. No later sprint started.
+- Exact next action in a new chat: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG03. Verify the work and update the handoff before stopping.`
+- Merge readiness: **SG02 complete locally; NOT READY for M01** until SG04 and peer build prerequisites pass. Merged at: **not yet**.
+
+### SG02 local commit request — 2026-11-10 13:22 Asia/Kolkata
+- User requested committing the completed sprint locally. Include all SG02 owned code, tests, notes and experiment evidence, plus this handoff update, in one commit on `codex/sakshi-dip`.
+- Commit subject: `SG02: Add tested grayscale, denoising and contrast experiments`.
+- Resolve the resulting commit with `git log -1 --format='%H %s'`; verify the checkout with `git status --short --branch`. The earlier uncommitted statements describe the pre-commit sprint checkpoint.
+- Pre-commit `git diff --check`: PASS; all pending paths belong to Sakshi's SG02 work. Existing verification remains 15 tests PASS and 74/74 experiment files reproduced identically; no code changes since those checks.
+- This is a local commit only; no push or merge. SG02 remains DONE; next SG03 in this checkout. M01 readiness remains NOT READY pending SG04 and peer prerequisites.
+- Staged verification: ordinary `git diff --cached --check` flags CSV writer CRLF line endings as trailing whitespace. `git -c core.whitespace=cr-at-eol diff --cached --check`: PASS, recognizing those CSV line endings; experiment files and their verified hashes are preserved. Reviewed staged paths: all 82 files are Sakshi-owned SG02 code, evidence and notes.
