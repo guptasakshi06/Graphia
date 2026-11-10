@@ -6,13 +6,17 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 12:46 Asia/Kolkata; **M00 DONE**, personal work not started.
-- Active sprint: none.
-- Next: **JB01 — eligible; M00 DONE**.
+- Updated: 2026-11-10 13:14 Asia/Kolkata; **M00 DONE; JB01 DONE (not merged)**.
+- Active sprint: none; JB01 completed and verified. User authorized the local JB01 commit with Jigisha's GitHub noreply identity.
+- Next: **JB02 — eligible after JB01; do not start in this chat**.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
 - Code/evidence merged: none.
+- JB01 artifacts: `modules/classification.py`, `tests/fixtures/rule_cases.json`, `tests/test_classification.py`, `docs/sprint_notes/JB01.md`. 8 unittest methods PASS on 16 fictional reference cases; also PASS with site packages disabled. Fixture success is not real OCR evidence.
+- Git authorization: approved local JB01 commit as **Jigisha Baiswar**, account `jigishadebugging`, using `146957478+jigishadebugging@users.noreply.github.com` for both author and committer. Use per-command identity overrides; shared/global Git identity stays unchanged. Existing Graphia repository confirmed. No push requested.
+- Local commit locator: `git log -1 --format=fuller -- modules/classification.py` identifies the JB01 commit carrying these five owned files and this handoff. Checkout remains `codex/jigisha-app`.
+- Main delivery instruction (2026-11-10): keep personal sprint commits local; **add completed work to `main` only after all sprints and required verification are done**. Intermediate M01/M02 integration gates remain on `codex/integration`; this instruction does not authorize an early main update or push. Merge chat must carry this preference into the shared record at its next gate.
 - Peer requests: none.
 
 Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **this file in Jigisha's checkout**, not a stale root copy. Read `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` and `AGENTS.md` first. Keep your own handoff current; do not change the master, Sakshi's handoff, shared dependencies or her image/OCR modules during parallel work.
@@ -23,7 +27,7 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| JB01 | 1 | 60 min | M00 | TODO | Not merged; target M01 |
+| JB01 | 1 | 60 min | M00 | DONE | Not merged; target M01 |
 | JB02 | 1 | 60 min | JB01 | TODO | Not merged; target M01 |
 | JB03 | 1 | 60 min | JB02 | TODO | Not merged; target M01 |
 | JB04 | 1 | 90 min | JB03 | TODO | Not merged; target M01 |
@@ -177,3 +181,42 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 
 ### One-commit baseline correction — 2026-11-10 12:56 Asia/Kolkata
 - User requested replacing the three intermediate setup commits with one root commit named `M00`. Keep this checkout on its existing codex branch and start from that root baseline. Historical hashes above describe pre-squash activity only; current baseline is obtained with `git rev-list --max-parents=0 HEAD`. Setup/evidence files and TODO sprint statuses are preserved.
+
+### JB01 start — 2026-11-10 13:04 Asia/Kolkata — session 1
+- Status: TODO → IN_PROGRESS. User clarified the original mixed SG01/path request: execute **Jigisha JB01 in worktrees/jigisha**.
+- Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`; branch `codex/jigisha-app`; HEAD/root baseline `464c884af09bb1d2db686559eaee16cdb9912d59` (`M00`); own checkout clean at start.
+- Read project instructions, master, original brief, contract v1, M00 evidence and both personal handoffs. Sakshi's checkout contains unfinished SG01 work; it is not changed by this session.
+- Preflight: `.venv/bin/python scripts/check_environment.py --json /tmp/dip042-jigisha-preflight.json` PASS (all six imports, local venv, Tesseract 5.3.4 with eng/osd); `.venv/bin/python -m pip check` PASS. Default Matplotlib/pip cache locations are unwritable; subsequent checks use temporary cache settings. No dependency change needed.
+- Teaching: normalize case/whitespace in a temporary string, match whole document-title phrases, retain matching keywords as evidence, and return unknown on conflicting types. No trained model or OCR accuracy claim.
+- Plan: classifier, labeled fictional/reference fixtures including JB02 expected fields, focused standard-library tests and JB01 notes. No extraction/UI/peer/shared implementation.
+- Git: user requested `jigishadebugging` and authorization before committing. Existing local author is Sakshi; do not commit with it. Profile URL alone does not select a repository or prove authenticated account access. Repository/commit identity clarification and final authorization remain pending; no commit/push or remote/config change performed.
+
+### JB01 checkpoint and completion — 2026-11-10 13:06 Asia/Kolkata — session 1
+- Status: IN_PROGRESS → DONE. All JB01 acceptance checks passed; **not merged**. Commit approval/author identity are pending separately from implementation completion.
+- Checkout/branch/baseline: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha` / `codex/jigisha-app` / `464c884af09bb1d2db686559eaee16cdb9912d59` (`M00`). HEAD unchanged; five owned files are the intended uncommitted diff. No staged changes, commit or push.
+- Implemented `classify_document(text)` with exact contract-v1 keys, whole-phrase matching, case/whitespace normalization, deterministic inspectable evidence and conservative conflict handling. Preserves raw text; no filename/image/OCR/UI dependency. Invalid non-string callers raise TypeError.
+- Vocabulary: income certificate; caste certificate; marksheet / mark sheet; identity proof. Generic words do not suffice. Two distinct types return unknown/ambiguous; repeated titles or two aliases of one type do not inflate evidence or create ambiguity.
+- Created 16 labeled fictional/reference cases covering four types, unrelated/blank/whitespace, mixed case/linebreaks/punctuation, title variant, conflicts, repetition, generic/embedded words and a manually authored damaged title. Expected field strings/None are recorded for JB02 only; field extraction has NOT RUN and is not implemented here.
+- Changed owned files (explicit future staging list): `JIGISHA_HANDOFF.md`, `modules/classification.py`, `tests/fixtures/rule_cases.json`, `tests/test_classification.py`, `docs/sprint_notes/JB01.md`.
+- Checks actually executed from this checkout:
+  - `MPLCONFIGDIR=/tmp/dip042-matplotlib .venv/bin/python scripts/check_environment.py --json /tmp/dip042-jigisha-jb01-environment.json`: PASS; own Python 3.12.3 venv, six package imports, Tesseract 5.3.4 eng/osd, no problems. Temporary JSON is local evidence only.
+  - `.venv/bin/python -m pip --disable-pip-version-check --no-cache-dir check`: PASS, no broken requirements.
+  - `.venv/bin/python -m unittest discover -s tests -p test_classification.py -v`: PASS, 8 methods, including all 16 fixture cases, all 6 conflicting type pairs and all 4 titles with case/whitespace variation.
+  - `.venv/bin/python -S -m unittest discover -s tests -p test_classification.py -v`: PASS, same 8 methods with third-party site packages unavailable.
+  - `.venv/bin/python -m compileall -q modules/classification.py tests/test_classification.py`: PASS.
+  - `git diff --check`: PASS. Final Python scope/whitespace/JSON review: PASS; exactly the five owned files listed above are changed, none staged, fixture JSON parses with 16 cases, and all five files have no trailing whitespace. No shared/peer changes in this checkout.
+- Teaching/evidence: `docs/sprint_notes/JB01.md` explains each key function/regex, field references, commands/results and limitations. Fixture success proves rule behavior only, not OCR accuracy or the real application.
+- Limits: exact title phrases miss damaged/unseen layouts; a text mentioning one title can trigger a false positive; several titles are ambiguous. No authenticity/eligibility or matching-student claim. Real OCR validation remains deferred to M01/JB05.
+- Read-only Git checks: `git config --show-origin --get user.name` / `user.email` show inherited Sakshi identity; `git remote -v` shows existing Graphia origin. GitHub connector login is `meridian-max`; `gh auth status` reports invalid token for `guptasakshi06`. No attempt to authenticate, send, publish or change shared/global Git settings.
+- Remaining work: user-requested approval for proposed local commit `JB01: add conservative document classification and fictional fixtures`, plus intended author email for Jigisha Baiswar / `jigishadebugging`. A local commit does not require GitHub login; publishing as that account would require authenticated repository access and a separate push request. Repository question remains unanswered; keep origin unchanged.
+- No unmet JB01 implementation checks or peer/dependency requests. Sakshi/shared files preserved. Merge readiness: NOT READY for M01; JB02–JB04 still TODO; merged at: not yet.
+- Exact next sprint request in a new chat: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB02 only. Verify it and update this handoff.` Do not start JB02 until this chat stops.
+
+### JB01 local commit authorization — 2026-11-10 13:14 Asia/Kolkata — session 1 follow-up
+- User explicitly authorized: commit JB01 locally as Jigisha Baiswar using the GitHub noreply email for `jigishadebugging`; keep existing Graphia repository. Latest instruction: add to `main` after all sprints are done. Earlier pending-approval notes are historical and resolved.
+- Public profile lookup `https://api.github.com/users/jigishadebugging` returned login `jigishadebugging`, ID `146957478`, display name `JIGISHA BAISWAR`. The first sandbox request failed DNS; authorized read-only network retry succeeded. GitHub's email reference documents `ID+USERNAME@users.noreply.github.com`; use `146957478+jigishadebugging@users.noreply.github.com` for author and committer, with name `Jigisha Baiswar`.
+- Checkout/branch/start HEAD: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha` / `codex/jigisha-app` / `464c884af09bb1d2db686559eaee16cdb9912d59`. JB01 remains DONE; no new sprint started.
+- Pre-commit recheck: `.venv/bin/python -m unittest discover -s tests -p test_classification.py -v` PASS (8 methods); same command with `-S` PASS (8 methods). `git diff --check` PASS. `git config --get core.hooksPath` returned exit 1 because no custom hooks path is configured; this was not a test failure.
+- Commit scope: only `JIGISHA_HANDOFF.md`, `modules/classification.py`, `tests/fixtures/rule_cases.json`, `tests/test_classification.py`, `docs/sprint_notes/JB01.md`. Message: `JB01: add conservative document classification and fictional fixtures`. Per-command author/committer environment overrides avoid changing the shared repository configuration or Sakshi's identity.
+- Resolve actual commit hash and attribution after execution with `git log -1 --format=fuller -- modules/classification.py`; verify clean own checkout using `git status --short --branch`, exact five-file commit using `git show --stat HEAD`, and unchanged `origin/main` (`464c884af09bb1d2db686559eaee16cdb9912d59`). No local `main` exists at this point. No branch switch, merge or push is part of this action.
+- Peer/integration request: retain the user's deferred-main instruction at the next merge gate. Do not edit shared handoffs during this personal chat. M01 readiness remains NOT READY until JB02–JB04 and Sakshi prerequisites are actually DONE. Next action remains JB02 in a new chat using this checkout's handoff.
