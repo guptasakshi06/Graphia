@@ -6,9 +6,9 @@
 
 - Owner: **Sakshi Gupta**.
 - Role: image dataset, DIP pipeline, OCR, experiments, academic report; integration lead in separate M chats.
-- Updated: 2026-11-10 14:36 Asia/Kolkata; SG01–SG04 integrated and verified at M01; synchronization pending.
+- Updated: 2026-11-10 14:40 Asia/Kolkata; **M01 DONE**, SG01–SG04 integrated, verified and synchronized.
 - Active sprint: none; **SG04 completed**.
-- Next: **SG05** after M01 synchronization completes; read `docs/merge/M01.md` from this checkout.
+- Next: **SG05 is eligible now** from the synchronized M01 baseline; read `docs/merge/M01.md` here.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`. Branch: `codex/sakshi-dip`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/sakshi-dip`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-sakshi.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -22,10 +22,10 @@ Before M00 use the root `MERGE_HANDOFF.md` for shared setup. After M00 use **thi
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| SG01 | 1 | 60 min | M00 | DONE | M01 (verified; sync pending) |
-| SG02 | 1 | 75 min | SG01 | DONE | M01 (verified; sync pending) |
-| SG03 | 1 | 75 min | SG02 | DONE | M01 (verified; sync pending) |
-| SG04 | 1 | 75 min | SG03 | DONE | M01 (verified; sync pending) |
+| SG01 | 1 | 60 min | M00 | DONE | M01 (DONE, synchronized) |
+| SG02 | 1 | 75 min | SG01 | DONE | M01 (DONE, synchronized) |
+| SG03 | 1 | 75 min | SG02 | DONE | M01 (DONE, synchronized) |
+| SG04 | 1 | 75 min | SG03 | DONE | M01 (DONE, synchronized) |
 | SG05 | 2 | 75 min | SG04, M01 | TODO | Not merged; target M02 |
 | SG06 | 2 | 90 min | SG05, M02 | TODO | Not merged; target M03 |
 
@@ -352,3 +352,8 @@ Update the current position, own ledger, active/next sprint, branch/checkout, me
 - Full combined suite 101 PASS; real four-sample production smoke and two-upload browser flow PASS; downloads verified. `docs/merge/M01.md` records exact evidence, commands and limitations. No public contract/default/dependency change or fixture in the production flow.
 - Only app notice/setup-error wording changed at integration; module behavior preserved. Recursive filesystem watching overflowed with nested worktrees; tested launch uses `--server.fileWatcherType=none`, requiring server restart after source changes.
 - Synchronization pending into both clean personal checkouts; do not start SG05 until the completion annotation below. No SG05, human review or final evidence freeze performed. All commits local; main unchanged.
+
+### M01 synchronization completion — 2026-11-10 14:40 Asia/Kolkata
+- M01 DONE. This branch fast-forwarded to verified code/evidence `c1c155d5ab9368f13ede5781470ff4cc0673d38a` using `git merge --ff-only codex/integration`; all three tips matched and worktrees were clean. All real modules now physically present here. Own .venv imports/config validation and pip check PASS; correct owner Git identity retained.
+- SG01–SG04 are DONE and merged at M01. SG05 remains TODO and is now the next eligible personal sprint. Use this checkout, not the root snapshot. Read `docs/merge/M01.md` and its real OCR/browser evidence before validation; final metrics/scenario evidence remains your sprint, then M02.
+- Completion metadata is synchronized through a subsequent fast-forward before the merge chat stops; actual final tip is `git rev-parse HEAD`. Do not start from the older unmerged source cutoff. No API/default/dependency revisions, pending peer requests or required M01 user action. Local-only commits; main still deferred through M03.

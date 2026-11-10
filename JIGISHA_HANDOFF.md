@@ -6,9 +6,9 @@
 
 - Owner: **Jigisha Baiswar**.
 - Role: rule-based classification, field extraction, readiness/report exports, Streamlit, screenshots, diagrams, slides and app viva/demo.
-- Updated: 2026-11-10 14:36 Asia/Kolkata; JB01–JB04 integrated and verified at M01; synchronization pending.
+- Updated: 2026-11-10 14:40 Asia/Kolkata; **M01 DONE**, JB01–JB04 integrated, verified and synchronized.
 - Active sprint: none; **JB01–JB04 completed and integrated at M01**. Original JB04 tip `5bbd086`; no push.
-- Next: **JB05** after M01 synchronization completes; read `docs/merge/M01.md` from this checkout.
+- Next: **JB05 is eligible now** from the synchronized M01 baseline; read `docs/merge/M01.md` here.
 - Checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`. Branch: `codex/jigisha-app`.
 - GitHub repository: `https://github.com/guptasakshi06/Graphia`; shared remote `origin`; matching remote branch `origin/codex/jigisha-app`. Initial M00 history published by user request; further pushes require user instructions.
 - M00 baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). The user requested one commit instead of three intermediate setup commits. Verified local `.venv`: Python 3.12.3; all six imports, `pip check`, Streamlit CLI and Tesseract 5.3.4 (`eng`, `osd`) PASS. Evidence: `docs/merge/M00-environment-jigisha.json` and `docs/merge/M00-environment-comparison.json`. Code/dependencies are unchanged by the history cleanup.
@@ -30,10 +30,10 @@ Your first four sprints must not wait for Sakshi's OCR. Use clearly labeled know
 
 | Sprint | Day | Target | Depends on | Status | Integrated at |
 |---|---|---:|---|---|---|
-| JB01 | 1 | 60 min | M00 | DONE | M01 (verified; sync pending) |
-| JB02 | 1 | 60 min | JB01 | DONE | M01 (verified; sync pending) |
-| JB03 | 1 | 60 min | JB02 | DONE | M01 (verified; sync pending) |
-| JB04 | 1 | 90 min | JB03 | DONE | M01 (verified; sync pending) |
+| JB01 | 1 | 60 min | M00 | DONE | M01 (DONE, synchronized) |
+| JB02 | 1 | 60 min | JB01 | DONE | M01 (DONE, synchronized) |
+| JB03 | 1 | 60 min | JB02 | DONE | M01 (DONE, synchronized) |
+| JB04 | 1 | 90 min | JB03 | DONE | M01 (DONE, synchronized) |
 | JB05 | 2 | 75 min | JB04, M01 | TODO | Not merged; target M02 |
 | JB06 | 2 | 90 min | JB05, M02 | TODO | Not merged; target M03 |
 
@@ -356,3 +356,8 @@ Update current position, own ledger, branch/path, active/next sprint, merge-read
 - Full combined suite 101 PASS; real four-sample production smoke and two-upload browser flow PASS; downloads verified. `docs/merge/M01.md` records exact evidence, commands and limitations. No public contract/default/dependency change or fixture in the production flow.
 - Only app notice/setup-error wording changed at integration; module behavior preserved. Recursive filesystem watching overflowed with nested worktrees; tested launch uses `--server.fileWatcherType=none`, requiring server restart after source changes.
 - Synchronization pending into both clean personal checkouts; do not start JB05 until the completion annotation below. No JB05, human review or final evidence freeze performed. All commits local; main unchanged.
+
+### M01 synchronization completion — 2026-11-10 14:40 Asia/Kolkata
+- M01 DONE. This branch fast-forwarded to verified code/evidence `c1c155d5ab9368f13ede5781470ff4cc0673d38a` using `git merge --ff-only codex/integration`; all three tips matched and worktrees were clean. All real modules now physically present here. Own .venv imports/config validation and pip check PASS; correct owner Git identity retained.
+- JB01–JB04 are DONE and merged at M01. JB05 remains TODO and is now the next eligible personal sprint. Use this checkout, not the root snapshot. Read `docs/merge/M01.md` and its real OCR/browser evidence before validation; final metrics/scenario evidence remains your sprint, then M02.
+- Completion metadata is synchronized through a subsequent fast-forward before the merge chat stops; actual final tip is `git rev-parse HEAD`. Do not start from the older unmerged source cutoff. No API/default/dependency revisions, pending peer requests or required M01 user action. Local-only commits; main still deferred through M03.

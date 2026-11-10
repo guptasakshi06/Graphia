@@ -10,10 +10,10 @@
 - **Integration lead:** Sakshi Gupta; Jigisha reviews the application and presentation. A merge chat performs the concrete integration work, rather than asking either person to manually combine code snippets.
 - **Planning date:** 2026-11-10, Asia/Kolkata. Update local timestamps during actual work.
 - **Workspace/integration checkout:** `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- **Current phase:** **M01 IN_PROGRESS**; SG01–SG04 and JB01–JB04 merged and verified; synchronization/completion record pending.
-- **Next shared action:** finish M01 synchronization, then M02 waits for verified SG05 and JB05.
-- **Next Sakshi action:** **SG05**, only after M01 synchronization; use Sakshi’s live checkout handoff.
-- **Next Jigisha action:** **JB05**, only after M01 synchronization; use Jigisha’s live checkout handoff.
+- **Current phase:** **M01 DONE**; SG01–SG04 and JB01–JB04 merged, verified and synchronized locally.
+- **Next shared action:** **M02** waits for verified SG05 and JB05.
+- **Next Sakshi action:** **SG05**, eligible from the synchronized M01 baseline; use Sakshi’s live checkout handoff.
+- **Next Jigisha action:** **JB05**, eligible from the synchronized M01 baseline; use Jigisha’s live checkout handoff.
 - **Original full requirements:** `PROJECT_BRIEF.md`, preserved without edits.
 - **Time budget:** Two focused days. Work estimates are targets, not calendar deadlines.
 
@@ -89,14 +89,14 @@ No shared experiment script or combined report file should be edited by both tra
 
 Target critical path: around 5.5–6 hours on Day 1 and 5–6 hours on Day 2, plus a buffer of up to an hour each day. Individual sprint durations are not promises. The workload is parallel, so do not add both people's hours as elapsed project time. Keep optional features out if buffers are consumed.
 
-### Master status snapshot — M01 verification, 2026-11-10 14:36 Asia/Kolkata
+### Master status snapshot — M01 completion, 2026-11-10 14:40 Asia/Kolkata
 
 | Track | Sprints/checkpoints | Status | Merged state |
 |---|---|---|---|
 | Shared setup | M00 | DONE | Single root commit `M00`; no personal code merged |
 | Sakshi build | SG01–SG04 | DONE | Merged at M01, source cutoff `93a07b1`, merge `8951039` |
 | Jigisha build | JB01–JB04 | DONE | Merged at M01, source cutoff `5bbd086`, merge `a8a0208` |
-| Code integration | M01 | IN_PROGRESS | Real OCR/browser verified; sync pending |
+| Code integration | M01 | DONE | `c1c155d` verified code/evidence synchronized into both tracks |
 | Sakshi validation | SG05 | TODO | Not merged |
 | Jigisha validation | JB05 | TODO | Not merged |
 | Evidence integration | M02 | TODO | Waiting for both validation tracks |
@@ -244,3 +244,5 @@ At each M gate the integration chat reads both live handoffs, merges owned work,
 ### M01 verification — 2026-11-10 14:36 Asia/Kolkata
 - Both live handoffs READY and clean: Sakshi `93a07b1`, Jigisha `5bbd086`; sequential normal merges `8951039` / `a8a0208` preserve both authors. All 101 tests PASS; final notice-only update passed 12 UI tests. Real production smoke: four samples/eight OCR calls, exact expected fields/types, six stages, corrupt record retained. Browser: two actual uploads/four OCR calls, 50% coverage/readiness, both downloads parsed, no browser warnings/errors.
 - M01 synchronization pending. No SG05/JB05, final evidence freeze, human review, push or main update. Evidence: `docs/merge/M01.md`.
+
+- 2026-11-10 14:40 Asia/Kolkata: **M01 DONE**. Verified code/evidence baseline `c1c155d5ab9368f13ede5781470ff4cc0673d38a` fast-forwarded into both clean personal tracks. Their independent venv real-module imports, checklist validation and pip checks PASS; correct worktree-specific identities retained. Completion metadata follows locally and is synchronized before stopping. Next: SG05/JB05 independently; M02 awaits both. No push/main update or later checkpoint.

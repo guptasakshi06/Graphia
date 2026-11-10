@@ -5,11 +5,11 @@
 ## Current position
 
 - Integration lead: **Sakshi Gupta**. Application/presentation reviewer: **Jigisha Baiswar**.
-- Updated: 2026-11-10 14:39 Asia/Kolkata; **M01 IN_PROGRESS**; both complete build tracks merged and real flow verified; final synchronization pending.
-- Active checkpoint: **M01 IN_PROGRESS**, started 2026-11-10 13:57 Asia/Kolkata; both live build tracks DONE/READY and clean.
-- Next checkpoint: finish M01 real integration verification, then synchronize both tracks for SG05/JB05.
+- Updated: 2026-11-10 14:40 Asia/Kolkata; **M01 DONE**, both complete build tracks integrated, verified and synchronized locally.
+- Active checkpoint: none; **M01 completed and verified**.
+- Next checkpoint: **M02**, waiting for SG05 and JB05 DONE/READY. Both are now eligible in their synchronized personal checkouts.
 - Integration checkout: `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi`.
-- Integration branch: `codex/integration`; both build tracks merged at `a8a0208`; verified M01 baseline commit/synchronization pending.
+- Integration branch: `codex/integration`; verified M01 code/evidence baseline `c1c155d5ab9368f13ede5781470ff4cc0673d38a` synchronized into both tracks; completion metadata commit follows.
 - Sakshi branch/checkout: `codex/sakshi-dip`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi`.
 - Jigisha branch/checkout: `codex/jigisha-app`, `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha`.
 - Common baseline: single root commit named `M00` (resolve with `git rev-list --max-parents=0 HEAD`). User requested replacing the three intermediate setup commits with one; history below retains the actual setup evidence. Remote `origin`: `https://github.com/guptasakshi06/Graphia.git`. GitHub main retains M00. Sakshi's branch also has the previously authorized SG01 commit `6629e0f`; future development commits remain local under the latest user policy.
@@ -23,7 +23,7 @@ Read `AGENTS.md`, master `HANDOFF.md`, `PROJECT_BRIEF.md`, `TEAM_CONTRACT.md` an
 | Checkpoint | Depends on | Status | Expected output | Actual commit/evidence |
 |---|---|---|---|---|
 | M00 | Planning files | DONE | Tested baseline, fixed interfaces, two separate checkouts | `M00` single root commit; `docs/merge/M00.md` + JSON evidence |
-| M01 | M00, SG01–SG04, JB01–JB04 | IN_PROGRESS | Real integrated application with first complete upload test | — |
+| M01 | M00, SG01–SG04, JB01–JB04 | DONE | Real integrated application with first complete upload test | `c1c155d`; `docs/merge/M01.md`; synchronized both tracks |
 | M02 | M01, SG05, JB05 | TODO | Frozen tested code and measured evidence for report/slides | — |
 | M03 | M02, SG06, JB06 | TODO | Verified submission package and final master status | — |
 
@@ -259,3 +259,16 @@ Update this file and the master at every checkpoint or interruption. When person
 - Runtime issue: recursive Streamlit watching overflowed with nested environments/worktrees; resolved with tested `--server.fileWatcherType=none`, documented in README. Restart after code edits. No system-watch setting changed.
 - Browser origin access was declined during an optional later screenshot-framing adjustment. Stopped all browser actions; did not circumvent it. Earlier downloaded reports, complete final DOM and saved partial-viewport screenshot remain valid. This is not a failed OCR/browser acceptance check or automatic shell-approval rejection.
 - Root handoffs/master/README updated; source worktrees rechecked clean and still at recorded tips. Commit this verified baseline, then forward-merge it sequentially into both tracks. No SG05/JB05 or later M gate started; no push/main update.
+
+### M01 — 2026-11-10 14:40 Asia/Kolkata — session 1 — completion
+- Status before → after: TODO → IN_PROGRESS → DONE. One merge checkpoint only; all M01 acceptance checks complete; no required student-only action or unresolved integration defect.
+- Integration start `f99cafe`; Sakshi source `93a07b1` (SG01–SG04 READY); Jigisha source `5bbd086` (JB01–JB04 READY). All clean/stable at cutoff; no unrelated edits. Actual source merge commits `8951039` and `a8a0208`, no conflicts, histories/authors preserved.
+- Verified code/evidence commit `c1c155d5ab9368f13ede5781470ff4cc0673d38a` (`M01: verify integrated real OCR application and record baseline`), author/committer Sakshi Gupta with root worktree-specific identity. No shared/global identity change. An extra EOF blank in the Markdown smoke export was caught by staged diff check, corrected in exporter/artifact, and rechecked before commit; no algorithm/test result changed.
+- Executed sequentially: `git -C worktrees/sakshi merge --ff-only codex/integration --quiet`, then the same in `worktrees/jigisha`: PASS, both feature tips equal `c1c155d5ab9368f13ede5781470ff4cc0673d38a`, all three checkouts clean afterward. Original owner histories remain ancestors; branch names/independent .venv unchanged.
+- Post-sync own-environment checks in BOTH tracks: imports `app.load_real_provider()` with all three real functions, validates empty-input configured readiness as Incomplete, reports own sys.prefix, `pip check`: PASS; both worktrees clean, owner author identities preserved (Sakshi / Jigisha respectively).
+- Earlier full verification/evidence: 101 combined tests PASS, 12 final UI tests PASS, environment/Tesseract/compile/diff PASS, real production and browser smoke/downloads PASS. Exact commands/results/limitations/artifacts in `docs/merge/M01.md`. Runtime watcher workaround documented; browser optional reframing refusal respected. Local server stopped cleanly, exit 0.
+- Master/delivery tracker and both integrated personal handoffs now annotate build sprints merged at M01, validation sprints TODO and eligible. Completion metadata changes only documentation; forward-merge its containing commit into both clean tracks, then verify identical tips/clean states. Resolve final containing hash with `git log -1 --format=%H`, avoiding a self-reference.
+- No SG05/JB05, M02/M03, human walkthrough, final experiment freeze, report/slides, push or main update. Local origin/main remains M00 `464c884af09bb1d2db686559eaee16cdb9912d59`; no remote operation performed.
+- Exact next Sakshi action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi/SAKSHI_HANDOFF.md and execute SG05 only. Verify the work and update the handoff before stopping.`
+- Exact next Jigisha action: `Read /home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha/JIGISHA_HANDOFF.md and execute JB05 only. Verify the work and update the handoff before stopping.`
+- Next merge requires both SG05 and JB05 from these synchronized checkouts; use `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/MERGE_HANDOFF.md` for M02. Stop after final metadata synchronization.
