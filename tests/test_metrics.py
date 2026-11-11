@@ -6,6 +6,7 @@ import hashlib
 from io import StringIO
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -186,8 +187,19 @@ class FinalEvaluationTests(unittest.TestCase):
         self.assertEqual(row["failure_attribution"], "ocr_path_mismatch_reference_rules_pass")
         self.assertTrue(row["reference_diagnostic"]["rules_pass"])
 
-    def test_final_artifact_integrity_sources_and_comparison_coverage(self):
-        from scripts.evaluate_dataset import COMPARISONS, SOURCE_FILES
+    @unittest.skipUnless((ROOT / ".git").exists(), "frozen source verification requires Git history")
+    def test_final_measured_sources_match_frozen_commit(self):
+        from scripts.evaluate_dataset import SOURCE_FILES
+        folder = ROOT / "outputs/experiments/SG05"
+        report = json.loads((folder / "metrics.json").read_text())
+        freeze = json.loads((ROOT / "docs/merge/M02-freeze.json").read_text())
+        commit = freeze["merged_evidence_commit"]
+        for relative in SOURCE_FILES:
+            source = subprocess.check_output(["git", "show", f"{commit}:{relative}"], cwd=ROOT)
+            self.assertEqual(hashlib.sha256(source).hexdigest(), report["source_sha256"][relative], relative)
+
+    def test_final_artifact_integrity_and_comparison_coverage(self):
+        from scripts.evaluate_dataset import COMPARISONS
         from PIL import Image
         folder = ROOT / "outputs/experiments/SG05"
         report = json.loads((folder / "metrics.json").read_text())
@@ -199,8 +211,6 @@ class FinalEvaluationTests(unittest.TestCase):
             if relative.endswith(".png"):
                 with Image.open(folder / relative) as im:
                     im.verify()
-        for relative in SOURCE_FILES:
-            self.assertEqual(hashlib.sha256((ROOT / relative).read_bytes()).hexdigest(), report["source_sha256"][relative])
         self.assertEqual(report["comparison_groups"], COMPARISONS)
         self.assertEqual(len(COMPARISONS), 7)
         self.assertEqual(report["sample_count"], 8)

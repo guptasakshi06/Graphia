@@ -19,6 +19,7 @@ from modules.readiness import TYPE_NAMES, analyze_readiness, render_report
 
 ROOT = Path(__file__).resolve().parent
 ENGINE = {"lang": "eng", "psm": 6, "timeout": 20}
+BILINGUAL_ENGINE = {**ENGINE, "lang": "eng+hin", "psm": 4}
 STAGES = ("original", "grayscale", "denoised", "enhanced", "thresholded", "morphology")
 
 
@@ -32,10 +33,11 @@ def collect_uploads(files):
     return items
 
 
-def input_signature(items, options, required_types, source, config):
+def input_signature(items, options, required_types, source, config, *, bilingual=False):
     """Changing any analysis input makes the old report invalid."""
     payload = {"uploads": [item["id"] for item in items], "options": options,
-               "required_types": required_types, "source": source, "config": config}
+               "required_types": required_types, "source": source, "config": config,
+               "bilingual": bilingual}
     return sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
@@ -55,30 +57,31 @@ def load_real_provider():
     return load_image, run_pipeline, extract_text
 
 
-def error_ocr(message):
+def error_ocr(message, engine=ENGINE):
     return {"text": "", "status": "error", "confidence": None,
-            "error": message, "engine_config": dict(ENGINE)}
+            "error": message, "engine_config": dict(engine)}
 
 
-def call_ocr(extract_text, image):
+def call_ocr(extract_text, image, engine=ENGINE):
     """Convert a raised engine error to the contracted explicit error state."""
     try:
-        return extract_text(image, **ENGINE)
+        return extract_text(image, **engine)
     except Exception as error:
-        return error_ocr(f"OCR failed: {error}")
+        return error_ocr(f"OCR failed: {error}", engine)
 
 
-def analyze_uploads(items, options, source, provider):
+def analyze_uploads(items, options, source, provider, *, bilingual=False):
     """Orchestrate real APIs; keep every failed file and keep arrays separate.
 
     The provider argument makes boundary checks possible in tests. main() always
     obtains it from load_real_provider(), with no user-selectable test mode.
     """
     load_image, run_pipeline, extract_text = provider
+    engine = BILINGUAL_ENGINE if bilingual else ENGINE
     records, views = [], {}
     for item in items:
-        original = error_ocr("Image could not be loaded.")
-        processed = error_ocr("Processing did not run.")
+        original = error_ocr("Image could not be loaded.", engine)
+        processed = error_ocr("Processing did not run.", engine)
         parameters = {"requested_options": dict(options), "max_dimension": 1800}
         view = {"stages": {}, "error": None}
         try:
@@ -87,27 +90,40 @@ def analyze_uploads(items, options, source, provider):
             parameters["loaded_dimensions"] = {"width": int(image.shape[1]), "height": int(image.shape[0])}
         except Exception as error:
             view["error"] = f"Image load failed: {error}"
-            original = processed = error_ocr(view["error"])
+            original = processed = error_ocr(view["error"], engine)
         else:
             # Original OCR is independent: pipeline failure must not erase it.
-            original = call_ocr(extract_text, image)
+            original = call_ocr(extract_text, image, engine)
             try:
                 pipeline = run_pipeline(image, options=dict(options))
                 if not set(STAGES).issubset(pipeline["stages"]):
                     raise ValueError("Pipeline did not return all six named stages.")
                 parameters["resolved_pipeline"] = pipeline["parameters"]
                 view["stages"] = pipeline["stages"]
-                processed = call_ocr(extract_text, pipeline["ocr_input"])
+                processed = call_ocr(extract_text, pipeline["ocr_input"], engine)
             except Exception as error:
                 view["error"] = f"Processing failed: {error}"
-                processed = error_ocr(view["error"])
-        selected = original if source == "original" else processed
-        classification = classify_document(selected["text"])
+                processed = error_ocr(view["error"], engine)
+        selected_source = "original" if source == "original" else "processed"
+        selected = original if selected_source == "original" else processed
+        if source == "auto" and "original" in view["stages"]:
+            from modules.photo_ocr import recover_photo
+
+            selected_source, selected, classification, fields, method = recover_photo(
+                image, original, processed,
+                lambda pixels, settings: call_ocr(extract_text, pixels, settings), engine,
+            )
+            if selected_source == "processed":
+                processed = selected
+            parameters["photo_recovery"] = method
+        else:
+            classification = classify_document(selected["text"])
+            fields = extract_fields(selected["text"], classification["doc_type"])
         records.append({
             "id": item["id"], "filename": item["filename"],
-            "ocr_original": original, "ocr_processed": processed, "ocr_source": source,
+            "ocr_original": original, "ocr_processed": processed, "ocr_source": selected_source,
             "ocr": selected, "classification": classification,
-            "fields": extract_fields(selected["text"], classification["doc_type"]),
+            "fields": fields,
             "processing_parameters": parameters,
         })
         views[item["id"]] = view
@@ -178,6 +194,9 @@ def show_results(result):
             if document["problems"]:
                 st.warning("\n".join(document["problems"]))
             st.write("Extracted fields (selected OCR: " + document["ocr_source"] + ")")
+            photo_method = document["processing_parameters"].get("photo_recovery")
+            if photo_method:
+                st.caption("Auto photo selected " + photo_method + ".")
             st.json({key: value if value is not None else "Not Found / Unreadable"
                      for key, value in document["fields"].items()})
             st.write("Original and processed OCR")
@@ -230,10 +249,20 @@ def main():
     with st.expander("Configured required fields"):
         st.json({TYPE_NAMES[key]: config["required_documents"][key] for key in required})
     options = processing_controls()
-    source = st.radio("OCR source used for type, fields and readiness", ["processed", "original"], horizontal=True)
+    bilingual = st.selectbox(
+        "OCR language", ["English", "English + Hindi"],
+        help="Choose English + Hindi for bilingual forms. If the processed text is "
+             "less readable, select original as the OCR source.",
+    ) == "English + Hindi"
+    source = st.radio(
+        "OCR source used for type, fields and readiness", ["processed", "original", "auto"],
+        format_func=lambda value: "Auto photo" if value == "auto" else value,
+        horizontal=True,
+        help="Auto photo tries to crop the page and correct sideways photos when the standard OCR misses fields.",
+    )
     uploads = st.file_uploader("Document images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     items = collect_uploads(uploads)
-    signature = input_signature(items, options, required, source, config)
+    signature = input_signature(items, options, required, source, config, bilingual=bilingual)
     had_results = "analysis" in st.session_state
     if invalidate_results(st.session_state, signature) and had_results:
         st.info("Inputs changed. Previous results and downloads were cleared; press Analyze documents again.")
@@ -254,7 +283,7 @@ def main():
         else:
             try:
                 with st.spinner("Processing images and running original/processed OCR…"):
-                    records, views = analyze_uploads(items, options, source, provider)
+                    records, views = analyze_uploads(items, options, source, provider, bilingual=bilingual)
                     report = analyze_readiness(records, config, required)
                     st.session_state["analysis"] = {"report": report, "views": views}
             except Exception as error:

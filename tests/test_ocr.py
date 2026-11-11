@@ -49,9 +49,22 @@ class OCRContractTests(unittest.TestCase):
             self.assertEqual(kwargs, {"lang": "eng+osd", "config": "--psm 3", "timeout": 0.5})
             return "42"
 
-        with patch("modules.ocr.pytesseract.image_to_string", side_effect=engine):
+        with (
+            patch("modules.ocr.pytesseract.get_languages", return_value=["eng", "osd"]),
+            patch("modules.ocr.pytesseract.image_to_string", side_effect=engine),
+        ):
             extract_text(self.gray, lang="eng+osd", psm=3, timeout=0.5)
         np.testing.assert_array_equal(self.gray, before)
+
+    def test_missing_second_language_reports_error_before_ocr(self):
+        with (
+            patch("modules.ocr.pytesseract.get_languages", return_value=["eng"]),
+            patch("modules.ocr.pytesseract.image_to_string") as engine,
+        ):
+            result = extract_text(self.gray, lang="eng+hin")
+        engine.assert_not_called()
+        self.assertEqual(result["status"], "error")
+        self.assertIn("hin", result["error"])
 
     def test_successful_blank_or_punctuation_is_no_text(self):
         for raw in ("", " \n\t", "--- ...\n"):

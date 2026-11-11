@@ -100,6 +100,20 @@ demonstration checklist/default settings and press **Analyze documents**. Review
 six image stages, original/processed OCR, type, fields and readiness; download
 JSON or Markdown. Changing inputs clears results until Analyze is pressed again.
 The default is median 3 → CLAHE 2.0/8×8 → Otsu → no morphology, English PSM 6.
+For the bilingual OBC form with the heading “Form of certificate to be produced
+by Other Backward Classes,” install optional Hindi OCR data on Ubuntu with
+`sudo apt install tesseract-ocr-hin`. Select **English + Hindi** and **original**
+as the OCR source. This mode uses Tesseract page segmentation mode 4. The app
+reads the holder from the certification sentence and the number from the
+Hindi certificate label. The app still displays both OCR outputs for review.
+The bilingual mode also handles supported Hindi income certificate titles and
+applicant or certificate-number labels. A PAN card with a supported card heading
+and an explicit holder name label counts under **Identity Proof** in the demo.
+For camera photos, choose **Auto photo** as the OCR source. The app can crop
+background, try quarter turns, and read supported UP income form fields from
+separate areas of the same image. The result identifies which method it used.
+The full OCR transcript can still contain errors in small or blurry text.
+
 A type is usable when one candidate has sufficient OCR text and its configured
 fields. Coverage counts detected required types; readiness counts usable types,
 each divided by the number of required types. Duplicates count once.
@@ -121,11 +135,12 @@ text, select original OCR and analyze again. The experiment did not measure
 accuracy on unfamiliar layouts, handwriting or real scans.
 
 The [experiment summary](outputs/experiments/SG05/summary.csv) and [browser evidence](docs/merge/M02.md)
-include the fixed methods, results and provenance. Verify the saved evidence or
-reproduce the study in a new directory with these commands:
+include the fixed methods, results and provenance. Run
+`.venv/bin/python docs/merge/verify_m02.py` from a checkout of the published M03
+revision to check its frozen source and evidence. To evaluate the current
+code without replacing the saved results, run:
 
 ```bash
-.venv/bin/python docs/merge/verify_m02.py
 .venv/bin/python scripts/evaluate_dataset.py --output-dir /tmp/dip042-sg05-repeat
 .venv/bin/python -m unittest discover -s tests -v
 ```

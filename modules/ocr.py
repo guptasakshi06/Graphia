@@ -8,7 +8,7 @@ import numpy as np
 import pytesseract
 
 
-def extract_text(image, lang="eng", psm=6, timeout=20):
+def extract_text(image, lang="eng", psm=6, timeout=20, *, digits_only=False):
     """Return contract-v1 raw text, status, error and resolved engine settings.
 
     Accept BGR or 2D grayscale uint8 arrays; the caller's pixels stay unchanged.
@@ -33,11 +33,21 @@ def extract_text(image, lang="eng", psm=6, timeout=20):
         raise ValueError("timeout must be a positive finite number of seconds.")
     result = {"text": "", "status": "error", "confidence": None, "error": None,
               "engine_config": {"lang": lang, "psm": int(psm), "timeout": float(timeout)}}
+    config = f"--psm {int(psm)}"
+    if digits_only:
+        config += " -c tessedit_char_whitelist=0123456789"
+        result["engine_config"]["digits_only"] = True
     # Pytesseract interprets 3-channel arrays as RGB, unlike OpenCV's BGR.
     prepared = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if image.ndim == 3 else image.copy()
     try:
+        if "+" in lang:
+            # Tesseract can return English text even if the requested second model is missing.
+            missing = sorted(set(lang.split("+")) - set(pytesseract.get_languages()))
+            if missing:
+                result["error"] = "Missing Tesseract language data: " + ", ".join(missing)
+                return result
         text = pytesseract.image_to_string(prepared, lang=lang,
-                                          config=f"--psm {int(psm)}", timeout=float(timeout))
+                                          config=config, timeout=float(timeout))
     except pytesseract.TesseractNotFoundError:
         result["error"] = "Tesseract executable not found. Install tesseract-ocr and ensure it is on PATH."
     except pytesseract.TesseractError as exc:
