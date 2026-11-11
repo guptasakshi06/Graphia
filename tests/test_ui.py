@@ -146,6 +146,19 @@ class OrchestrationTests(unittest.TestCase):
             self.assertEqual(records[0]["classification"]["doc_type"], "marksheet" if source == "original" else "unknown")
             self.assertIn("failure", views[self.items[0]["id"]]["error"])
 
+    def test_photo_ocr_prefers_pan_number_over_old_checklist_name(self):
+        from modules.photo_ocr import recover_photo
+
+        original = {"text": "PERMANENT ACCOUNT NUMBER CARD\nName: Asha Example", "status": "ok"}
+        processed = {"text": "PERMANENT ACCOUNT NUMBER CARD\nABCDE1234F", "status": "ok"}
+        with patch("modules.photo_ocr._paper_crop") as retry:
+            source, _, _, _, _ = recover_photo(
+                None, original, processed, None, app.ENGINE,
+                required_fields={"identity_proof": ["pan_number"]},
+            )
+        self.assertEqual(source, "processed")
+        retry.assert_not_called()
+
     def test_real_rotated_fictional_identity_image_recovers_name(self):
         manifest = json.loads((ROOT / "dataset/manifest.json").read_text())
         sample = next(row for row in manifest["samples"]
@@ -214,7 +227,7 @@ class StreamlitInteractionTests(unittest.TestCase):
         at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=15).run()
         self.assertEqual(len(at.exception), 0)
         self.assertTrue(at.button[0].disabled)
-        self.assertEqual(at.radio[0].value, "processed")
+        self.assertEqual(at.radio[0].value, "auto")
         at.multiselect[0].set_value([]).run()
         self.assertEqual(len(at.exception), 0)
         self.assertTrue(any("at least one" in error.value for error in at.error))
@@ -295,7 +308,8 @@ class StreamlitInteractionTests(unittest.TestCase):
             self.assertEqual(document["ocr_" + source]["engine_config"], app.BILINGUAL_ENGINE)
         language.set_value("English").run()
         photo_settings = next(widget for widget in at.button if widget.label == "Use phone photo settings")
-        photo_settings.click().run()
+        with patch("app.has_hindi_ocr", return_value=True):
+            photo_settings.click().run()
         self.assertEqual(next(widget.value for widget in at.selectbox if widget.label == "OCR language"),
                          "English + Hindi")
         self.assertEqual(at.radio[0].value, "auto")

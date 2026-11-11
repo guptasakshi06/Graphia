@@ -78,7 +78,7 @@ def call_ocr(extract_text, image, engine=ENGINE):
         return error_ocr(f"OCR failed: {error}", engine)
 
 
-def analyze_uploads(items, options, source, provider, *, bilingual=False):
+def analyze_uploads(items, options, source, provider, *, bilingual=False, required_fields=None):
     """Orchestrate real APIs; keep every failed file and keep arrays separate.
 
     The provider argument makes boundary checks possible in tests. main() always
@@ -120,6 +120,7 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
             selected_source, selected, classification, fields, method = recover_photo(
                 image, original, processed,
                 lambda pixels, settings: call_ocr(extract_text, pixels, settings), engine,
+                required_fields=required_fields,
             )
             if selected_source == "processed":
                 processed = selected
@@ -167,7 +168,7 @@ def preview_upload(data):
 
 def processing_controls():
     """Expose contract-v1 options, including valid odd kernels/block sizes."""
-    with st.expander("Advanced image settings"):
+    with st.expander("Image processing settings"):
         st.caption("Adjust the processing pipeline and compare the results in Image stages.")
         denoise = st.selectbox("Denoising", ["median", "gaussian", "none"])
         kernel = st.select_slider("Denoising kernel (odd pixels)", [1, 3, 5, 7, 9], value=3)
@@ -236,7 +237,21 @@ def show_document(document, view):
     with images_tab:
         stages = [stage for stage in STAGES if stage in view["stages"]]
         if stages:
-            stage = st.selectbox("Image stage", stages, index=len(stages) - 1, format_func=str.title)
+            preferred = "thresholded" if "thresholded" in stages else stages[-1]
+            stage = st.selectbox("Image stage", stages, index=stages.index(preferred), format_func=str.title)
+            settings = document["processing_parameters"].get("resolved_pipeline", {})
+            if stage == "enhanced" and settings.get("contrast") == "clahe":
+                st.caption(f"CLAHE increases local contrast. Clip limit {settings['clahe_clip_limit']:g}.")
+            elif stage == "enhanced" and settings.get("contrast") == "equalize":
+                st.caption("Histogram equalization redistributes grayscale intensities to increase contrast.")
+            elif stage == "thresholded" and settings.get("threshold") == "adaptive":
+                st.caption(f"Adaptive thresholding uses local neighborhoods. Block size {settings['adaptive_block_size']} px, C = {settings['adaptive_c']:g}.")
+            elif stage == "thresholded" and settings.get("threshold") in ("otsu", "global"):
+                otsu = settings["threshold"] == "otsu"
+                cutoff = settings.get("selected_otsu_threshold") if otsu else settings["global_threshold"]
+                method = "Otsu (chosen from the histogram)" if otsu else "Global (manually selected)"
+                detail = "" if cutoff is None else f" · Cutoff {cutoff:g} / 255."
+                st.caption(f"{method} threshold{detail}")
             if stage == "original":
                 st.image(display_pixels(view["stages"][stage]), caption="Original", width=760)
             else:
@@ -300,9 +315,19 @@ def show_results(result):
         st.markdown(render_report(report))
 
 
+@st.cache_data
+def has_hindi_ocr():
+    from pytesseract import get_languages
+
+    try:
+        return "hin" in get_languages()
+    except OSError:
+        return False
+
+
 def use_phone_photo_settings():
     """Apply the existing bilingual OCR and photo recovery options together."""
-    st.session_state["ocr_language"] = "English + Hindi"
+    st.session_state["ocr_language"] = "English + Hindi" if has_hindi_ocr() else "English"
     st.session_state["ocr_source"] = "auto"
 
 
@@ -346,14 +371,20 @@ def main():
         required = st.multiselect("Required document types", list(config["required_documents"]),
                                   default=list(config["required_documents"]), format_func=TYPE_NAMES.get)
         st.caption("Testing one document? Select only its type.")
-        bilingual = st.selectbox("OCR language", ["English", "English + Hindi"], key="ocr_language") == "English + Hindi"
+        hindi_available = has_hindi_ocr()
+        bilingual = st.selectbox(
+            "OCR language", ["English", "English + Hindi"],
+            index=int(hindi_available), key="ocr_language",
+        ) == "English + Hindi"
+        if not hindi_available:
+            st.caption("English + Hindi requires the Hindi (hin) Tesseract language data.")
         source = st.radio(
             "OCR source", list(OCR_SOURCES), format_func=OCR_SOURCES.get, horizontal=True,
-            key="ocr_source",
+            key="ocr_source", index=list(OCR_SOURCES).index("auto"),
         )
         st.button("Use phone photo settings", on_click=use_phone_photo_settings,
-                  disabled=bilingual and source == "auto",
-                  help="Selects English + Hindi and Auto photo. Useful for bilingual certificates and sideways cards.")
+                  disabled=source == "auto" and bilingual == hindi_available,
+                  help="Selects Auto photo and uses Hindi OCR when the language data is installed.")
         options = processing_controls()
         with st.expander("Required fields"):
             for doc_type in required:
@@ -377,7 +408,10 @@ def main():
         else:
             try:
                 with upload_feedback.container(), st.spinner("Analyzing documents…"):
-                    records, views = analyze_uploads(items, options, source, provider, bilingual=bilingual)
+                    records, views = analyze_uploads(
+                        items, options, source, provider, bilingual=bilingual,
+                        required_fields=config["required_documents"],
+                    )
                     report = analyze_readiness(records, config, required)
                     st.session_state["analysis"] = {"report": report, "views": views}
                 upload_feedback.empty()

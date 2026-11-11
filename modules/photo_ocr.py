@@ -6,7 +6,8 @@ import cv2
 
 from modules.classification import (GRADE_SHEET_HEADING, HINDI_INCOME_HEADING,
                                     SC_CERTIFICATE_HEADING, UP_INCOME_HEADING, classify_document)
-from modules.extraction import extract_fields
+from modules.extraction import extract_document_details, extract_fields
+from modules.readiness import INCOME_AMOUNT_FIELDS
 
 
 UP_INCOME_TITLE = "कार्यालय तहसीलदार द्वारा प्रदत्त"
@@ -144,7 +145,7 @@ def _read_up_income(gray, read, page_ocr, timeout):
     return recovered, layout
 
 
-def _evaluate(ocr, layout_fields=None):
+def _evaluate(ocr, layout_fields=None, *, required_fields=None):
     classification = classify_document(ocr["text"])
     doc_type = classification["doc_type"]
     fields = extract_fields(ocr["text"], doc_type)
@@ -157,17 +158,26 @@ def _evaluate(ocr, layout_fields=None):
     complete = recognized and bool(fields["student_name"]) and (
         doc_type not in ("caste_certificate", "income_certificate") or bool(fields["certificate_number"])
     )
+    if required_fields and required_fields.get(doc_type):
+        values = {**fields, **extract_document_details(ocr["text"], doc_type)}
+        present = {key for key, value in values.items() if value}
+        if present.intersection(INCOME_AMOUNT_FIELDS):
+            present.add("income_amount")
+        complete = set(required_fields[doc_type]).issubset(present)
     score = (recognized, complete, sum(value is not None for value in fields.values()),
              ocr["status"] == "ok", min(400, sum(char.isalnum() for char in ocr["text"])))
     return score, classification, fields
 
 
-def recover_photo(image, original, processed, read, engine):
+def recover_photo(image, original, processed, read, engine, *, required_fields=None):
     """Return the selected OCR result, fields and method for a single upload."""
+    def evaluate(ocr, layout=None):
+        return _evaluate(ocr, layout, required_fields=required_fields)
+
     selected = max((("original", original), ("processed", processed)),
-                   key=lambda candidate: _evaluate(candidate[1])[0])
+                   key=lambda candidate: evaluate(candidate[1])[0])
     source, best = selected
-    score, classification, fields = _evaluate(best)
+    score, classification, fields = evaluate(best)
     method = source
     if score[1] or (original["status"] == processed["status"] == "error"):
         return source, best, classification, fields, method
@@ -186,7 +196,7 @@ def recover_photo(image, original, processed, read, engine):
     if not score[0] and not any(classify_document(ocr["text"])["doc_type"] != "unknown" for _, ocr, _ in attempts):
         attempts.extend(_read_known_header(page, page_ocr, read, retry))
     for label, ocr, layout in attempts:
-        result = _evaluate(ocr, layout)
+        result = evaluate(ocr, layout)
         if result[0] > score:
             score, classification, fields = result
             source, best, method = "processed", ocr, label
@@ -201,7 +211,7 @@ def recover_photo(image, original, processed, read, engine):
     ):
         pixels = enlarged if angle is None else cv2.rotate(image, angle)
         ocr = read(pixels, {**retry, "psm": 11 if angle is None else 4})
-        result = _evaluate(ocr)
+        result = evaluate(ocr)
         if result[0] > score:
             score, classification, fields = result
             source, best, method = "processed", ocr, label
