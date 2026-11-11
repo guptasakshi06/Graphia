@@ -15,7 +15,7 @@ __pycache__/
 *~
 .DS_Store
 
-# Private inputs and local settings; retain selected public output evidence
+# Private inputs and local settings
 private_uploads/
 uploads/
 .env
@@ -27,3 +27,12 @@ uploads/
 .agents/
 .codex/
 .aws/
+
+# Local project handoffs, planning and verification artifacts
+/AGENTS.md
+/*HANDOFF.md
+/PROJECT_BRIEF.md
+/TEAM_CONTRACT.md
+/dataset/
+/docs/
+/outputs/
