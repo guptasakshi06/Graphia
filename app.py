@@ -219,8 +219,14 @@ def show_document(document, view):
     with images_tab:
         stages = [stage for stage in STAGES if stage in view["stages"]]
         if stages:
-            stage = st.selectbox("Image stage", stages, format_func=str.title)
-            st.image(display_pixels(view["stages"][stage]), width=760)
+            stage = st.selectbox("Image stage", stages, index=len(stages) - 1, format_func=str.title)
+            if stage == "original":
+                st.image(display_pixels(view["stages"][stage]), caption="Original", width=760)
+            else:
+                original, processed = st.columns(2)
+                original.image(display_pixels(view["stages"]["original"]), caption="Original", width="stretch")
+                processed.image(display_pixels(view["stages"][stage]), caption=stage.title(), width="stretch")
+                st.caption("A stage can look unchanged when its operation is turned off in the DIP settings.")
         else:
             st.caption("Image stages are unavailable for this file.")
 
@@ -230,7 +236,7 @@ def show_results(result):
     with st.container(border=True, key="results"):
         title, exports = st.columns([1, 2], vertical_alignment="center")
         with title:
-            st.subheader("Results")
+            st.subheader("Results", anchor="graphia-results")
         with exports:
             with st.container(horizontal=True, horizontal_alignment="right"):
                 st.download_button(
@@ -277,6 +283,12 @@ def show_results(result):
         st.markdown(render_report(report))
 
 
+def use_phone_photo_settings():
+    """Apply the existing bilingual OCR and photo recovery options together."""
+    st.session_state["ocr_language"] = "English + Hindi"
+    st.session_state["ocr_source"] = "auto"
+
+
 def main():
     st.set_page_config(page_title="Graphia", layout="wide")
     st.html(ROOT / ".streamlit" / "graphia.css")
@@ -316,11 +328,14 @@ def main():
         st.subheader("Checklist & OCR")
         required = st.multiselect("Required document types", list(config["required_documents"]),
                                   default=list(config["required_documents"]), format_func=TYPE_NAMES.get)
-        bilingual = st.selectbox("OCR language", ["English", "English + Hindi"]) == "English + Hindi"
+        bilingual = st.selectbox("OCR language", ["English", "English + Hindi"], key="ocr_language") == "English + Hindi"
         source = st.radio(
             "OCR source", list(OCR_SOURCES), format_func=OCR_SOURCES.get, horizontal=True,
+            key="ocr_source",
         )
-        st.caption("Try Auto photo for sideways or angled phone photos.")
+        st.button("Use phone photo settings", on_click=use_phone_photo_settings,
+                  disabled=bilingual and source == "auto",
+                  help="Selects English + Hindi and Auto photo. Useful for bilingual certificates and sideways cards.")
         options = processing_controls()
         with st.expander("Required fields"):
             for doc_type in required:
@@ -350,7 +365,10 @@ def main():
                 st.session_state.pop("analysis", None)
                 upload_feedback.error(f"Analysis could not complete: {error}")
     if "analysis" in st.session_state:
-        show_results(st.session_state["analysis"])
+        result = st.session_state["analysis"]
+        status = result["report"]["overall_status"]
+        upload_feedback.markdown(f"**Analysis complete · {status}.** [View results](#graphia-results)")
+        show_results(result)
     st.caption("Project 042 · Sakshi Gupta and Jigisha Baiswar · Readiness reflects the selected demo checklist.")
 
 

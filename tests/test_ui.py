@@ -260,7 +260,7 @@ class StreamlitInteractionTests(unittest.TestCase):
                          (3, 25, 25))
         self.assertEqual(len(at.get("download_button")), 2)
         self.assertIn("Asha Example", at.table[0].value["Value"].tolist())
-        self.assertEqual(len(at.get("image")), 2)  # One upload preview and one image stage.
+        self.assertEqual(len(at.get("image")), 3)  # Upload preview plus the DIP comparison pair.
         stage = next(widget for widget in at.selectbox if widget.label == "Image stage")
         self.assertEqual(stage.options, [name.title() for name in app.STAGES])
         stage.set_value("thresholded").run()
@@ -292,6 +292,13 @@ class StreamlitInteractionTests(unittest.TestCase):
         document = at.session_state["analysis"]["report"]["documents"][0]
         for source in ("original", "processed"):
             self.assertEqual(document["ocr_" + source]["engine_config"], app.BILINGUAL_ENGINE)
+        language.set_value("English").run()
+        photo_settings = next(widget for widget in at.button if widget.label == "Use phone photo settings")
+        photo_settings.click().run()
+        self.assertEqual(next(widget.value for widget in at.selectbox if widget.label == "OCR language"),
+                         "English + Hindi")
+        self.assertEqual(at.radio[0].value, "auto")
+        self.assertNotIn("analysis", at.session_state)
         # Different file bytes/count trigger the same production invalidation path.
         with patch("test_ui.fixture_uploads", return_value=[FictionalUpload(data=b"new bytes")]):
             at.run()
