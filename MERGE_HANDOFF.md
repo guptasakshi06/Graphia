@@ -392,3 +392,8 @@ Update this file and the master at every checkpoint or interruption. When person
 ### Publication — 2026-11-12 Asia/Kolkata — final app
 - User requested publishing the final app to `guptasakshi06/Graphia` using `jigishadebugging`. Merged verified integration commit `3322a2b` with GitHub main at `3581d57` in a temporary checkout. Both histories and original authors are preserved. The app, modules, config, and tests match the integration checkout.
 - PASS: 118 tests via `OMP_THREAD_LIMIT=1 .venv/bin/python -m unittest discover -s tests` using the integration virtual environment from the release checkout. The staged diff passed `git diff --cached --check`. The four untracked IEEE drafts are outside the app release.
+
+### Streamlit Community Cloud preparation — 2026-11-12 Asia/Kolkata
+- Prepared the published `main` from `a3c5300` in a temporary checkout. Added `packages.txt` for Tesseract, English and Hindi. Updated the upload caption to describe processing on the app server.
+- PASS: Python 3.12 dependency resolution with `python -m pip install --dry-run --ignore-installed -r requirements.txt`, 118 local tests, and staged diff check.
+- Deploy `guptasakshi06/Graphia`, branch `main`, entry point `app.py`, with Python 3.12. The Community Cloud workspace is at its sign-in page. After signing in and deploying, verify the public app with a fictional sample.

@@ -364,7 +364,7 @@ def main():
                     st.image(preview_upload(items[index]["data"]), width=500)
                 except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError) as error:
                     st.error(f"Cannot preview this image: {error}")
-        st.caption("Images are processed locally and kept in this session.")
+        st.caption("The app server processes images and keeps the results in this session.")
 
     with settings_column, st.container(border=True, key="settings"):
         st.subheader("Checklist & OCR")
