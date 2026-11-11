@@ -10,7 +10,7 @@ import json
 import math
 
 from modules.classification import TITLE_KEYWORDS
-from modules.extraction import FIELD_KEYS
+from modules.extraction import DETAIL_LABELS, FIELD_KEYS
 
 
 TYPE_NAMES = {
@@ -124,6 +124,13 @@ def _copy_record(record, seen_ids):
     if not isinstance(record["processing_parameters"], dict):
         raise ValueError("processing_parameters must be a JSON-serializable dictionary.")
     copied = {key: deepcopy(record[key]) for key in RECORD_KEYS}
+    if "document_details" in record:
+        details = record["document_details"]
+        if not isinstance(details, dict) or not set(details).issubset(DETAIL_LABELS) or not all(
+            value is None or isinstance(value, str) for value in details.values()
+        ):
+            raise ValueError("Invalid optional document details.")
+        copied["document_details"] = details.copy()
     try:
         json.dumps(copied, allow_nan=False)
     except (TypeError, ValueError) as error:
@@ -260,6 +267,8 @@ def render_report(report):
         for field in FIELD_KEYS:
             value = document["fields"][field]
             lines.append(f"- {_markdown(field)}: " + _markdown(value if value and value.strip() else "Not Found / Unreadable"))
+        for field, value in document.get("document_details", {}).items():
+            lines.append(f"- {DETAIL_LABELS[field]}: " + _markdown(value or "Not Found / Unreadable"))
         lines.extend(["", "Problems:", ""])
         lines.extend("- " + _markdown(problem) for problem in document["problems"] or ["None."])
         lines.extend(["", "Selected OCR text:", "", _text_block(document["ocr"]["text"]), "",

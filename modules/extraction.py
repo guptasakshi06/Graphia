@@ -8,10 +8,30 @@ original OCR text separately.
 from datetime import date
 import re
 
-from modules.classification import HINDI_CASTE_HEADING, OBC_CERTIFICATE_HEADING, PAN_CARD_HEADING
+from modules.classification import (GRADE_SHEET_HEADING, HINDI_CASTE_HEADING, OBC_CERTIFICATE_HEADING,
+                                    PAN_CARD_HEADING, SC_CERTIFICATE_HEADING)
 
 
 FIELD_KEYS = ("student_name", "certificate_number", "application_id", "issue_date")
+DETAIL_LABELS = {
+    "pan_number": "PAN number",
+    "annual_income": "Annual income",
+    "monthly_income": "Monthly income",
+    "income_amount": "Income amount",
+    "caste_category": "Caste category",
+}
+PAN_NUMBER = re.compile(r"(?<!\w)[A-Z]{5}[0-9]{4}[A-Z](?!\w)")
+AMOUNT = r"(?:[0-9]{1,3}(?:,[0-9]{2})*,[0-9]{3}|[0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)(?:\.[0-9]{1,2})?"
+RUPEES = r"(?:₹|Rs\.?|INR|रु\.?|रू\.?|रुपये)"
+INCOME_PERIODS = {
+    "annual_income": r"(?:\b(?:annual|yearly)\s+(?:family\s+)?income\b|(?:वार्षिक|सालाना)\s*आय)",
+    "monthly_income": r"(?:\bmonthly\s+(?:family\s+)?income\b|मासिक\s*आय)",
+}
+CASTE_CATEGORIES = {
+    "SC": r"scheduled\s+caste(?:s)?|अनुसूचित\s+जाति|S\.?\s*C\.?",
+    "ST": r"scheduled\s+tribe(?:s)?|अनुसूचित\s+जनजाति|S\.?\s*T\.?",
+    "OBC": r"other\s+backward\s+class(?:es)?|अन्य\s+पिछड़ा\s+वर्ग|O\.?\s*B\.?\s*C\.?",
+}
 CERTIFICATE_PREFIXES = {"income_certificate": "INC", "caste_certificate": "CST"}
 KNOWN_TYPES = set(CERTIFICATE_PREFIXES) | {"marksheet", "identity_proof", "unknown"}
 LABEL_KEYS = {
@@ -110,6 +130,51 @@ def _validate_holder(raw_value, doc_type):
     return _validate_value("student_name", value, doc_type)
 
 
+def extract_document_details(text, doc_type):
+    """Return optional document-specific values separately from checklist fields."""
+    if doc_type == "identity_proof" and PAN_CARD_HEADING.search(text):
+        numbers = set(PAN_NUMBER.findall(text.upper()))
+        return {"pan_number": next(iter(numbers)) if len(numbers) == 1 else None}
+
+    if doc_type == "income_certificate":
+        normalized = " ".join(text.translate(str.maketrans("०१२३४५६७८९", "0123456789")).split())
+        details = {}
+        for key, label in INCOME_PERIODS.items():
+            candidates = re.findall(
+                rf"{label}\s*(?:(?:[:=]|is\b|of\b|से|लगभग|राशि)\s*|(?:from all sources|is assessed at)\s*)*"
+                rf"(?:{RUPEES}\s*)?({AMOUNT})(?![\w,]|\.[0-9])",
+                normalized, re.IGNORECASE,
+            )
+            if candidates:
+                values = {value.replace(",", "") for value in candidates}
+                details[key] = f"₹{next(iter(values))}" if len(values) == 1 else None
+        if details:
+            return details
+        candidates = re.findall(
+            rf"^\s*(?:total\s+)?income(?:\s+amount)?\s*[:=]\s*(?:{RUPEES}\s*)?({AMOUNT})(?![\w,]|\.[0-9])",
+            text, re.IGNORECASE | re.MULTILINE,
+        )
+        values = {value.replace(",", "") for value in candidates}
+        return {"income_amount": f"₹{next(iter(values))}" if len(values) == 1 else None}
+
+    if doc_type == "caste_certificate":
+        # Only use an explicit category label or certificate heading, not community names.
+        normalized = " ".join(text.split())
+        matches = set()
+        if OBC_CERTIFICATE_HEADING in normalized.casefold():
+            matches.add("OBC")
+        if SC_CERTIFICATE_HEADING.search(text):
+            matches.add("SC")
+        for category, pattern in CASTE_CATEGORIES.items():
+            if re.search(rf"(?<!\w)(?:{pattern})\s+(?:caste\s+)?certificate\b", normalized, re.IGNORECASE) or re.search(
+                rf"^\s*(?:caste\s+category|category|श्रेणी|वर्ग)\s*[:=-]\s*(?:{pattern})(?!\w)",
+                text, re.IGNORECASE | re.MULTILINE,
+            ):
+                matches.add(category)
+        return {"caste_category": next(iter(matches)) if len(matches) == 1 else None}
+    return {}
+
+
 def extract_fields(text, doc_type):
     """Return all four contract-v1 fields as strings or None.
 
@@ -168,7 +233,10 @@ def extract_fields(text, doc_type):
 
     if doc_type == "marksheet":
         for line in text.splitlines():
-            if match := MARKSHEET_CANDIDATE_PATTERN.fullmatch(line):
+            match = MARKSHEET_CANDIDATE_PATTERN.fullmatch(line)
+            if not match and GRADE_SHEET_HEADING.search(text):
+                match = re.fullmatch(r"[ \t]*Name[ \t]*:[ \t]*(?P<value>.*?)\s*", line, re.IGNORECASE)
+            if match:
                 candidates["student_name"].append(_validate_holder(match.group("value"), doc_type))
 
     if doc_type == "identity_proof" and PAN_CARD_HEADING.search(text):

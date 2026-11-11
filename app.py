@@ -13,7 +13,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import streamlit as st
 
 from modules.classification import classify_document
-from modules.extraction import extract_fields
+from modules.extraction import DETAIL_LABELS, extract_document_details, extract_fields
 from modules.readiness import TYPE_NAMES, analyze_readiness, render_report
 
 
@@ -114,7 +114,7 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
         selected_source = "original" if source == "original" else "processed"
         selected = original if selected_source == "original" else processed
         if source == "auto" and "original" in view["stages"]:
-            from modules.photo_ocr import recover_photo
+            from modules.photo_ocr import recover_photo, recover_up_income_amounts
 
             selected_source, selected, classification, fields, method = recover_photo(
                 image, original, processed,
@@ -126,13 +126,26 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
         else:
             classification = classify_document(selected["text"])
             fields = extract_fields(selected["text"], classification["doc_type"])
-        records.append({
+        record = {
             "id": item["id"], "filename": item["filename"],
             "ocr_original": original, "ocr_processed": processed, "ocr_source": selected_source,
             "ocr": selected, "classification": classification,
             "fields": fields,
             "processing_parameters": parameters,
-        })
+        }
+        details = extract_document_details(selected["text"], classification["doc_type"])
+        if (source == "auto" and bilingual and classification["doc_type"] == "income_certificate"
+                and not any(details.values()) and "original" in view["stages"]):
+            amounts = recover_up_income_amounts(
+                image, selected["text"], lambda pixels, settings: call_ocr(extract_text, pixels, settings),
+                min(engine["timeout"], 5),
+            )
+            if amounts:
+                details = amounts
+                parameters["income_reading"] = "UP form amount in words, agreed in two OCR passes"
+        if details:
+            record["document_details"] = details
+        records.append(record)
         views[item["id"]] = view
     return records, views
 
@@ -190,8 +203,10 @@ def show_document(document, view):
                 problems.append(f"Missing required fields: {missing}.")
             st.warning("\n".join(f"- {problem}" for problem in problems))
         st.table(
-            [{"Field": FIELD_NAMES[key], "Value": value or "Not Found / Unreadable"}
-             for key, value in document["fields"].items()],
+            [{"Field": DETAIL_LABELS[key], "Value": value or "Not Found / Unreadable"}
+             for key, value in document.get("document_details", {}).items()]
+            + [{"Field": FIELD_NAMES[key], "Value": value or "Not Found / Unreadable"}
+               for key, value in document["fields"].items()],
             hide_index=True,
             border="horizontal",
         )
