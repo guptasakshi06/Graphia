@@ -13,6 +13,8 @@ from modules.classification import TITLE_KEYWORDS
 from modules.extraction import DETAIL_LABELS, FIELD_KEYS
 
 
+CHECKLIST_FIELDS = set(FIELD_KEYS) | set(DETAIL_LABELS)
+INCOME_AMOUNT_FIELDS = ("income_amount", "annual_income", "monthly_income")
 TYPE_NAMES = {
     "income_certificate": "Income Certificate",
     "caste_certificate": "Caste Certificate",
@@ -50,7 +52,7 @@ def _validate_config(config, required_types):
         if doc_type not in TITLE_KEYWORDS:
             raise ValueError(f"Invalid required document type: {doc_type!r}")
         if (not isinstance(fields, list)
-                or any(not isinstance(field, str) or field not in FIELD_KEYS for field in fields)
+                or any(not isinstance(field, str) or field not in CHECKLIST_FIELDS for field in fields)
                 or len(fields) != len(set(fields))):
             raise ValueError(f"Required fields for {doc_type} must be a list of unique field IDs.")
     readability = config["readability"]
@@ -159,7 +161,11 @@ def analyze_readiness(records, config, required_types=None):
         alnum_count = sum(character.isalnum() for character in ocr["text"])
         readable = ocr["status"] == "ok" and alnum_count >= minimum
         fields_needed = config["required_documents"].get(doc_type, [])
-        missing_fields = [field for field in fields_needed if not (document["fields"][field] or "").strip()]
+        values = {**document["fields"], **document.get("document_details", {})}
+        present = {field for field, value in values.items() if value and value.strip()}
+        if present.intersection(INCOME_AMOUNT_FIELDS):
+            present.add("income_amount")
+        missing_fields = [field for field in fields_needed if field not in present]
         candidate_usable = doc_type != "unknown" and readable and not missing_fields
         problems = []
         if doc_type == "unknown":

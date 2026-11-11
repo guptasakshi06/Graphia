@@ -90,7 +90,7 @@ Blank/unrelated text is `unknown`; conflicting competing class evidence is conse
 
 `extract_fields` in `modules.extraction` returns a dict containing all four field keys with string values or `None`. No fabricated fallback value; no automatic choice of any arbitrary number/date. Format missing values only in the UI/report as `Not Found / Unreadable`. Do not require not-applicable fields for readiness. Additional metadata may be added in a coordinated contract revision if needed.
 
-Post-M03 extension: an optional `document_details` mapping carries document-specific string or `None` values (`pan_number`, `annual_income`, `monthly_income`, `income_amount`, `caste_category`). The UI and exports display it when present. It does not change the four checklist fields or readiness rules. A grade sheet's holder remains `student_name`.
+Post-M03 extension: an optional `document_details` mapping carries document-specific string or `None` values (`pan_number`, `annual_income`, `monthly_income`, `income_amount`, `caste_category`). The UI and exports display it when present. The app uses `config/document_checklist.json` to require the PAN number, income amount, caste category, and marksheet holder (`student_name`). Annual or monthly income also satisfies `income_amount`. The original `config/requirements.json` remains the reference for the M03 package and experiment fixtures.
 
 ## 4. Configuration, document record and readiness — Jigisha owns implementation
 

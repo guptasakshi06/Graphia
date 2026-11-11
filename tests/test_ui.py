@@ -18,7 +18,8 @@ import app
 from modules.readiness import analyze_readiness, render_report
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = "FICTIONAL TEST ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\nCertificate Number: INC-00017"
+REFERENCE = ("FICTIONAL TEST ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\n"
+             "Certificate Number: INC-00017\nAnnual Income: Rs. 120000")
 ORIGINAL = "FICTIONAL TEST ONLY - NOT REAL OCR\nMarksheet\nStudent Name: Bela Example"
 OPTIONS = {"denoise": "median", "kernel_size": 3, "contrast": "clahe", "threshold": "otsu",
            "global_threshold": 127, "adaptive_block_size": 31, "adaptive_c": 11.0,

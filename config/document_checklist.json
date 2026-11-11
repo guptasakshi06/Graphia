@@ -1,0 +1,10 @@
+{
+  "profile_name": "Document field checklist",
+  "required_documents": {
+    "income_certificate": ["income_amount"],
+    "caste_certificate": ["caste_category"],
+    "marksheet": ["student_name"],
+    "identity_proof": ["pan_number"]
+  },
+  "readability": {"min_alnum_chars": 20}
+}

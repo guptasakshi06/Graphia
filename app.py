@@ -22,6 +22,7 @@ ENGINE = {"lang": "eng", "psm": 6, "timeout": 20}
 BILINGUAL_ENGINE = {**ENGINE, "lang": "eng+hin", "psm": 4}
 STAGES = ("original", "grayscale", "denoised", "enhanced", "thresholded", "morphology")
 FIELD_NAMES = {
+    **DETAIL_LABELS,
     "student_name": "Name",
     "certificate_number": "Certificate number",
     "application_id": "Application ID",
@@ -202,11 +203,12 @@ def show_document(document, view):
                 missing = ", ".join(FIELD_NAMES[key] for key in document["missing_required_fields"])
                 problems.append(f"Missing required fields: {missing}.")
             st.warning("\n".join(f"- {problem}" for problem in problems))
+        values = {**document.get("document_details", {}), **document["fields"]}
+        for key in document["missing_required_fields"]:
+            values.setdefault(key, None)
         st.table(
-            [{"Field": DETAIL_LABELS[key], "Value": value or "Not Found / Unreadable"}
-             for key, value in document.get("document_details", {}).items()]
-            + [{"Field": FIELD_NAMES[key], "Value": value or "Not Found / Unreadable"}
-               for key, value in document["fields"].items()],
+            [{"Field": FIELD_NAMES[key], "Value": value or "Not Found / Unreadable"}
+             for key, value in values.items()],
             hide_index=True,
             border="horizontal",
         )
@@ -312,7 +314,7 @@ def main():
         st.write("Review document images against a checklist.")
 
     try:
-        config = json.loads((ROOT / "config/requirements.json").read_text(encoding="utf-8"))
+        config = json.loads((ROOT / "config/document_checklist.json").read_text(encoding="utf-8"))
         analyze_readiness([], config)
     except (OSError, ValueError) as error:
         st.session_state.pop("analysis", None)
@@ -343,6 +345,7 @@ def main():
         st.subheader("Checklist & OCR")
         required = st.multiselect("Required document types", list(config["required_documents"]),
                                   default=list(config["required_documents"]), format_func=TYPE_NAMES.get)
+        st.caption("Testing one document? Select only its type.")
         bilingual = st.selectbox("OCR language", ["English", "English + Hindi"], key="ocr_language") == "English + Hindi"
         source = st.radio(
             "OCR source", list(OCR_SOURCES), format_func=OCR_SOURCES.get, horizontal=True,
@@ -354,8 +357,10 @@ def main():
         options = processing_controls()
         with st.expander("Required fields"):
             for doc_type in required:
-                fields = ", ".join(FIELD_NAMES.get(key, key) for key in config["required_documents"][doc_type])
+                fields = ", ".join(FIELD_NAMES[key] for key in config["required_documents"][doc_type])
                 st.write(f"**{TYPE_NAMES[doc_type]}** · {fields or 'No required fields'}")
+            if "income_certificate" in required:
+                st.caption("An annual, monthly, or total income amount can satisfy the income check.")
 
     signature = input_signature(items, options, required, source, config, bilingual=bilingual)
     had_results = "analysis" in st.session_state

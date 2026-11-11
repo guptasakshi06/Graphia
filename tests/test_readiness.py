@@ -78,6 +78,22 @@ class ReadinessTests(unittest.TestCase):
     def setUp(self):
         self.config = load_config()
 
+    def test_app_checklist_uses_document_details(self):
+        config = json.loads((ROOT / "config/document_checklist.json").read_text(encoding="utf-8"))
+        records = complete_records()
+        records[0]["document_details"] = {"monthly_income": "₹8,000"}
+        records[1]["document_details"] = {"caste_category": "SC"}
+        records[3]["document_details"] = {"pan_number": "AAAAA0000A"}
+        for record in records[:2]:
+            record["fields"]["student_name"] = record["fields"]["certificate_number"] = None
+        self.assertEqual(analyze_readiness(records, config)["overall_status"], "Ready")
+        records[0]["document_details"] = {"monthly_income": None, "annual_income": " "}
+        records[3].pop("document_details")  # A holder name alone does not satisfy the PAN check.
+        report = analyze_readiness(records, config)
+        self.assertEqual(report["overall_status"], "Needs Attention")
+        self.assertEqual(report["documents"][0]["missing_required_fields"], ["income_amount"])
+        self.assertEqual(report["documents"][3]["missing_required_fields"], ["pan_number"])
+
     def test_default_config_and_complete_submission(self):
         report = analyze_readiness(complete_records(), self.config)
         self.assertEqual(self.config["required_documents"], {
