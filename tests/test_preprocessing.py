@@ -92,6 +92,8 @@ class ImageInputTests(unittest.TestCase):
             load_image(payload[:35])  # truncated PNG
 
 
+@unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                     "requires local project evidence")
 class DatasetTests(unittest.TestCase):
     def test_generator_reproduces_assets_and_manifest(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -243,6 +245,8 @@ class GrayscaleFilterContrastTests(unittest.TestCase):
         np.testing.assert_array_equal(bgr, before)
 
 
+@unittest.skipUnless((ROOT / "outputs/experiments/SG02/metrics.json").is_file(),
+                     "requires local project evidence")
 class ExperimentArtifactTests(unittest.TestCase):
     def test_saved_metrics_images_histograms_and_source_identity(self):
         import cv2
@@ -456,6 +460,8 @@ class ThresholdMorphologyPipelineTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 apply_morphology(gray, method, size)
 
+    @unittest.skipUnless((ROOT / "outputs/experiments/SG03/metrics.json").is_file(),
+                         "requires local project evidence")
     def test_saved_sg03_artifacts_match_recomputed_outputs_and_sources(self):
         import cv2
         folder = ROOT / "outputs/experiments/SG03"
