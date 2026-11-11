@@ -1,194 +1,88 @@
-# Project 042 Document Intelligence for Application Readiness
+# Graphia
 
-Students: **Sakshi Gupta** and **Jigisha Baiswar**.
+**Document Intelligence for Application Readiness and Missing-Requirement Detection**
 
-This local Python project demonstrates image preprocessing, Tesseract OCR,
-rule-based document classification, field extraction and a configurable
-demonstration scholarship checklist. Readiness describes the configured
-presence and usable information only. It does not establish authenticity,
-official eligibility or whether documents belong to the same person.
+Project 042 · Digital Image Processing · Academic group project by **Sakshi Gupta** and **Jigisha Baiswar**
 
-The technical package is complete at M03. The [delivery manifest](docs/DELIVERY.md)
-lists the submission files, verification and cover details still needed.
+Graphia helps students review scholarship application documents before submission. Upload document images to see which required documents were detected, which fields were extracted, and what still needs attention.
 
-## Ubuntu setup
+**[Launch Graphia on Streamlit](https://9vqvn98mcqbgmps2tuhfwc.streamlit.app/)** · [Try it with fictional documents](#try-the-demo)
 
-Run these commands from a checkout of the verified M03 package. In the original
-workspace, the integration directory already contains the application.
+![Graphia upload dashboard with document requirements and analysis controls](outputs/screenshots/graphia-current-ui.png)
 
-Check the tools first:
+*Graphia dashboard captured from the current local app.*
 
-```bash
-python3 --version
-git --version
-tesseract --version
-tesseract --list-langs
-```
+## Project team
 
-Only if required tools are missing, install them on Ubuntu:
+| Team member | Contributions |
+| --- | --- |
+| **Sakshi Gupta** | Built the image preprocessing and Tesseract OCR modules, prepared the fictional dataset and reference transcripts, and ran the preprocessing and OCR comparison experiments. Led integration and prepared the academic report and DIP viva notes. |
+| **Jigisha Baiswar** | Built rule-based document classification, field extraction, checklist scoring, and the Streamlit interface with downloadable reports. Validated the application in a browser and prepared the presentation, diagrams, and demo materials. |
+
+## How it works
+
+1. Upload one or more JPG, JPEG, or PNG files. Graphia recognizes supported layouts for income certificates, caste certificates, marksheets, and identity proofs.
+2. Review the image processing stages. The app exposes grayscale conversion, denoising, contrast enhancement, thresholding, and morphology so you can see how each stage affects the text.
+3. Compare Tesseract OCR output from the original and processed images. **Auto photo** can also try cropping and rotation on photographed documents.
+4. Review the detected type, extracted fields, and checklist results. Export the report as JSON or Markdown.
+
+## What the checklist measures
+
+**Coverage** counts required document types detected. **Readiness** counts required types with at least one readable submission containing all configured fields. Both scores use the total number of required types as the denominator. Duplicate submissions count once per type.
+
+| Example with four required types | Coverage | Readiness |
+| --- | ---: | ---: |
+| All four types detected and usable | 100% | 100% |
+| All four types detected, one missing a required field | 100% | 75% |
+| Three types detected, all three usable | 75% | 75% |
+
+The bundled checklist looks for an income amount, a caste category, a student name on the marksheet, and a PAN number on the identity proof. You can inspect the rules in [`config/document_checklist.json`](config/document_checklist.json). Graphia checks application completeness and readability. Authenticity and official scholarship eligibility are outside its scope.
+
+## Try the demo
+
+1. Open the [Streamlit app](https://9vqvn98mcqbgmps2tuhfwc.streamlit.app/) and download a clear fictional sample from the [sample dataset](dataset/README.md).
+2. Upload the image and select **Analyze documents**. Review the detected type, image stages, and OCR output.
+3. Add or remove a document and analyze again to see how coverage and readiness change. Some older fictional samples lack fields in the current checklist and may appear as detected but unusable.
+4. Download a JSON or Markdown report. Use fictional documents for the hosted demo and for shared screenshots or reports.
+
+## Run locally on Ubuntu
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-venv python3-pip git tesseract-ocr tesseract-ocr-eng
-```
+sudo apt install git python3 python3-venv python3-pip tesseract-ocr tesseract-ocr-eng
 
-Run the following from the checkout you intend to use:
-
-```bash
+git clone https://github.com/guptasakshi06/Graphia.git
+cd Graphia
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python scripts/check_environment.py
-python -m pip check
+python -m streamlit run app.py --server.address=127.0.0.1
 ```
 
-The environment checker prints JSON and exits with zero only when all six
-dependencies import, a virtual environment is active, and Tesseract runs with
-`eng` language data. `--json path/to/report.json` also saves its observations.
-Use `.venv/bin/python` instead of activation when running automated commands.
-To reproduce the complete M00 dependency snapshot, install with
-`python -m pip install -r requirements.txt -c docs/merge/M00-requirements-lock.txt`.
+Open the local URL printed by Streamlit. For supported bilingual forms, install `tesseract-ocr-hin` and select **English + Hindi** in the app.
 
-NumPy represents pixel arrays; OpenCV performs DIP operations; Matplotlib shows
-comparisons; Pillow reads/creates images; Pytesseract calls the separate system
-Tesseract engine; Streamlit provides the UI. `opencv-python-headless` avoids
-desktop GUI dependencies and works with Streamlit/Matplotlib. Do not install a
-second OpenCV wheel alongside it. No optional PDF or direct Pandas dependency is
-needed; Streamlit may install Pandas as one of its own dependencies.
+## Repository layout
 
-## Separate workspaces
+| Path | Contents |
+| --- | --- |
+| [app.py](app.py) | Streamlit upload, analysis, and reporting interface |
+| [modules/](modules/) | OpenCV and NumPy preprocessing, Pytesseract OCR, classification, field extraction, and readiness logic |
+| [config/](config/) | Checklist and readability settings |
+| [dataset/](dataset/) | Eight fictional images and reference transcripts |
+| [scripts/](scripts/) and [tests/](tests/) | Environment checks, OCR evaluation, and automated tests |
+| [docs/](docs/) and [outputs/](outputs/) | Academic materials, experiment results, screenshots, and sample reports |
 
-| Work | Branch | Checkout |
-|---|---|---|
-| Integration | `codex/integration` | `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi` |
-| Sakshi's DIP/OCR | `codex/sakshi-dip` | `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/sakshi` |
-| Jigisha's rules/UI | `codex/jigisha-app` | `/home/ubuntu/Documents/ChatGPT/DIP_Jigi_Sakshi/worktrees/jigisha` |
+## Evaluation and project materials
 
-A branch records a history of commits. A worktree is a separate folder checked
-out on a branch. These worktrees share Git's history but have independent files
-and independent `.venv` folders. Never switch two chats' branches in one folder.
-Do not copy or move a `.venv`; recreate it from requirements in its checkout.
+In the eight-image fictional dataset, original-image OCR and the preprocessing pipeline selected as the default for that experiment both had a pooled character error rate of 0%. Some alternative settings damaged text, including a global threshold that blanked the faint income certificate. The experiment covered four generated layouts and their degraded variants. [Experiment summary](outputs/experiments/SG05/summary.csv)
 
-The [merge handoff](MERGE_HANDOFF.md) records the final integration. The personal
-handoffs in each checkout record its sprint history. The [team contract](TEAM_CONTRACT.md)
-documents the module interfaces, processing options and report fields.
-
-## Folder layout and local launch
-
-```text
-modules/             Plain Python DIP, OCR, classification, extraction and readiness
-scripts/             Environment check, dataset generator and experiment scripts
-config/              Fictional demonstration requirements JSON
-dataset/             Eight labeled fictional samples, references and provenance
-tests/fixtures/      Labeled development fixtures (not OCR evidence)
-outputs/             Selected experiment, screenshot and report evidence
-docs/merge/          Executed merge-checkpoint evidence and setup versions
-docs/sprint_notes/   Owner teaching and verification records
-worktrees/           Ignored independent personal checkouts
-.venv/               Ignored checkout-local Python environment
-```
-
-Run from the chosen checkout (each has its own environment):
+Run the automated tests from the activated virtual environment.
 
 ```bash
-.venv/bin/python -m streamlit run app.py --server.address=127.0.0.1 --server.fileWatcherType=none --browser.gatherUsageStats=false
+python -m unittest discover -s tests -v
 ```
 
-Open the printed local URL, upload fictional images from `dataset/`, keep the
-demonstration checklist/default settings and press **Analyze documents**. Review
-six image stages, original/processed OCR, type, fields and readiness; download
-JSON or Markdown. Changing inputs clears results until Analyze is pressed again.
-The default is median 3 → CLAHE 2.0/8×8 → Otsu → no morphology, English PSM 6.
-For the bilingual OBC form with the heading “Form of certificate to be produced
-by Other Backward Classes,” install optional Hindi OCR data on Ubuntu with
-`sudo apt install tesseract-ocr-hin`. Select **English + Hindi** and **original**
-as the OCR source. This mode uses Tesseract page segmentation mode 4. The app
-reads the holder from the certification sentence and the number from the
-Hindi certificate label. The app still displays both OCR outputs for review.
-The bilingual mode also handles supported Hindi income certificate titles and
-applicant or certificate-number labels. A PAN card with a supported card heading
-and an explicit holder name label counts under **Identity Proof** in the demo.
-For camera photos, choose **Auto photo** as the OCR source. The app can crop
-background, try quarter turns, and read supported UP income form fields from
-separate areas of the same image. The result identifies which method it used.
-The full OCR transcript can still contain errors in small or blurry text.
-
-A type is usable when one candidate has sufficient OCR text and its configured
-fields. Coverage counts detected required types; readiness counts usable types,
-each divided by the number of required types. Duplicates count once.
-
-## Architecture and sample evidence
-
-Streamlit decodes each upload, runs the original and processed images through
-Tesseract, then uses the selected OCR text for title matching and field extraction.
-The readiness module checks those records against the selected JSON checklist.
-The [architecture diagram](docs/diagrams/architecture.png) shows the modules and
-the [workflow diagram](docs/diagrams/workflow.png) shows the three possible outcomes.
-
-The [dataset](dataset/README.md) contains eight labeled fictional images from four
-generated layouts. Four are clear and four are related low-contrast, noisy or
-slightly blurred derivatives. Original and default OCR tied at zero pooled
-character error rate on this set. Some alternatives damaged text. For example,
-global threshold 127 blanked the faint Income Certificate. If processing damages
-text, select original OCR and analyze again. The experiment did not measure
-accuracy on unfamiliar layouts, handwriting or real scans.
-
-The [experiment summary](outputs/experiments/SG05/summary.csv) and [browser evidence](docs/merge/M02.md)
-include the fixed methods, results and provenance. Run
-`.venv/bin/python docs/merge/verify_m02.py` from a checkout of the published M03
-revision to check its frozen source and evidence. To evaluate the current
-code without replacing the saved results, run:
-
-```bash
-.venv/bin/python scripts/evaluate_dataset.py --output-dir /tmp/dip042-sg05-repeat
-.venv/bin/python -m unittest discover -s tests -v
-```
-
-Use fictional samples for the demo. The application does not save uploads by
-default, but a downloaded report can contain OCR text. Keep any private files
-and reports outside version control.
-
-## Six-minute demo
-
-1. Launch Streamlit with the command above. Upload the four clear fictional
-   files listed in the [demo script](docs/demo_script.md), then analyze. With
-   the default checklist, the expected result is Ready at 100% for both scores.
-2. Open the Income Certificate. Compare the processing stages and OCR results.
-3. Remove the Identity Proof and analyze again. The expected result is
-   Incomplete, with both scores at 75%. Add the fictional missing-name version
-   from the demo script and analyze. Coverage returns to 100% while readiness
-   stays at 75% and the status becomes Needs Attention. Download a report.
-
-## Submission files
-
-- Academic report [PDF](docs/project_report.pdf) and [editable DOCX](docs/project_report.docx)
-- [PowerPoint presentation](docs/project_042_presentation.pptx)
-- [Combined viva Q&A](docs/viva.md) and [demo script](docs/demo_script.md)
-- [Full delivery manifest](docs/DELIVERY.md)
-
-## Setup troubleshooting
-
-- `No module named ...`: use this checkout's `.venv/bin/python`, then install
-  its `requirements.txt`.
-- Venv creation fails: install `python3-venv` using the Ubuntu command above.
-- Missing Tesseract or `eng`: install the separate engine/language packages;
-  reinstalling Pytesseract alone cannot provide them.
-- Package download fails: check network access and retry the install. An
-  existing pip version does not prove an attempted upgrade reached the index.
-- Repeated `Inotify queue overflowed`: nested worktrees/environments can overload
-  recursive watching. The launch command above disables watching; restart the
-  server after code changes. This was observed and resolved during M01.
-- `pip check` reports conflicts: keep the exact error and resolve it in an
-  integration chat; personal tracks must not change shared requirements.
-
-Verified setup versions and real command results are recorded in
-`docs/merge/M00.md` and its environment JSON files. Verify each new machine
-separately; checks on this machine do not verify a remote student's computer.
-
-## Git history
-
-The combined project is on local `main` and `codex/integration`. The owner
-branches preserve both students’ sprint commits. The [merge handoff](MERGE_HANDOFF.md)
-records the final local delivery and publication status. Git ignores virtual
-environments, nested worktrees, private uploads, caches and local secrets.
+- [Architecture diagram](docs/diagrams/architecture.png) and [workflow diagram](docs/diagrams/workflow.png)
+- [Academic report](docs/project_report.pdf) and [presentation](docs/project_042_presentation.pptx)
+- [Browser validation and evidence](docs/merge/M02.md) and [delivery manifest](docs/DELIVERY.md)
