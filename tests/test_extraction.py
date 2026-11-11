@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 from modules.classification import classify_document
-from modules.extraction import extract_fields
+from modules.extraction import extract_document_details, extract_fields
 
 
 FIELD_KEYS = {"student_name", "certificate_number", "application_id", "issue_date"}
@@ -14,6 +14,35 @@ EMPTY_FIELDS = dict.fromkeys(FIELD_KEYS)
 
 
 class ExtractionTests(unittest.TestCase):
+    def test_short_pan_heading_requires_issuer_and_separate_number(self):
+        heading = "Income Tax Department\nGovernment of India\nPermanent Account Number\n"
+        pan = heading + "\nZZZPK5826Z\nName: Arjun Sample"
+        self.assertEqual(classify_document(pan)["doc_type"], "identity_proof")
+        self.assertEqual(extract_document_details(pan, "identity_proof"), {"pan_number": "ZZZPK5826Z"})
+        self.assertEqual(extract_fields(pan, "identity_proof")["student_name"], "Arjun Sample")
+        self.assertIsNone(extract_document_details(pan + "\nBBBBB0000B", "identity_proof")["pan_number"])
+        for text in (heading, "Permanent Account Number\nZZZPK5826Z",
+                     "Income Tax Department\nTax Return\nPermanent Account Number: ZZZPK5826Z"):
+            self.assertEqual(classify_document(text)["doc_type"], "unknown")
+
+    def test_document_specific_details_and_conflicts(self):
+        pan = "Permanent Account Number Card\nAAAAA0000A"
+        self.assertEqual(extract_document_details(pan, "identity_proof"), {"pan_number": "AAAAA0000A"})
+        self.assertIsNone(extract_document_details(pan + "\nBBBBB0000B", "identity_proof")["pan_number"])
+        self.assertEqual(extract_document_details("Identity Proof\nAAAAA0000A", "identity_proof"), {})
+        income = "Annual Income: Rs. 1,20,000\nमासिक आय: ₹१००००\nCertificate Number: 999999"
+        self.assertEqual(extract_document_details(income, "income_certificate"),
+                         {"annual_income": "₹120000", "monthly_income": "₹10000"})
+        self.assertIsNone(extract_document_details(income + "\nAnnual Income: 130000", "income_certificate")["annual_income"])
+        for title, category in (("SCHEQULED CASTE CERTINCATE", "SC"),
+                                ("FORM OF CERTIFICATE TO BE PRODUCED BY OTHER BACKWARD CLASSES", "OBC")):
+            self.assertEqual(classify_document(title)["doc_type"], "caste_certificate")
+            self.assertEqual(extract_document_details(title, "caste_certificate"), {"caste_category": category})
+            self.assertIsNone(extract_document_details(title + "\nCategory: ST", "caste_certificate")["caste_category"])
+        grade = "GRADE SHEET\nName: Asha Example\nFather's Name: Other Example"
+        self.assertEqual(classify_document(grade)["doc_type"], "marksheet")
+        self.assertEqual(extract_fields(grade, "marksheet")["student_name"], "Asha Example")
+
     def test_official_title_variants_and_marksheet_holder(self):
         examples = (
             ("e - Permanent Account Number (e-PAN) Card\nनाम / Name\nAsha Example", "identity_proof"),

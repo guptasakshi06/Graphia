@@ -15,12 +15,25 @@ PAN_CARD_HEADING = re.compile(
     r"स्थायी[ \t]+लेखा[ \t]+संख्या[ \t]+कार्ड)[ \t]*\r?$",
     re.IGNORECASE | re.MULTILINE,
 )
+PAN_NUMBER = re.compile(r"(?<!\w)[A-Z]{5}[0-9]{4}[A-Z](?!\w)")
+PAN_SHORT_HEADING = re.compile(r"^[ \t]*permanent[ \t]+account[ \t]+number[ \t]*\r?$", re.I | re.M)
+PAN_ISSUER = re.compile(r"\b(?:income\s+tax\s+department|government\s+of\s+india)\b", re.I)
 HINDI_INCOME_HEADING = re.compile(
     r"^[ \t]*(?:(?:कार्यालय तहसीलदार द्वारा प्रदत्त|"
     r"आर्थिक रूप से पिछड़े वर्ग के उम्मीदवारों के लिए)[ \t]+)?"
     r"(?P<title>आय[ \t]+प्रमाण[ \t-]*पत्र)[ \t।]*\r?$",
     re.MULTILINE,
 )
+UP_INCOME_HEADING = re.compile(
+    r"^[ \t]*(?P<title>कार्य[ा]लय[ \t]+तह[\u0900-\u097f]{3,14}[ \t]+"
+    r"द्वारा?[ \t।|]+प्र(?:द|व)त्त[ \t]+(?:आय|आग)[ \t]+प्रमाण[ \t-]+पत्र)[ \t।]*\r?$",
+    re.MULTILINE,
+)
+SC_CERTIFICATE_HEADING = re.compile(
+    r"^[ \t]*(?P<title>sche[dq]uled[ \t]+caste[ \t]+certi(?:fi|n)cate)[ \t]*\r?$",
+    re.IGNORECASE | re.MULTILINE,
+)
+GRADE_SHEET_HEADING = re.compile(r"^[ \t]*grade[ \t]+sheet[ \t]*\r?$", re.IGNORECASE | re.MULTILINE)
 HINDI_CASTE_HEADING = re.compile(
     r"^[ \t]*(?P<title>जाति[ \t]+प्रमाण[ \t-]*पत्र)[ \t।]*\r?$",
     re.MULTILINE,
@@ -31,10 +44,9 @@ MARK_STATEMENT_HEADING = re.compile(
     re.IGNORECASE | re.MULTILINE,
 )
 DOCUMENT_HEADINGS = {
-    "income_certificate": HINDI_INCOME_HEADING,
-    "caste_certificate": HINDI_CASTE_HEADING,
-    "marksheet": MARK_STATEMENT_HEADING,
-    "identity_proof": PAN_CARD_HEADING,
+    "income_certificate": (HINDI_INCOME_HEADING, UP_INCOME_HEADING),
+    "caste_certificate": (HINDI_CASTE_HEADING, SC_CERTIFICATE_HEADING),
+    "marksheet": (MARK_STATEMENT_HEADING, GRADE_SHEET_HEADING),
 }
 
 # Keep order fixed so evidence and test results are reproducible.
@@ -44,6 +56,18 @@ TITLE_KEYWORDS = {
     "marksheet": ("marksheet", "mark sheet"),
     "identity_proof": ("identity proof",),
 }
+
+
+def find_pan_heading(text):
+    """Recognize a short PAN heading with issuer and number corroboration."""
+    if heading := PAN_CARD_HEADING.search(text):
+        return heading
+    heading = PAN_SHORT_HEADING.search(text)
+    if heading and PAN_ISSUER.search(text):
+        number_line = next((line.strip() for line in text[heading.end():].splitlines() if line.strip()), "")
+        if PAN_NUMBER.fullmatch(number_line.upper()):
+            return heading
+    return None
 
 
 def classify_document(text):
@@ -69,9 +93,15 @@ def classify_document(text):
             keyword for keyword in keywords
             if re.search(r"(?<!\w)" + re.escape(keyword) + r"(?!\w)", normalized)
         ]
-        heading_pattern = DOCUMENT_HEADINGS.get(doc_type)
-        if heading_pattern and (heading := heading_pattern.search(text)):
-            matches.append(" ".join(heading.group("title").casefold().split()))
+        if doc_type == "identity_proof":
+            heading = find_pan_heading(text)
+        else:
+            for pattern in DOCUMENT_HEADINGS[doc_type]:
+                heading = pattern.search(text)
+                if heading:
+                    break
+        if heading:
+            matches.append(" ".join(heading.groupdict().get("title", heading.group()).casefold().split()))
         if matches:
             matched_types.append(doc_type)
             evidence.extend(matches)

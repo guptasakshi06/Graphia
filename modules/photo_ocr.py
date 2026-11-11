@@ -4,8 +4,10 @@ import re
 
 import cv2
 
-from modules.classification import HINDI_INCOME_HEADING, classify_document
-from modules.extraction import extract_fields
+from modules.classification import (GRADE_SHEET_HEADING, HINDI_INCOME_HEADING,
+                                    SC_CERTIFICATE_HEADING, UP_INCOME_HEADING, classify_document)
+from modules.extraction import extract_document_details, extract_fields
+from modules.readiness import INCOME_AMOUNT_FIELDS
 
 
 UP_INCOME_TITLE = "कार्यालय तहसीलदार द्वारा प्रदत्त"
@@ -18,6 +20,11 @@ UP_REGIONS = {
     "certificate": (125, 206, 216, 220),
     "holder": (269, 255, 373, 278),
 }
+SMALL_NUMBERS = dict(zip(
+    "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(),
+    range(1, 20),
+))
+TENS = dict(zip("twenty thirty forty fifty sixty seventy eighty ninety".split(), range(20, 100, 10)))
 
 
 def _paper_crop(image):
@@ -50,6 +57,64 @@ def _read_region(gray, key, scale, read, **engine):
     return read(enlarged, engine)
 
 
+def _read_band(pixels, box, read, lang, psm, timeout):
+    height, width = pixels.shape[:2]
+    x0, y0, x1, y1 = box
+    region = pixels[int(y0 * height):int(y1 * height), int(x0 * width):int(x1 * width)]
+    if not region.size:
+        return {"text": ""}
+    scale = min(3, 1600 / max(region.shape))
+    enlarged = cv2.resize(region, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+    return read(enlarged, {"lang": lang, "psm": psm, "timeout": timeout})
+
+
+def _thousands_in_words(text):
+    units = "|".join(SMALL_NUMBERS)
+    tens = "|".join(TENS)
+    values = []
+    for match in re.finditer(
+        rf"\b(?:(?P<tens>{tens})(?:[\s-]+(?P<ones>{units}))?|(?P<small>{units}))\s+thousand\b",
+        text.casefold(),
+    ):
+        value = TENS.get(match["tens"], 0) + SMALL_NUMBERS.get(match["ones"] or match["small"], 0)
+        values.append(value * 1000)
+    return values
+
+
+def recover_up_income_amounts(image, text, read, timeout):
+    """Use the printed amount in words when two reads of this UP layout agree."""
+    page = _paper_crop(image)
+    if not UP_INCOME_HEADING.search(text):
+        heading = _read_band(page, (0, .13, 1, .36), read, "hin+eng", 6, timeout)
+        if not UP_INCOME_HEADING.search(heading["text"]):
+            return {}
+    box = (0, .57, 1, .72) if page.shape[0] / page.shape[1] < 1.35 else (0, .47, 1, .60)
+    first, second = (
+        _thousands_in_words(_read_band(page, box, read, "eng", psm, timeout)["text"])
+        for psm in (6, 11)
+    )
+    if first == second and len(first) == 2 and first[1] == first[0] * 12:
+        return {"annual_income": f"₹{first[1]:,}", "monthly_income": f"₹{first[0]:,}"}
+    return {}
+
+
+def _read_known_header(gray, page_ocr, read, engine):
+    """Use a tighter header view for small or framed documents."""
+    timeout = engine["timeout"]
+    regions = [(GRADE_SHEET_HEADING, (0, 0, 1, .47), "eng", "grade sheet header")]
+    if gray.shape[1] <= 650:
+        regions.append((SC_CERTIFICATE_HEADING, (.14, .13, .87, .29), "eng", "SC certificate header"))
+    if engine["lang"] == "eng+hin":
+        regions.append((UP_INCOME_HEADING, (0, .13, 1, .36), "hin+eng", "UP income header"))
+    for pattern, box, lang, label in regions:
+        header = _read_band(gray, box, read, lang, 6, timeout)
+        if match := pattern.search(header["text"]):
+            # The grade-sheet crop also contains its labeled holder name.
+            if pattern is not GRADE_SHEET_HEADING:
+                header = {**header, "text": match.group().strip() + "\n" + page_ocr["text"]}
+            yield label, header, None
+
+
 def _read_up_income(gray, read, page_ocr, timeout):
     """Read separate regions only when the form's exact issuer heading is present."""
     height, width = gray.shape
@@ -80,7 +145,7 @@ def _read_up_income(gray, read, page_ocr, timeout):
     return recovered, layout
 
 
-def _evaluate(ocr, layout_fields=None):
+def _evaluate(ocr, layout_fields=None, *, required_fields=None):
     classification = classify_document(ocr["text"])
     doc_type = classification["doc_type"]
     fields = extract_fields(ocr["text"], doc_type)
@@ -93,17 +158,26 @@ def _evaluate(ocr, layout_fields=None):
     complete = recognized and bool(fields["student_name"]) and (
         doc_type not in ("caste_certificate", "income_certificate") or bool(fields["certificate_number"])
     )
+    if required_fields and required_fields.get(doc_type):
+        values = {**fields, **extract_document_details(ocr["text"], doc_type)}
+        present = {key for key, value in values.items() if value}
+        if present.intersection(INCOME_AMOUNT_FIELDS):
+            present.add("income_amount")
+        complete = set(required_fields[doc_type]).issubset(present)
     score = (recognized, complete, sum(value is not None for value in fields.values()),
              ocr["status"] == "ok", min(400, sum(char.isalnum() for char in ocr["text"])))
     return score, classification, fields
 
 
-def recover_photo(image, original, processed, read, engine):
+def recover_photo(image, original, processed, read, engine, *, required_fields=None):
     """Return the selected OCR result, fields and method for a single upload."""
+    def evaluate(ocr, layout=None):
+        return _evaluate(ocr, layout, required_fields=required_fields)
+
     selected = max((("original", original), ("processed", processed)),
-                   key=lambda candidate: _evaluate(candidate[1])[0])
+                   key=lambda candidate: evaluate(candidate[1])[0])
     source, best = selected
-    score, classification, fields = _evaluate(best)
+    score, classification, fields = evaluate(best)
     method = source
     if score[1] or (original["status"] == processed["status"] == "error"):
         return source, best, classification, fields, method
@@ -119,8 +193,10 @@ def recover_photo(image, original, processed, read, engine):
         region_result = _read_up_income(gray, read, page_ocr, retry["timeout"])
         if region_result is not None:
             attempts.append(("UP income form regions", *region_result))
+    if not score[0] and not any(classify_document(ocr["text"])["doc_type"] != "unknown" for _, ocr, _ in attempts):
+        attempts.extend(_read_known_header(page, page_ocr, read, retry))
     for label, ocr, layout in attempts:
-        result = _evaluate(ocr, layout)
+        result = evaluate(ocr, layout)
         if result[0] > score:
             score, classification, fields = result
             source, best, method = "processed", ocr, label
@@ -135,7 +211,7 @@ def recover_photo(image, original, processed, read, engine):
     ):
         pixels = enlarged if angle is None else cv2.rotate(image, angle)
         ocr = read(pixels, {**retry, "psm": 11 if angle is None else 4})
-        result = _evaluate(ocr)
+        result = evaluate(ocr)
         if result[0] > score:
             score, classification, fields = result
             source, best, method = "processed", ocr, label

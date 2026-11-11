@@ -13,7 +13,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import streamlit as st
 
 from modules.classification import classify_document
-from modules.extraction import extract_fields
+from modules.extraction import DETAIL_LABELS, extract_document_details, extract_fields
 from modules.readiness import TYPE_NAMES, analyze_readiness, render_report
 
 
@@ -21,6 +21,14 @@ ROOT = Path(__file__).resolve().parent
 ENGINE = {"lang": "eng", "psm": 6, "timeout": 20}
 BILINGUAL_ENGINE = {**ENGINE, "lang": "eng+hin", "psm": 4}
 STAGES = ("original", "grayscale", "denoised", "enhanced", "thresholded", "morphology")
+FIELD_NAMES = {
+    **DETAIL_LABELS,
+    "student_name": "Name",
+    "certificate_number": "Certificate number",
+    "application_id": "Application ID",
+    "issue_date": "Issue date",
+}
+OCR_SOURCES = {"processed": "Processed", "original": "Original", "auto": "Auto photo"}
 
 
 def collect_uploads(files):
@@ -70,7 +78,7 @@ def call_ocr(extract_text, image, engine=ENGINE):
         return error_ocr(f"OCR failed: {error}", engine)
 
 
-def analyze_uploads(items, options, source, provider, *, bilingual=False):
+def analyze_uploads(items, options, source, provider, *, bilingual=False, required_fields=None):
     """Orchestrate real APIs; keep every failed file and keep arrays separate.
 
     The provider argument makes boundary checks possible in tests. main() always
@@ -107,11 +115,12 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
         selected_source = "original" if source == "original" else "processed"
         selected = original if selected_source == "original" else processed
         if source == "auto" and "original" in view["stages"]:
-            from modules.photo_ocr import recover_photo
+            from modules.photo_ocr import recover_photo, recover_up_income_amounts
 
             selected_source, selected, classification, fields, method = recover_photo(
                 image, original, processed,
                 lambda pixels, settings: call_ocr(extract_text, pixels, settings), engine,
+                required_fields=required_fields,
             )
             if selected_source == "processed":
                 processed = selected
@@ -119,13 +128,26 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
         else:
             classification = classify_document(selected["text"])
             fields = extract_fields(selected["text"], classification["doc_type"])
-        records.append({
+        record = {
             "id": item["id"], "filename": item["filename"],
             "ocr_original": original, "ocr_processed": processed, "ocr_source": selected_source,
             "ocr": selected, "classification": classification,
             "fields": fields,
             "processing_parameters": parameters,
-        })
+        }
+        details = extract_document_details(selected["text"], classification["doc_type"])
+        if (source == "auto" and bilingual and classification["doc_type"] == "income_certificate"
+                and not any(details.values()) and "original" in view["stages"]):
+            amounts = recover_up_income_amounts(
+                image, selected["text"], lambda pixels, settings: call_ocr(extract_text, pixels, settings),
+                min(engine["timeout"], 5),
+            )
+            if amounts:
+                details = amounts
+                parameters["income_reading"] = "UP form amount in words, agreed in two OCR passes"
+        if details:
+            record["document_details"] = details
+        records.append(record)
         views[item["id"]] = view
     return records, views
 
@@ -146,9 +168,8 @@ def preview_upload(data):
 
 def processing_controls():
     """Expose contract-v1 options, including valid odd kernels/block sizes."""
-    with st.expander("Processing settings", expanded=False):
-        st.caption("Choose alternatives; these settings are not a promise of better OCR. "
-                   "All named stages remain visible when an operation is bypassed.")
+    with st.expander("Image processing settings"):
+        st.caption("Adjust the processing pipeline and compare the results in Image stages.")
         denoise = st.selectbox("Denoising", ["median", "gaussian", "none"])
         kernel = st.select_slider("Denoising kernel (odd pixels)", [1, 3, 5, 7, 9], value=3)
         contrast = st.selectbox("Contrast", ["clahe", "equalize", "none"])
@@ -158,141 +179,251 @@ def processing_controls():
         adaptive_c = st.number_input("Adaptive C", value=11.0, step=1.0)
         morphology = st.selectbox("Morphology", ["none", "erosion", "dilation", "opening", "closing"])
         morph_kernel = st.slider("Morphology kernel (pixels)", 1, 7, 2)
-        st.caption("Median replaces a pixel by its neighbourhood median; Gaussian smooths "
-                   "with weighted neighbours. Thresholding separates dark and light pixels. "
-                   "Morphology changes the foreground shape; compare before choosing it.")
     return {"denoise": denoise, "kernel_size": kernel, "contrast": contrast,
             "threshold": threshold, "global_threshold": global_value,
             "adaptive_block_size": block, "adaptive_c": adaptive_c,
             "morphology": morphology, "morph_kernel_size": morph_kernel}
 
 
+def show_document(document, view):
+    """Present one file at a time and keep raw evidence within reach."""
+    doc_type = TYPE_NAMES[document["doc_type"]]
+    file_status = "Usable for the checklist" if document["usable"] else "Needs review"
+    if not document["is_required"]:
+        file_status = "Outside the checklist" if document["doc_type"] != "unknown" else "Needs review"
+    st.markdown(f"**{doc_type}** · {file_status}")
+
+    fields_tab, ocr_tab, images_tab = st.tabs(["Extracted fields", "OCR text", "Image stages"])
+    with fields_tab:
+        if view["error"]:
+            st.error(view["error"])
+        if document["problems"]:
+            problems = [problem for problem in document["problems"]
+                        if not problem.startswith("Missing required fields: ")]
+            if document["missing_required_fields"]:
+                missing = ", ".join(FIELD_NAMES[key] for key in document["missing_required_fields"])
+                problems.append(f"Missing required fields: {missing}.")
+            st.warning("\n".join(f"- {problem}" for problem in problems))
+        values = {**document.get("document_details", {}), **document["fields"]}
+        for key in document["missing_required_fields"]:
+            values.setdefault(key, None)
+        st.table(
+            [{"Field": FIELD_NAMES[key], "Value": value or "Not Found / Unreadable"}
+             for key, value in values.items()],
+            hide_index=True,
+            border="horizontal",
+        )
+    with ocr_tab:
+        photo_method = document["processing_parameters"].get("photo_recovery")
+        selected_source = OCR_SOURCES[document["ocr_source"]]
+        st.caption(f"OCR used for extraction: {photo_method or selected_source}")
+        for column, source in zip(st.columns(2), ("original", "processed")):
+            ocr = document["ocr_" + source]
+            title = "Photo recovery" if source == "processed" and photo_method not in (
+                None, "original", "processed"
+            ) else OCR_SOURCES[source]
+            with column:
+                st.markdown(f"**{title}**")
+                st.code(ocr["text"] or "No usable OCR text", language=None, wrap_lines=True)
+                if ocr["error"]:
+                    st.error(ocr["error"])
+        with st.expander("Technical details"):
+            st.json({
+                "classification": document["classification"],
+                "original_ocr": document["ocr_original"]["engine_config"],
+                "processed_ocr": document["ocr_processed"]["engine_config"],
+                "processing": document["processing_parameters"],
+            })
+    with images_tab:
+        stages = [stage for stage in STAGES if stage in view["stages"]]
+        if stages:
+            preferred = "thresholded" if "thresholded" in stages else stages[-1]
+            stage = st.selectbox("Image stage", stages, index=stages.index(preferred), format_func=str.title)
+            settings = document["processing_parameters"].get("resolved_pipeline", {})
+            if stage == "enhanced" and settings.get("contrast") == "clahe":
+                st.caption(f"CLAHE increases local contrast. Clip limit {settings['clahe_clip_limit']:g}.")
+            elif stage == "enhanced" and settings.get("contrast") == "equalize":
+                st.caption("Histogram equalization redistributes grayscale intensities to increase contrast.")
+            elif stage == "thresholded" and settings.get("threshold") == "adaptive":
+                st.caption(f"Adaptive thresholding uses local neighborhoods. Block size {settings['adaptive_block_size']} px, C = {settings['adaptive_c']:g}.")
+            elif stage == "thresholded" and settings.get("threshold") in ("otsu", "global"):
+                otsu = settings["threshold"] == "otsu"
+                cutoff = settings.get("selected_otsu_threshold") if otsu else settings["global_threshold"]
+                method = "Otsu (chosen from the histogram)" if otsu else "Global (manually selected)"
+                detail = "" if cutoff is None else f" · Cutoff {cutoff:g} / 255."
+                st.caption(f"{method} threshold{detail}")
+            if stage == "original":
+                st.image(display_pixels(view["stages"][stage]), caption="Original", width=760)
+            else:
+                original, processed = st.columns(2)
+                original.image(display_pixels(view["stages"]["original"]), caption="Original", width="stretch")
+                processed.image(display_pixels(view["stages"][stage]), caption=stage.title(), width="stretch")
+                st.caption("A stage can look unchanged when its operation is turned off in the DIP settings.")
+        else:
+            st.caption("Image stages are unavailable for this file.")
+
+
 def show_results(result):
     report, views = result["report"], result["views"]
-    st.subheader("Readiness analysis")
-    st.write("Overall status: " + report["overall_status"])
-    columns = st.columns(3)
-    columns[0].metric("Submitted files", report["submitted_file_count"])
-    columns[1].metric("Detected required types", report["detected_required_type_count"])
-    columns[2].metric("Usable required types", report["usable_required_type_count"])
-    st.caption(f"Required types: {report['required_type_count']}. Duplicate types count once.")
-    columns = st.columns(2)
-    columns[0].metric("Coverage", f"{report['coverage_percent']:.2f}%")
-    columns[1].metric("Readiness", f"{report['readiness_percent']:.2f}%")
-    st.write("Missing types: " + (", ".join(TYPE_NAMES[x] for x in report["missing_types"]) or "None"))
-    st.write("Detected but unusable types: " + (", ".join(TYPE_NAMES[x] for x in report["unusable_types"]) or "None"))
-    for document in report["documents"]:
-        with st.expander("File: " + document["filename"], expanded=True):
-            st.caption("Record ID: " + document["id"])
-            view = views[document["id"]]
-            if view["error"]:
-                st.error(view["error"])
-            st.write("Detected type: " + TYPE_NAMES[document["doc_type"]])
-            st.write("Matched keywords:")
-            st.json(document["classification"])
-            st.write(f"Readable heuristic: {document['readable']} · Usable candidate: {document['usable']}")
-            if document["problems"]:
-                st.warning("\n".join(document["problems"]))
-            st.write("Extracted fields (selected OCR: " + document["ocr_source"] + ")")
-            photo_method = document["processing_parameters"].get("photo_recovery")
-            if photo_method:
-                st.caption("Auto photo selected " + photo_method + ".")
-            st.json({key: value if value is not None else "Not Found / Unreadable"
-                     for key, value in document["fields"].items()})
-            st.write("Original and processed OCR")
-            for column, source in zip(st.columns(2), ("original", "processed")):
-                ocr = document["ocr_" + source]
-                column.write(source.title() + " — " + ocr["status"])
-                column.code(ocr["text"] or "No usable OCR text", language=None)
-                if ocr["error"]:
-                    column.error(ocr["error"])
-                column.caption(f"Engine settings: {ocr['engine_config']}; "
-                               f"confidence heuristic: {ocr['confidence']} (not accuracy)")
-            st.write("Named image processing views")
-            for stage in STAGES:
-                if stage in view["stages"]:
-                    st.image(display_pixels(view["stages"][stage]), caption=stage.title(), width="stretch")
-            st.write("Requested settings, resolved pipeline and loaded dimensions")
-            st.json(document["processing_parameters"])
-    st.download_button("Download JSON report", json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False),
-                       file_name="readiness_report.json", mime="application/json", on_click="ignore")
-    st.download_button("Download Markdown report", render_report(report),
-                       file_name="readiness_report.md", mime="text/markdown", on_click="ignore")
-    with st.expander("Readable report"):
+    with st.container(border=True, key="results"):
+        title, exports = st.columns([1, 2], vertical_alignment="center")
+        with title:
+            st.subheader("Results", anchor="graphia-results")
+        with exports:
+            with st.container(horizontal=True, horizontal_alignment="right"):
+                st.download_button(
+                    "Download JSON report", json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False),
+                    file_name="readiness_report.json", mime="application/json", on_click="ignore",
+                )
+                st.download_button(
+                    "Download Markdown report", render_report(report),
+                    file_name="readiness_report.md", mime="text/markdown", on_click="ignore",
+                )
+
+        status = report["overall_status"]
+        status_message = {
+            "Ready": st.success,
+            "Incomplete": st.info,
+            "Needs Attention": st.warning,
+        }[status]
+        status_message(f"Overall status: {status}")
+        files, coverage, readiness = st.columns(3)
+        files.metric("Files reviewed", report["submitted_file_count"], border=True)
+        coverage.metric("Coverage", f"{report['coverage_percent']:.2f}%", border=True,
+                        help="Share of required document types detected.")
+        readiness.metric("Readiness", f"{report['readiness_percent']:.2f}%", border=True,
+                         help="Share of required document types with readable required fields.")
+        st.caption(f"{report['usable_required_type_count']} of {report['required_type_count']} required types usable")
+        if report["missing_types"]:
+            st.write("Missing: " + ", ".join(TYPE_NAMES[key] for key in report["missing_types"]))
+        if report["unusable_types"]:
+            st.write("Detected but unusable: " + ", ".join(TYPE_NAMES[key] for key in report["unusable_types"]))
+
+    with st.container(border=True, key="review"):
+        st.subheader("Document review")
+        documents = report["documents"]
+        filenames = [document["filename"] for document in documents]
+        labels = [
+            f"{filename} (file {index + 1})" if filenames.count(filename) > 1 else filename
+            for index, filename in enumerate(filenames)
+        ]
+        selected = st.selectbox("Document", range(len(documents)), format_func=labels.__getitem__)
+        document = documents[selected]
+        show_document(document, views[document["id"]])
+
+    with st.expander("Report preview"):
         st.markdown(render_report(report))
 
 
-def main():
-    st.set_page_config(page_title="Document Intelligence — Project 042", layout="wide")
-    st.title("Document Intelligence for Application Readiness")
-    st.caption("Project 042 · Sakshi Gupta and Jigisha Baiswar · Local academic demonstration")
-    st.info("Local DIP and Tesseract OCR process your uploaded images. "
-            "Compare the original and processed OCR before reviewing readiness.")
-    st.write("Upload JPG, JPEG or PNG documents, choose a checklist and processing settings, "
-             "then press Analyze documents. Review both OCR outputs before choosing a source.")
-    st.warning("Demonstration checklist only. Readiness checks presence and usable information; "
-               "it does not verify authenticity, official eligibility or matching student identity.")
-    st.caption("Uploads stay in this session; the app does not save them to disk. "
-               "Download a report only when you want a local copy.")
+@st.cache_data
+def has_hindi_ocr():
+    from pytesseract import get_languages
+
     try:
-        config = json.loads((ROOT / "config/requirements.json").read_text(encoding="utf-8"))
-        analyze_readiness([], config)  # Validate policy before building widgets.
+        return "hin" in get_languages()
+    except OSError:
+        return False
+
+
+def use_phone_photo_settings():
+    """Apply the existing bilingual OCR and photo recovery options together."""
+    st.session_state["ocr_language"] = "English + Hindi" if has_hindi_ocr() else "English"
+    st.session_state["ocr_source"] = "auto"
+
+
+def main():
+    st.set_page_config(page_title="Graphia", layout="wide")
+    st.html(ROOT / ".streamlit" / "graphia.css")
+    with st.container(key="page-heading"):
+        st.title("Graphia")
+        st.write("Review document images against a checklist.")
+
+    try:
+        config = json.loads((ROOT / "config/document_checklist.json").read_text(encoding="utf-8"))
+        analyze_readiness([], config)
     except (OSError, ValueError) as error:
         st.session_state.pop("analysis", None)
         st.error(f"Checklist configuration error: {error}")
         return
-    required = st.multiselect("Required document types", list(config["required_documents"]),
-                              default=list(config["required_documents"]), format_func=TYPE_NAMES.get)
-    st.caption(f"Readability heuristic: OCR status ok and at least "
-               f"{config['readability']['min_alnum_chars']} alphanumeric characters. "
-               "Each required type needs one file with its configured fields.")
-    with st.expander("Configured required fields"):
-        st.json({TYPE_NAMES[key]: config["required_documents"][key] for key in required})
-    options = processing_controls()
-    bilingual = st.selectbox(
-        "OCR language", ["English", "English + Hindi"],
-        help="Choose English + Hindi for bilingual forms. If the processed text is "
-             "less readable, select original as the OCR source.",
-    ) == "English + Hindi"
-    source = st.radio(
-        "OCR source used for type, fields and readiness", ["processed", "original", "auto"],
-        format_func=lambda value: "Auto photo" if value == "auto" else value,
-        horizontal=True,
-        help="Auto photo tries to crop the page and correct sideways photos when the standard OCR misses fields.",
-    )
-    uploads = st.file_uploader("Document images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-    items = collect_uploads(uploads)
+
+    upload_column, settings_column = st.columns([5, 4], gap="medium")
+    with upload_column, st.container(border=True, key="upload"):
+        st.subheader("Add documents")
+        uploads = st.file_uploader(
+            "Document images", type=["jpg", "jpeg", "png"], accept_multiple_files=True,
+            label_visibility="collapsed",
+        )
+        items = collect_uploads(uploads)
+        action = st.empty()
+        upload_feedback = st.empty()
+        if items:
+            with st.expander("Preview uploads"):
+                index = st.selectbox("Preview file", range(len(items)),
+                                     format_func=lambda index: items[index]["filename"])
+                try:
+                    st.image(preview_upload(items[index]["data"]), width=500)
+                except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError) as error:
+                    st.error(f"Cannot preview this image: {error}")
+        st.caption("Images are processed locally and kept in this session.")
+
+    with settings_column, st.container(border=True, key="settings"):
+        st.subheader("Checklist & OCR")
+        required = st.multiselect("Required document types", list(config["required_documents"]),
+                                  default=list(config["required_documents"]), format_func=TYPE_NAMES.get)
+        st.caption("Testing one document? Select only its type.")
+        hindi_available = has_hindi_ocr()
+        bilingual = st.selectbox(
+            "OCR language", ["English", "English + Hindi"],
+            index=int(hindi_available), key="ocr_language",
+        ) == "English + Hindi"
+        if not hindi_available:
+            st.caption("English + Hindi requires the Hindi (hin) Tesseract language data.")
+        source = st.radio(
+            "OCR source", list(OCR_SOURCES), format_func=OCR_SOURCES.get, horizontal=True,
+            key="ocr_source", index=list(OCR_SOURCES).index("auto"),
+        )
+        st.button("Use phone photo settings", on_click=use_phone_photo_settings,
+                  disabled=source == "auto" and bilingual == hindi_available,
+                  help="Selects Auto photo and uses Hindi OCR when the language data is installed.")
+        options = processing_controls()
+        with st.expander("Required fields"):
+            for doc_type in required:
+                fields = ", ".join(FIELD_NAMES[key] for key in config["required_documents"][doc_type])
+                st.write(f"**{TYPE_NAMES[doc_type]}** · {fields or 'No required fields'}")
+            if "income_certificate" in required:
+                st.caption("An annual, monthly, or total income amount can satisfy the income check.")
+
     signature = input_signature(items, options, required, source, config, bilingual=bilingual)
     had_results = "analysis" in st.session_state
     if invalidate_results(st.session_state, signature) and had_results:
-        st.info("Inputs changed. Previous results and downloads were cleared; press Analyze documents again.")
-    for item in items:
-        with st.expander("Upload preview: " + item["filename"]):
-            try:
-                st.image(preview_upload(item["data"]), caption=item["filename"], width="stretch")
-            except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError) as error:
-                st.error(f"Cannot preview this image: {error}. Analyze will retain its error record.")
+        upload_feedback.info("Previous results cleared. Analyze again to update your report.")
     if not required:
-        st.error("Select at least one required document type.")
-    if st.button("Analyze documents", disabled=not items or not required, type="primary"):
+        upload_feedback.error("Select at least one required document type.")
+    if action.button("Analyze documents", disabled=not items or not required, type="primary", width="stretch"):
         st.session_state.pop("analysis", None)
         try:
             provider = load_real_provider()
         except (ImportError, OSError) as error:
-            st.error(f"Awaiting real DIP/OCR modules: {error}. Check the local installation and module files; no fake OCR fallback is used.")
+            upload_feedback.error(f"Awaiting real DIP/OCR modules: {error}")
         else:
             try:
-                with st.spinner("Processing images and running original/processed OCR…"):
-                    records, views = analyze_uploads(items, options, source, provider, bilingual=bilingual)
+                with upload_feedback.container(), st.spinner("Analyzing documents…"):
+                    records, views = analyze_uploads(
+                        items, options, source, provider, bilingual=bilingual,
+                        required_fields=config["required_documents"],
+                    )
                     report = analyze_readiness(records, config, required)
                     st.session_state["analysis"] = {"report": report, "views": views}
+                upload_feedback.empty()
             except Exception as error:
                 st.session_state.pop("analysis", None)
-                st.error(f"Analysis could not complete: {error}")
+                upload_feedback.error(f"Analysis could not complete: {error}")
     if "analysis" in st.session_state:
-        show_results(st.session_state["analysis"])
-    elif not items:
-        st.info("Upload at least one document image to begin.")
+        result = st.session_state["analysis"]
+        status = result["report"]["overall_status"]
+        upload_feedback.markdown(f"**Analysis complete · {status}.** [View results](#graphia-results)")
+        show_results(result)
+    st.caption("Project 042 · Sakshi Gupta and Jigisha Baiswar · Readiness reflects the selected demo checklist.")
 
 
 if __name__ == "__main__":

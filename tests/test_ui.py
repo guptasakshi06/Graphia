@@ -18,7 +18,8 @@ import app
 from modules.readiness import analyze_readiness, render_report
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = "FICTIONAL TEST ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\nCertificate Number: INC-00017"
+REFERENCE = ("FICTIONAL TEST ONLY - NOT REAL OCR\nIncome Certificate\nStudent Name: Asha Example\n"
+             "Certificate Number: INC-00017\nAnnual Income: Rs. 120000")
 ORIGINAL = "FICTIONAL TEST ONLY - NOT REAL OCR\nMarksheet\nStudent Name: Bela Example"
 OPTIONS = {"denoise": "median", "kernel_size": 3, "contrast": "clahe", "threshold": "otsu",
            "global_threshold": 127, "adaptive_block_size": 31, "adaptive_c": 11.0,
@@ -145,6 +146,19 @@ class OrchestrationTests(unittest.TestCase):
             self.assertEqual(records[0]["classification"]["doc_type"], "marksheet" if source == "original" else "unknown")
             self.assertIn("failure", views[self.items[0]["id"]]["error"])
 
+    def test_photo_ocr_prefers_pan_number_over_old_checklist_name(self):
+        from modules.photo_ocr import recover_photo
+
+        original = {"text": "PERMANENT ACCOUNT NUMBER CARD\nName: Asha Example", "status": "ok"}
+        processed = {"text": "PERMANENT ACCOUNT NUMBER CARD\nABCDE1234F", "status": "ok"}
+        with patch("modules.photo_ocr._paper_crop") as retry:
+            source, _, _, _, _ = recover_photo(
+                None, original, processed, None, app.ENGINE,
+                required_fields={"identity_proof": ["pan_number"]},
+            )
+        self.assertEqual(source, "processed")
+        retry.assert_not_called()
+
     def test_real_rotated_fictional_identity_image_recovers_name(self):
         manifest = json.loads((ROOT / "dataset/manifest.json").read_text())
         sample = next(row for row in manifest["samples"]
@@ -213,7 +227,7 @@ class StreamlitInteractionTests(unittest.TestCase):
         at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=15).run()
         self.assertEqual(len(at.exception), 0)
         self.assertTrue(at.button[0].disabled)
-        self.assertEqual(at.radio[0].value, "processed")
+        self.assertEqual(at.radio[0].value, "auto")
         at.multiselect[0].set_value([]).run()
         self.assertEqual(len(at.exception), 0)
         self.assertTrue(any("at least one" in error.value for error in at.error))
@@ -259,10 +273,19 @@ class StreamlitInteractionTests(unittest.TestCase):
         self.assertEqual((report["submitted_file_count"], report["coverage_percent"], report["readiness_percent"]),
                          (3, 25, 25))
         self.assertEqual(len(at.get("download_button")), 2)
-        self.assertTrue(any("Asha Example" in element.value for element in at.json))
-        self.assertEqual(len(at.get("image")), 14)  # 2 previews + 12 named stages; corrupt stays visible.
+        self.assertIn("Asha Example", at.table[0].value["Value"].tolist())
+        self.assertEqual(len(at.get("image")), 3)  # Upload preview plus the DIP comparison pair.
+        stage = next(widget for widget in at.selectbox if widget.label == "Image stage")
+        self.assertEqual(stage.options, [name.title() for name in app.STAGES])
+        stage.set_value("thresholded").run()
+        self.assertIn("analysis", at.session_state)
+        document = next(widget for widget in at.selectbox if widget.label == "Document")
+        self.assertEqual(len(document.options), 3)
+        document.set_value(2).run()
+        self.assertTrue(any("corrupt" in error.value for error in at.error))
+        self.assertIn("analysis", at.session_state)
         for mutate in (
-            lambda ui: ui.selectbox[2].set_value("adaptive"),
+            lambda ui: next(widget for widget in ui.selectbox if widget.label == "Threshold").set_value("adaptive"),
             lambda ui: ui.multiselect[0].set_value(["income_certificate"]),
             lambda ui: ui.radio[0].set_value("original"),
         ):
@@ -283,6 +306,14 @@ class StreamlitInteractionTests(unittest.TestCase):
         document = at.session_state["analysis"]["report"]["documents"][0]
         for source in ("original", "processed"):
             self.assertEqual(document["ocr_" + source]["engine_config"], app.BILINGUAL_ENGINE)
+        language.set_value("English").run()
+        photo_settings = next(widget for widget in at.button if widget.label == "Use phone photo settings")
+        with patch("app.has_hindi_ocr", return_value=True):
+            photo_settings.click().run()
+        self.assertEqual(next(widget.value for widget in at.selectbox if widget.label == "OCR language"),
+                         "English + Hindi")
+        self.assertEqual(at.radio[0].value, "auto")
+        self.assertNotIn("analysis", at.session_state)
         # Different file bytes/count trigger the same production invalidation path.
         with patch("test_ui.fixture_uploads", return_value=[FictionalUpload(data=b"new bytes")]):
             at.run()
