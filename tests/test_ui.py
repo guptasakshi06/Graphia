@@ -259,10 +259,19 @@ class StreamlitInteractionTests(unittest.TestCase):
         self.assertEqual((report["submitted_file_count"], report["coverage_percent"], report["readiness_percent"]),
                          (3, 25, 25))
         self.assertEqual(len(at.get("download_button")), 2)
-        self.assertTrue(any("Asha Example" in element.value for element in at.json))
-        self.assertEqual(len(at.get("image")), 14)  # 2 previews + 12 named stages; corrupt stays visible.
+        self.assertIn("Asha Example", at.table[0].value["Value"].tolist())
+        self.assertEqual(len(at.get("image")), 2)  # One upload preview and one image stage.
+        stage = next(widget for widget in at.selectbox if widget.label == "Image stage")
+        self.assertEqual(stage.options, [name.title() for name in app.STAGES])
+        stage.set_value("thresholded").run()
+        self.assertIn("analysis", at.session_state)
+        document = next(widget for widget in at.selectbox if widget.label == "Document")
+        self.assertEqual(len(document.options), 3)
+        document.set_value(2).run()
+        self.assertTrue(any("corrupt" in error.value for error in at.error))
+        self.assertIn("analysis", at.session_state)
         for mutate in (
-            lambda ui: ui.selectbox[2].set_value("adaptive"),
+            lambda ui: next(widget for widget in ui.selectbox if widget.label == "Threshold").set_value("adaptive"),
             lambda ui: ui.multiselect[0].set_value(["income_certificate"]),
             lambda ui: ui.radio[0].set_value("original"),
         ):
