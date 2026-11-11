@@ -9,7 +9,7 @@ from datetime import date
 import re
 
 from modules.classification import (GRADE_SHEET_HEADING, HINDI_CASTE_HEADING, OBC_CERTIFICATE_HEADING,
-                                    PAN_CARD_HEADING, SC_CERTIFICATE_HEADING)
+                                    PAN_NUMBER, SC_CERTIFICATE_HEADING, find_pan_heading)
 
 
 FIELD_KEYS = ("student_name", "certificate_number", "application_id", "issue_date")
@@ -20,7 +20,6 @@ DETAIL_LABELS = {
     "income_amount": "Income amount",
     "caste_category": "Caste category",
 }
-PAN_NUMBER = re.compile(r"(?<!\w)[A-Z]{5}[0-9]{4}[A-Z](?!\w)")
 AMOUNT = r"(?:[0-9]{1,3}(?:,[0-9]{2})*,[0-9]{3}|[0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)(?:\.[0-9]{1,2})?"
 RUPEES = r"(?:₹|Rs\.?|INR|रु\.?|रू\.?|रुपये)"
 INCOME_PERIODS = {
@@ -132,7 +131,7 @@ def _validate_holder(raw_value, doc_type):
 
 def extract_document_details(text, doc_type):
     """Return optional document-specific values separately from checklist fields."""
-    if doc_type == "identity_proof" and PAN_CARD_HEADING.search(text):
+    if doc_type == "identity_proof" and find_pan_heading(text):
         numbers = set(PAN_NUMBER.findall(text.upper()))
         return {"pan_number": next(iter(numbers)) if len(numbers) == 1 else None}
 
@@ -239,7 +238,7 @@ def extract_fields(text, doc_type):
             if match:
                 candidates["student_name"].append(_validate_holder(match.group("value"), doc_type))
 
-    if doc_type == "identity_proof" and PAN_CARD_HEADING.search(text):
+    if doc_type == "identity_proof" and find_pan_heading(text):
         lines = [line.strip() for line in text.splitlines() if line.strip()]
         for line, next_line in zip(lines, [*lines[1:], ""]):
             if match := PAN_NAME_PATTERN.fullmatch(line):

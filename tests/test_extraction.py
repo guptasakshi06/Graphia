@@ -14,6 +14,17 @@ EMPTY_FIELDS = dict.fromkeys(FIELD_KEYS)
 
 
 class ExtractionTests(unittest.TestCase):
+    def test_short_pan_heading_requires_issuer_and_separate_number(self):
+        heading = "Income Tax Department\nGovernment of India\nPermanent Account Number\n"
+        pan = heading + "\nZZZPK5826Z\nName: Arjun Sample"
+        self.assertEqual(classify_document(pan)["doc_type"], "identity_proof")
+        self.assertEqual(extract_document_details(pan, "identity_proof"), {"pan_number": "ZZZPK5826Z"})
+        self.assertEqual(extract_fields(pan, "identity_proof")["student_name"], "Arjun Sample")
+        self.assertIsNone(extract_document_details(pan + "\nBBBBB0000B", "identity_proof")["pan_number"])
+        for text in (heading, "Permanent Account Number\nZZZPK5826Z",
+                     "Income Tax Department\nTax Return\nPermanent Account Number: ZZZPK5826Z"):
+            self.assertEqual(classify_document(text)["doc_type"], "unknown")
+
     def test_document_specific_details_and_conflicts(self):
         pan = "Permanent Account Number Card\nAAAAA0000A"
         self.assertEqual(extract_document_details(pan, "identity_proof"), {"pan_number": "AAAAA0000A"})
