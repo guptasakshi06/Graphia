@@ -8,10 +8,6 @@ Graphia helps students review scholarship application documents before submissio
 
 **[Launch Graphia on Streamlit](https://9vqvn98mcqbgmps2tuhfwc.streamlit.app/)** · [Try it with fictional documents](#try-the-demo)
 
-![Graphia upload dashboard with document requirements and analysis controls](outputs/screenshots/graphia-current-ui.png)
-
-*Graphia dashboard captured from the current local app.*
-
 ## Project team
 
 | Team member | Contributions |
@@ -40,7 +36,7 @@ The bundled checklist looks for an income amount, a caste category, a student na
 
 ## Try the demo
 
-1. Open the [Streamlit app](https://9vqvn98mcqbgmps2tuhfwc.streamlit.app/) and download a clear fictional sample from the [sample dataset](dataset/README.md).
+1. Generate fictional samples locally with `python scripts/create_sample_dataset.py` after setup below. Open the [Streamlit app](https://9vqvn98mcqbgmps2tuhfwc.streamlit.app/) and choose a clear image from the generated `dataset/` folder.
 2. Upload the image and select **Analyze documents**. Review the detected type, image stages, and OCR output.
 3. Add or remove a document and analyze again to see how coverage and readiness change. Some older fictional samples lack fields in the current checklist and may appear as detected but unusable.
 4. Download a JSON or Markdown report. Use fictional documents for the hosted demo and for shared screenshots or reports.
@@ -69,20 +65,13 @@ Open the local URL printed by Streamlit. For supported bilingual forms, install 
 | [app.py](app.py) | Streamlit upload, analysis, and reporting interface |
 | [modules/](modules/) | OpenCV and NumPy preprocessing, Pytesseract OCR, classification, field extraction, and readiness logic |
 | [config/](config/) | Checklist and readability settings |
-| [dataset/](dataset/) | Eight fictional images and reference transcripts |
 | [scripts/](scripts/) and [tests/](tests/) | Environment checks, OCR evaluation, and automated tests |
-| [docs/](docs/) and [outputs/](outputs/) | Academic materials, experiment results, screenshots, and sample reports |
 
-## Evaluation and project materials
-
-In the eight-image fictional dataset, original-image OCR and the preprocessing pipeline selected as the default for that experiment both had a pooled character error rate of 0%. Some alternative settings damaged text, including a global threshold that blanked the faint income certificate. The experiment covered four generated layouts and their degraded variants. [Experiment summary](outputs/experiments/SG05/summary.csv)
-
-Run the automated tests from the activated virtual environment.
+## Run tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-- [Architecture diagram](docs/diagrams/architecture.png) and [workflow diagram](docs/diagrams/workflow.png)
-- [Academic report](docs/project_report.pdf) and [presentation](docs/project_042_presentation.pptx)
-- [Browser validation and evidence](docs/merge/M02.md) and [delivery manifest](docs/DELIVERY.md)
+Tests that require the local sample dataset or saved project evidence skip when
+those files are absent. The app runs without those files.

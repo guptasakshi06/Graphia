@@ -159,6 +159,8 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(source, "processed")
         retry.assert_not_called()
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_real_rotated_fictional_identity_image_recovers_name(self):
         manifest = json.loads((ROOT / "dataset/manifest.json").read_text())
         sample = next(row for row in manifest["samples"]

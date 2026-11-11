@@ -356,6 +356,8 @@ class ReadinessTests(unittest.TestCase):
         self.assertIn("\\[link\\]", text)
         self.assertNotIn("### [link]", text)
 
+    @unittest.skipUnless((ROOT / "outputs/reports/JB03_fixture_report.json").is_file(),
+                         "requires local project evidence")
     def test_committed_fixture_exports_match_reproducible_results(self):
         report = fixture_report()
         actual_json = json.loads((ROOT / "outputs/reports/JB03_fixture_report.json").read_text(encoding="utf-8"))

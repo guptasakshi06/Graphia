@@ -102,6 +102,8 @@ class OCRContractTests(unittest.TestCase):
 class RealTesseractTests(unittest.TestCase):
     """Do not skip missing setup: SG04 requires the actual system executable."""
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_clear_sample_contains_real_title_and_name(self):
         result = extract_text(load_image(ROOT / "dataset/income_certificate/income_certificate_clear.png"))
         self.assertEqual(result["status"], "ok", result)

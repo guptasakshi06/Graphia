@@ -55,6 +55,8 @@ class CERTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 levenshtein_distance(value, "abc")
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_reference_hash_and_review_checks(self):
         manifest_path = ROOT / "dataset/manifest.json"
         _, _, samples = verified_ocr_samples(manifest_path)
@@ -73,6 +75,8 @@ class CERTests(unittest.TestCase):
         with patch.object(Path, "read_text", changed_read), self.assertRaisesRegex(ValueError, "hash mismatch"):
             verified_ocr_samples(manifest_path)
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_error_saved_with_null_metrics_and_nonzero_cli_signal(self):
         manifest_path = ROOT / "dataset/manifest.json"
         manifest, review, samples = verified_ocr_samples(manifest_path)
@@ -96,6 +100,8 @@ class CERTests(unittest.TestCase):
                 self.assertIsNone(method["mean_cer"])
 
 
+@unittest.skipUnless((ROOT / "outputs/experiments/SG04/metrics.json").is_file(),
+                     "requires local project evidence")
 class SavedOCRAuditTests(unittest.TestCase):
     def test_actual_saved_ocr_images_raw_text_cer_and_summary(self):
         folder = ROOT / "outputs/experiments/SG04"
@@ -148,6 +154,8 @@ class SavedOCRAuditTests(unittest.TestCase):
 class FinalEvaluationTests(unittest.TestCase):
     """Final evidence checks use measured text; no fake OCR enters the app."""
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_no_text_and_engine_failure_have_different_denominators(self):
         from scripts.evaluate_dataset import evaluate_observation, summarize
         _, _, samples = verified_ocr_samples(ROOT / "dataset/manifest.json")
@@ -171,6 +179,8 @@ class FinalEvaluationTests(unittest.TestCase):
         self.assertEqual(totals["type_denominator"], 2)
         self.assertEqual(totals["pooled_cer"], 1)
 
+    @unittest.skipUnless((ROOT / "dataset/visual_review.json").is_file(),
+                         "requires local project evidence")
     def test_field_loss_can_exist_when_type_and_normalized_cer_pass(self):
         from scripts.evaluate_dataset import evaluate_observation
         _, _, samples = verified_ocr_samples(ROOT / "dataset/manifest.json")
@@ -188,6 +198,8 @@ class FinalEvaluationTests(unittest.TestCase):
         self.assertTrue(row["reference_diagnostic"]["rules_pass"])
 
     @unittest.skipUnless((ROOT / ".git").exists(), "frozen source verification requires Git history")
+    @unittest.skipUnless((ROOT / "docs/merge/M02-freeze.json").is_file(),
+                         "requires local project evidence")
     def test_final_measured_sources_match_frozen_commit(self):
         from scripts.evaluate_dataset import SOURCE_FILES
         folder = ROOT / "outputs/experiments/SG05"
@@ -198,6 +210,8 @@ class FinalEvaluationTests(unittest.TestCase):
             source = subprocess.check_output(["git", "show", f"{commit}:{relative}"], cwd=ROOT)
             self.assertEqual(hashlib.sha256(source).hexdigest(), report["source_sha256"][relative], relative)
 
+    @unittest.skipUnless((ROOT / "outputs/experiments/SG05/metrics.json").is_file(),
+                         "requires local project evidence")
     def test_final_artifact_integrity_and_comparison_coverage(self):
         from scripts.evaluate_dataset import COMPARISONS
         from PIL import Image
@@ -223,6 +237,8 @@ class FinalEvaluationTests(unittest.TestCase):
             for figure in report["comparison_figures_per_sample"].values():
                 self.assertTrue((folder / sample_id / figure).is_file())
 
+    @unittest.skipUnless((ROOT / "outputs/experiments/SG05/metrics.json").is_file(),
+                         "requires local project evidence")
     def test_final_saved_pixels_text_measurements_and_rule_outcomes(self):
         from modules.classification import classify_document
         from modules.extraction import extract_fields
@@ -267,6 +283,8 @@ class FinalEvaluationTests(unittest.TestCase):
                 self.assertEqual(row["present_field_correct"], sum(v is not None and v == row["fields"][k]
                                  for k, v in sample["expected_fields"].items()))
 
+    @unittest.skipUnless((ROOT / "outputs/experiments/SG05/metrics.json").is_file(),
+                         "requires local project evidence")
     def test_final_summaries_csv_and_paired_comparisons(self):
         folder = ROOT / "outputs/experiments/SG05"
         report = json.loads((folder / "metrics.json").read_text())
@@ -298,6 +316,8 @@ class FinalEvaluationTests(unittest.TestCase):
             self.assertEqual(float(pair["original_cer"]), matches["original"]["cer"])
             self.assertEqual(float(pair["processed_cer"]), matches["pipeline_default"]["cer"])
 
+    @unittest.skipUnless((ROOT / "outputs/experiments/SG05/metrics.json").is_file(),
+                         "requires local project evidence")
     def test_real_integrated_results_stages_and_readiness(self):
         from modules.readiness import analyze_readiness, render_report
         from modules.preprocessing import run_pipeline
