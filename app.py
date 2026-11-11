@@ -104,13 +104,26 @@ def analyze_uploads(items, options, source, provider, *, bilingual=False):
             except Exception as error:
                 view["error"] = f"Processing failed: {error}"
                 processed = error_ocr(view["error"], engine)
-        selected = original if source == "original" else processed
-        classification = classify_document(selected["text"])
+        selected_source = "original" if source == "original" else "processed"
+        selected = original if selected_source == "original" else processed
+        if source == "auto" and "original" in view["stages"]:
+            from modules.photo_ocr import recover_photo
+
+            selected_source, selected, classification, fields, method = recover_photo(
+                image, original, processed,
+                lambda pixels, settings: call_ocr(extract_text, pixels, settings), engine,
+            )
+            if selected_source == "processed":
+                processed = selected
+            parameters["photo_recovery"] = method
+        else:
+            classification = classify_document(selected["text"])
+            fields = extract_fields(selected["text"], classification["doc_type"])
         records.append({
             "id": item["id"], "filename": item["filename"],
-            "ocr_original": original, "ocr_processed": processed, "ocr_source": source,
+            "ocr_original": original, "ocr_processed": processed, "ocr_source": selected_source,
             "ocr": selected, "classification": classification,
-            "fields": extract_fields(selected["text"], classification["doc_type"]),
+            "fields": fields,
             "processing_parameters": parameters,
         })
         views[item["id"]] = view
@@ -181,6 +194,9 @@ def show_results(result):
             if document["problems"]:
                 st.warning("\n".join(document["problems"]))
             st.write("Extracted fields (selected OCR: " + document["ocr_source"] + ")")
+            photo_method = document["processing_parameters"].get("photo_recovery")
+            if photo_method:
+                st.caption("Auto photo selected " + photo_method + ".")
             st.json({key: value if value is not None else "Not Found / Unreadable"
                      for key, value in document["fields"].items()})
             st.write("Original and processed OCR")
@@ -238,7 +254,12 @@ def main():
         help="Choose English + Hindi for bilingual forms. If the processed text is "
              "less readable, select original as the OCR source.",
     ) == "English + Hindi"
-    source = st.radio("OCR source used for type, fields and readiness", ["processed", "original"], horizontal=True)
+    source = st.radio(
+        "OCR source used for type, fields and readiness", ["processed", "original", "auto"],
+        format_func=lambda value: "Auto photo" if value == "auto" else value,
+        horizontal=True,
+        help="Auto photo tries to crop the page and correct sideways photos when the standard OCR misses fields.",
+    )
     uploads = st.file_uploader("Document images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     items = collect_uploads(uploads)
     signature = input_signature(items, options, required, source, config, bilingual=bilingual)

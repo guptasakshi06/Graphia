@@ -145,6 +145,20 @@ class OrchestrationTests(unittest.TestCase):
             self.assertEqual(records[0]["classification"]["doc_type"], "marksheet" if source == "original" else "unknown")
             self.assertIn("failure", views[self.items[0]["id"]]["error"])
 
+    def test_real_rotated_fictional_identity_image_recovers_name(self):
+        manifest = json.loads((ROOT / "dataset/manifest.json").read_text())
+        sample = next(row for row in manifest["samples"]
+                      if row["doc_type"] == "identity_proof" and row["condition"] == "clear")
+        data = BytesIO()
+        with Image.open(ROOT / "dataset" / sample["image_path"]) as image:
+            image.transpose(Image.Transpose.ROTATE_270).save(data, format="PNG")
+        items = app.collect_uploads([FictionalUpload(data=data.getvalue())])
+        records, _ = app.analyze_uploads(items, OPTIONS, "auto", app.load_real_provider())
+        record = records[0]
+        self.assertEqual(record["classification"]["doc_type"], "identity_proof")
+        self.assertEqual(record["fields"], sample["expected_fields"])
+        self.assertEqual(record["processing_parameters"]["photo_recovery"], "rotated 90° left")
+
     def test_ocr_exception_and_no_text_keep_all_records(self):
         load, pipeline, _ = fixture_provider()
         def broken_ocr(image, **kwargs):

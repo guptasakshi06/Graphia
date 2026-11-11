@@ -14,6 +14,17 @@ EMPTY_FIELDS = dict.fromkeys(FIELD_KEYS)
 
 
 class ExtractionTests(unittest.TestCase):
+    def test_official_title_variants_and_marksheet_holder(self):
+        examples = (
+            ("e - Permanent Account Number (e-PAN) Card\nनाम / Name\nAsha Example", "identity_proof"),
+            ("जाति प्रमाण-पत्र\nApplicant Name: Asha Example", "caste_certificate"),
+            ("Marks Statement-cum-Certificate\nName of Candidate: Asha Example", "marksheet"),
+        )
+        for text, doc_type in examples:
+            with self.subTest(doc_type=doc_type):
+                self.assertEqual(classify_document(text)["doc_type"], doc_type)
+                self.assertEqual(extract_fields(text, doc_type)["student_name"], "Asha Example")
+
     def test_pan_card_uses_the_explicit_holder_label(self):
         heading = "INCOME TAX DEPARTMENT\nPermanent Account Number Card\n"
         for name in ("Name: Asha Example", "Name\nAsha Example", "नाम / Name: Asha Example"):

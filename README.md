@@ -109,6 +109,10 @@ Hindi certificate label. The app still displays both OCR outputs for review.
 The bilingual mode also handles supported Hindi income certificate titles and
 applicant or certificate-number labels. A PAN card with a supported card heading
 and an explicit holder name label counts under **Identity Proof** in the demo.
+For camera photos, choose **Auto photo** as the OCR source. The app can crop
+background, try quarter turns, and read supported UP income form fields from
+separate areas of the same image. The result identifies which method it used.
+The full OCR transcript can still contain errors in small or blurry text.
 
 A type is usable when one candidate has sufficient OCR text and its configured
 fields. Coverage counts detected required types; readiness counts usable types,

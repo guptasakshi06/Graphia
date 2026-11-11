@@ -10,16 +10,30 @@ import re
 
 OBC_CERTIFICATE_HEADING = "form of certificate to be produced by other backward classes"
 PAN_CARD_HEADING = re.compile(
-    r"^[ \t]*(?P<title>permanent\s+account\s+number\s+card|pan\s+card)[ \t]*\r?$",
+    r"^[ \t]*(?P<title>(?:e[ \t]*-[ \t]*)?permanent\s+account\s+number"
+    r"(?:\s+\(e[ \t-]*pan\))?\s+card|pan\s+card|(?:ई[ \t]*-[ \t]*)?"
+    r"स्थायी[ \t]+लेखा[ \t]+संख्या[ \t]+कार्ड)[ \t]*\r?$",
     re.IGNORECASE | re.MULTILINE,
 )
 HINDI_INCOME_HEADING = re.compile(
-    r"^[ \t]*(?:कार्यालय[ \t]+तहसीलदार[ \t]+द्वारा[ \t]+प्रदत्त[ \t]+)?"
+    r"^[ \t]*(?:(?:कार्यालय तहसीलदार द्वारा प्रदत्त|"
+    r"आर्थिक रूप से पिछड़े वर्ग के उम्मीदवारों के लिए)[ \t]+)?"
     r"(?P<title>आय[ \t]+प्रमाण[ \t-]*पत्र)[ \t।]*\r?$",
     re.MULTILINE,
 )
+HINDI_CASTE_HEADING = re.compile(
+    r"^[ \t]*(?P<title>जाति[ \t]+प्रमाण[ \t-]*पत्र)[ \t।]*\r?$",
+    re.MULTILINE,
+)
+MARK_STATEMENT_HEADING = re.compile(
+    r"^[ \t]*(?P<title>(?:marks[ \t]+statement|statement[ \t]+of[ \t]+marks)"
+    r"(?:[ \t-]+cum[ \t-]+certificate)?|अंक[ \t-]*पत्र)[ \t।]*\r?$",
+    re.IGNORECASE | re.MULTILINE,
+)
 DOCUMENT_HEADINGS = {
     "income_certificate": HINDI_INCOME_HEADING,
+    "caste_certificate": HINDI_CASTE_HEADING,
+    "marksheet": MARK_STATEMENT_HEADING,
     "identity_proof": PAN_CARD_HEADING,
 }
 
